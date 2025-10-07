@@ -1,12 +1,15 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { spfi, SPFx } from "@pnp/sp";
+import { SPFI, spfi, SPFx } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../../../styles/global.scss";
+import { getSP } from "../../loc/pnpjsConfig";
+import { SITE_URL } from "../../../../Shared/Constant";
+import CustomBreadcrumb from "../common/CustomBreadcrumb";
 
 interface IUser {
   id: number;
@@ -16,28 +19,25 @@ interface IUser {
   mobile?: string;
 }
 
-interface ITeamProfileProps {
-  context: any;
-}
 
-const TeamProfile: React.FC<ITeamProfileProps> = ({ context }) => {
+const TeamProfile= () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+const sp: SPFI = getSP();
  useEffect(() => {
   const fetchUsers = async () => {
     console.log(" useEffect started");
 
     try {
-      if (!context) {
-        console.error(" No SPFx context received");
-        return;
-      }
+      // if (!context) {
+      //   console.error(" No SPFx context received");
+      //   return;
+      // }
 
-      console.log(" SPFx Context received:", context);
+      // console.log(" SPFx Context received:", context);
 
       //  Setup PnP with current SPFx context
-      const sp = spfi().using(SPFx(context));
+      
       console.log(" PnP SP instance created");
 
       console.log(" Fetching site users...");
@@ -69,9 +69,29 @@ const TeamProfile: React.FC<ITeamProfileProps> = ({ context }) => {
   };
 
   fetchUsers();
-}, [context]);
+}, []);
+
+ const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Home",
+
+            "MainComponentURl": "Home",
 
 
+        },
+
+        {
+
+            "MainComponent": "Team Profile",
+
+            "MainComponentURl": "TeamProfile",
+
+
+        }
+
+    ];
   
   return (
     <div className="content">
@@ -80,7 +100,7 @@ const TeamProfile: React.FC<ITeamProfileProps> = ({ context }) => {
           <div className="col-xl-12 col-lg-12">
             <div className="row">
               <div className="col-lg-12 mb-3">
-                <h4 className="page-title fw-bold font-20">Team Profile</h4>
+                {/* <h4 className="page-title fw-bold font-20">Team Profile</h4>
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
                     <a href="dashboard.html">Home</a>
@@ -89,14 +109,16 @@ const TeamProfile: React.FC<ITeamProfileProps> = ({ context }) => {
                     <span className="fe-chevron-right"></span>
                   </li>
                   <li className="breadcrumb-item active">Team Profile</li>
-                </ol>
+                </ol> */}
+                <CustomBreadcrumb Breadcrumb={Breadcrumb} />
               </div>
 
               {/* Main Content */}
               <main>
                 <div className="grid">
                   {users.map((user) => {
-                    const profilePicUrl = `${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?size=L&username=${user.email}`;
+                    const profilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${user.email}`;
+
                     return (
                       <div className="card" key={user.id}>
                         <img

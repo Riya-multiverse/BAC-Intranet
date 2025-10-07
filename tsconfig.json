@@ -17,7 +17,8 @@
     "noUnusedParameters": false,
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/@microsoft"
+      "./node_modules/@microsoft",
+      "./src/customTypings"
     ],
     "types": [
       "webpack-env"
@@ -26,12 +27,12 @@
       "es5",
       "dom",
       "es2015.collection",
-      "es2015.promise"
+      "es2015.promise","es2017"
     ]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx"
-, "src/APIService/LeftNavService.js"  ],
+, "src/APIService/LeftNavService.js" ,"src/APIService/CryptoService.ts" ],
 
 }

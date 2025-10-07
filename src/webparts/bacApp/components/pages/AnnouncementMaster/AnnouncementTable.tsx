@@ -13,13 +13,13 @@ import { SPFI } from "@pnp/sp";
 import { getSP } from "../../../loc/pnpjsConfig";
 import Swal from "sweetalert2";
 
-interface INewsTableProps {
+interface IAnnouncementTableProps {
   onAdd: () => void;
   onEdit: (item: any) => void;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
+const AnnouncementTable = ({ onAdd, onEdit,setLoading }: IAnnouncementTableProps) => {
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -31,23 +31,25 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
   const currentData = newsItems.slice(startIndex, endIndex);
   useEffect(() => {
     setLoading(true);
-    const fetchNews = async () => {
+    const fetchAnnouncements = async () => {
       try {
         const sp: SPFI = getSP();
+        
         const items = await sp.web.lists
           .getByTitle("AnnouncementAndNews")
-          .items.filter("SourceType eq 'News'")
-          .select(
+          .items.filter("SourceType eq 'Announcements'").select(
             "Id",
             "Title",
             "Description",
-            "Category",
+            "AnnouncementCategory/Category",
+            "AnnouncementCategory/Id",
             "Department/DepartmentName",
             "Department/Id",
             "Overview",
+            "FeaturedAnnouncement",
             "Created"
           )
-          .expand("Department")
+          .expand("Department","AnnouncementCategory")
           .orderBy("Created", false)();
 
         console.log(" Raw News items:", items);
@@ -59,8 +61,10 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
           description: item.Description,
           department: item.Department?.DepartmentName || "",
           departmentId: item.Department?.Id || null,
-          category: item.Category || "—",
+           category: item.AnnouncementCategory?.Category || "", 
+           categoryId: item.AnnouncementCategory?.Id || null, 
           overview: item.Overview || "",
+          featured: item.FeaturedAnnouncement || false,
           created: new Date(item.Created).toLocaleDateString(),
         }));
 
@@ -74,7 +78,7 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
       }
     };
 
-    fetchNews();
+    fetchAnnouncements();
   }, [setLoading]);
   const handleDelete = async (id: number) => {
     Swal.fire({
@@ -160,7 +164,7 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
       {/* <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
+          <h4 className="page-title fw-bold mb-1 font-20">Announcement Master</h4>
           <ol className="breadcrumb m-0">
             <li className="breadcrumb-item">
               <a href="settings.html">Settings</a>
@@ -168,7 +172,7 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
             <li className="breadcrumb-item">
               <ChevronRight size={20} color="#000" />
             </li>
-            <li className="breadcrumb-item active">News Master</li>
+            <li className="breadcrumb-item active">Announcement Master</li>
           </ol>
         </div>
         <div className="col-lg-8">
@@ -216,7 +220,7 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
                         >
                           S.No.
                         </th>
-                        <th>News Title</th>
+                        <th>Title</th>
                         <th>Description</th>
                         <th>Department</th>
                         <th>Category</th>
@@ -364,4 +368,4 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
   );
 };
 
-export default NewsTable;
+export default AnnouncementTable;

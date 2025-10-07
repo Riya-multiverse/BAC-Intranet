@@ -1,0 +1,463 @@
+import * as React from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// import '../../../../styles/global.scss';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'material-symbols/index.css';
+// import * as feather from 'feather-icons';
+import { ChevronRight, Edit, Trash2 } from 'react-feather';
+import { faArrowLeft, faEllipsisV, faFileExport, faPlusCircle, faSort } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CustomBreadcrumb from '../../common/CustomBreadcrumb';
+import { SPFI } from "@pnp/sp/presets/all";
+import { getSP } from '../../../loc/pnpjsConfig';
+import * as XLSX from "xlsx";
+interface IQuickLinkTableProps {
+    onAdd: () => void;
+    onEdit: (item: any) => void;
+}
+
+
+
+const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
+    const sp: SPFI = getSP();
+    // const [quickLinkData, setQuickLinkData] = React.useState<any[]>([]);
+    const [QuickLinklistdata, setQuickLinkData] = React.useState<any[]>([]);
+    const [sortConfig, setSortConfig] = React.useState({ key: '', direction: 'ascending' });
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const toggleDropdown = () => {
+
+        setIsOpen(!isOpen);
+
+    };
+    const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Home",
+
+            "MainComponentURl": "Home",
+
+
+        },
+
+        {
+
+            "MainComponent": "Quick Link",
+
+            "MainComponentURl": "QuickLinkMaster",
+
+
+        }
+
+    ];
+
+    React.useEffect(() => {
+        ApiCall();
+    });
+
+    const ApiCall = async () => {
+        let QuickLinkArr: any[] = [];
+
+        QuickLinkArr = await getQuickLinkList();
+
+
+        setQuickLinkData(QuickLinkArr);
+
+    };
+
+
+
+
+    const getQuickLinkList = async () => {
+        let arr: any[] = []
+        const currentUser = await sp.web.currentUser();
+
+        //   if (isSuperAdmin == "Yes") {
+        await sp.web.lists.getByTitle("QuickLinks").items.select("*,QuickLinksID/ID,Department/ID,Department/DepartmentName").expand("QuickLinksID,Department").orderBy("Created", false).getAll()
+            .then((res) => {
+
+                arr = res;
+            })
+            .catch((error) => {
+                console.log("Error fetching data: ", error);
+            });
+
+        return arr;
+    }
+    const [filters, setFilters] = React.useState({
+        SNo: '',
+        Title: '',
+        URL: '',
+        RedirectToNewTab: '',
+        Department: {ID:'',DepartmentName:''},
+        IsActive: ''
+
+    });
+    const applyFiltersAndSorting = (data: any[]) => {
+        // debugger
+        // Filter data
+        const filteredData = data.filter((item, index) => {
+            return (
+                (filters.SNo === '' || String(index + 1).includes(filters.SNo)) &&
+                (filters.Title === '' || item.Title.toLowerCase().includes(filters.Title.toLowerCase())) &&
+                (filters.URL === '' || item.URL.toLowerCase().includes(filters.URL.toLowerCase())) &&
+                // (filters.RedirectToNewTab === '' || String(item.RedirectToNewTab).toLowerCase() === filters.RedirectToNewTab.toLowerCase())&&
+                (filters.RedirectToNewTab === '' || String(item.RedirectToNewTab ? 'Yes' : 'No').toLowerCase() === filters.RedirectToNewTab.toLowerCase()) &&
+
+                // (filters?.RedirectToNewTab === '' || item?.RedirectToNewTab?.toLowerCase().includes(filters?.RedirectToNewTab?.toLowerCase()))&&
+                (Object.keys(filters.Department).length === 0 || item.Department?.DepartmentName?.toLowerCase().includes(filters.Department.DepartmentName.toLowerCase())) &&
+                (filters.IsActive === '' || String(item.IsActive ? 'Yes' : 'No').toLowerCase() === filters.IsActive.toLowerCase())
+
+                // (filters?.IsActive === '' || item?.IsActive?.toLowerCase().includes(filters?.IsActive?.toLowerCase()))
+            );
+        });
+        const sortedData = filteredData.sort((a, b) => {
+            if (sortConfig.key === 'SNo') {
+                // Sort by index
+                const aIndex = data.indexOf(a);
+                const bIndex = data.indexOf(b);
+
+                return sortConfig.direction === 'ascending' ? aIndex - bIndex : bIndex - aIndex;
+            } else if (sortConfig.key) {
+                // Sort by other keys
+                const aValue = a[sortConfig.key] ? a[sortConfig.key].toLowerCase() : '';
+                const bValue = b[sortConfig.key] ? b[sortConfig.key].toLowerCase() : '';
+
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+            }
+            return 0;
+        });
+        return sortedData;
+    };
+
+    const filteredQuickLinkData = applyFiltersAndSorting(QuickLinklistdata);
+
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredQuickLinkData.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber: any) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = filteredQuickLinkData.slice(startIndex, endIndex);
+    const handleSortChange = (key: string) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [field]: e.target.value // Update other fields normally
+        }));
+    };
+
+    //#region Download exl file
+    const handleExportClick = () => {
+        const exportData = currentData.map((item, index) => ({
+            // 'S.No.': startIndex + index + 1,
+            // 'Title': item.Title,
+            // 'Url': item.Url,
+
+            // 'Status': item.Status,
+            // 'Submitted Date': item.Created,
+            "S.No.": startIndex + index + 1,
+
+            Title: item.Title,
+
+            URL: item.URL,
+            Department: item.Department.DepartmentName,
+
+            "Redirect to new tab": item.RedirectToNewTab,
+
+            Active: item.IsActive,
+
+            "Submitted Date": item.Created,
+        }));
+
+        exportToExcel(exportData, "Quick Links");
+    };
+    const exportToExcel = (data: any[], fileName: string) => {
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        XLSX.writeFile(workbook, `${fileName}.xlsx`);
+    };
+    //#endregion
+
+
+    return (
+        <>
+
+            {/* // <!-- start page title --> */}
+            <div className="row">
+                <div className="col-lg-4">
+                    <CustomBreadcrumb Breadcrumb={Breadcrumb} />
+                    
+                </div>
+                <div className="col-lg-8">
+                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+                        <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
+
+
+
+                            <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={onAdd}><i className="fe-arrow-left me-1"></i>Back</button>
+
+                            <button type="button" className="btn btn-primary waves-effect waves-light" onClick={onEdit}><i className="fe-plus-circle me-1"></i>Add</button>
+
+
+                           </form>
+
+
+
+                    </div>
+                </div>
+
+
+            </div>
+            {/* // <!-- end page title --></> */}
+            <div className="card cardCss mt-4 mb-0">
+                <div className="card-body">
+                    <div id="cardCollpase4" className="collapse show">
+                        <div className="table-responsive pt-0">
+                            <table className="mtbalenew mt-0 table-centered table-nowrap table-borderless mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style={{
+                                            borderBottomLeftRadius: '0px', minWidth: '40px',
+                                            maxWidth: '40px', borderTopLeftRadius: '0px'
+                                        }}>
+                                            <div className="d-flex pb-2"
+                                                style={{ justifyContent: 'space-between' }}>
+                                                <span>S.No.</span>
+                                                <span onClick={() => handleSortChange('SNo')}>
+                                                    <FontAwesomeIcon icon={faSort} />
+                                                </span>
+                                            </div>
+                                            <div className="bd-highlight">
+                                                <input
+                                                    type="text"
+                                                    placeholder="SNo"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                            e.preventDefault(); // Prevents the new line in textarea
+                                                        }
+                                                    }}
+                                                    onChange={(e) => handleFilterChange(e, 'SNo')}
+                                                    className="inputcss"
+                                                    style={{ width: '100%' }}
+                                                />
+                                            </div>
+                                        </th>
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Title</span>  <span onClick={() => handleSortChange('Title')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Title" onChange={(e) => handleFilterChange(e, 'Title')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >URL</span>  <span onClick={() => handleSortChange('URL')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by URL" onChange={(e) => handleFilterChange(e, 'URL')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+
+                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Department</span>  <span onClick={() => handleSortChange('Department')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Department" onChange={(e) => handleFilterChange(e, 'Entity')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+
+
+
+                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Redirect to other tab</span>  <span onClick={() => handleSortChange('RedirectToNewTab')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Redirect" onChange={(e) => handleFilterChange(e, 'RedirectToNewTab')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Active</span>  <span onClick={() => handleSortChange('IsActive')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Active" onChange={(e) => handleFilterChange(e, 'IsActive')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+
+
+                                        <th style={{ textAlign: 'center', minWidth: '80px', maxWidth: '80px', borderBottomRightRadius: '0px', borderTopRightRadius: '0px' }}> <div className="d-flex flex-column bd-highlight pb-2">
+
+                                            <div className="d-flex  pb-2" style={{ justifyContent: 'space-evenly' }}>  <span >Action</span> <div className="dropdown">
+
+                                                <FontAwesomeIcon icon={faEllipsisV} onClick={toggleDropdown} size='xl' />
+
+                                            </div>
+
+                                            </div>
+
+                                            <div className=" bd-highlight">   <div id="myDropdown" className={`dropdown-content ${isOpen ? 'show' : ''}`}>
+
+                                                <div onClick={handleExportClick} className="" >
+
+                                                    <FontAwesomeIcon icon={faFileExport} />  Export
+
+                                                </div>
+
+                                            </div></div>
+
+
+                                        </div>
+
+                                            <div style={{ height: '32px' }}></div>
+
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody style={{ maxHeight: '5000px' }}>
+                                    {currentData.length === 0 ?
+                                        (
+                                            <div className="no-results" style={{ display: 'flex', justifyContent: 'center' }}>No results found</div>
+                                        )
+                                        :
+                                        currentData.map((item, index) => {
+                                            // const ImageUrl = item.BannerImage == undefined || item.BannerImage == null ? "" : JSON.parse(item.BannerImage);
+                                            return (
+                                                <tr key={index}>
+                                                    <td style={{ minWidth: '40px', maxWidth: '40px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.Title}</td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.URL}</td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item?.Department?.DepartmentName}</td>
+                                                    <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.RedirectToNewTab ? "Yes" : "No"} </div> </td>
+                                                    <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.IsActive ? "Yes" : "No"} </div> </td>
+                                                    {/* <td style={{ minWidth: '80px', maxWidth: '80px' }} className="ng-binding">
+                                                        <div className="d-flex  pb-0" style={{ justifyContent: 'center', gap: '5px' }}>
+                                                            <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={onAdd}><i className="fe-arrow-left me-1"></i>Back</button>
+                                                            <button type="button" className="btn btn-primary waves-effect waves-light" onClick={onEdit}><i className="fe-plus-circle me-1"></i>Add</button>
+                                                            
+                                                        </div>
+                                                    </td> */}
+                                                    <td style={{ minWidth: "50px", maxWidth: "50px" }} className="ng-binding">
+                                                        {/* Edit button */}
+                                                        <a href="edit-news.html" className="action-icon text-primary">
+                                                            <Edit size={16} />
+                                                        </a>
+
+                                                        {/* Trash button */}
+                                                        <a href="javascript:void(0);" className="action-icon text-danger">
+                                                            <Trash2 size={16} />
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+                                </tbody>
+                            </table>
+
+
+                            <nav className="pagination-container">
+                                <ul className="pagination">
+                                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                        <a
+                                            className="page-link"
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            aria-label="Previous"
+                                        >
+                                            «
+                                        </a>
+                                    </li>
+                                    {Array.from({ length: totalPages }, (_, num) => (
+                                        <li
+                                            key={num}
+                                            className={`page-item ${currentPage === num + 1 ? 'active' : ''}`}
+                                        >
+                                            <a
+                                                className="page-link"
+                                                onClick={() => handlePageChange(num + 1)}
+                                            >
+                                                {num + 1}
+                                            </a>
+                                        </li>
+                                    ))}
+                                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                        <a
+                                            className="page-link"
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            aria-label="Next"
+                                        >
+                                            »
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export default QuickLinkTable

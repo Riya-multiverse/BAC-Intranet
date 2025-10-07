@@ -1,6 +1,6 @@
 import * as React from 'react'
-import NewsForm from './NewsForm'
-import NewsTable from './NewsTable'
+import AnnouncementForm from './AnnouncementForm'
+import AnnouncementTable from './AnnouncementTable'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../../../../styles/global.scss';
@@ -8,7 +8,7 @@ import '../../../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 
-const News = () => {
+const Announcement = () => {
 
      const [showForm, setShowForm] = React.useState(false);
   const [editItem, setEditItem] = React.useState<any>(null); 
@@ -54,14 +54,14 @@ const News = () => {
           </span>
         </div>
       )}
-      {/* <h2>News Master</h2> */}
+      {/* <h2>Announcement Master</h2> */}
       {showForm ? (
-        <NewsForm item={editItem} onCancel={handleCancel} onSave={handleSave} setLoading={setLoading}/>
+        <AnnouncementForm item={editItem} onCancel={handleCancel} onSave={handleSave} setLoading={setLoading}/>
       ) : (
-        <NewsTable onAdd={handleAdd} onEdit={handleEdit} setLoading={setLoading} />
+        <AnnouncementTable onAdd={handleAdd} onEdit={handleEdit} setLoading={setLoading} />
       )}
     </div>
   )
 }
 
-export default News
+export default Announcement

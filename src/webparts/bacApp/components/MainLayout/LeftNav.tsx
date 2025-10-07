@@ -8,6 +8,10 @@ import { getSP } from '../../loc/pnpjsConfig';
 import { SPFI } from '@pnp/sp';
 import "@pnp/sp/items/get-all";
 // import { getLeftNavitems } from '../../../../APIService/LeftNavService';
+import { FaHome, FaCog, FaNewspaper ,FaWifi } from "react-icons/fa";
+import { GrAnnounce } from "react-icons/gr";
+import { CgProfile } from "react-icons/cg";
+import { Link ,NavLink } from 'react-router-dom';
 
 
 interface ILeftNavProps {
@@ -18,42 +22,175 @@ interface ILeftNavProps {
 
 const LeftNav: React.FC<ILeftNavProps> = ({ isCollapsed }) => {
   const sp: SPFI = getSP();
+  const [navItems, setnavItems] = React.useState([]);
 
   React.useEffect(() => {
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
- const getLeftNavitems = async () => {
+  const getLeftNavitems = async () => {
+    const currentUser = await sp.web.currentUser();
 
-    let arr: any[] = []
-    let arrs: any[] = []
-    let bannerimg: any[] = []
+    // Get groups for the current user
+    const userGroups = await sp.web.currentUser.groups();
+
+    // console.log("userGroups", userGroups);
+    let grptitle: String[] = [];
+    for (var i = 0; i < userGroups.length; i++) {
+      grptitle.push(userGroups[i].Title.toLowerCase());
+    }
+
+    let arr: any = []
+    // let arrs: any[] = []
+    // let bannerimg: any[] = []
     await sp.web.lists.getByTitle("BACSidebarNavigation").
-    items.select("*").filter("IsActive eq 1").getAll()
-      .then((res:any) => {
-        console.log(res, ' let arrs=[]');
-       
- 
+      items.select("Title,Url,Icon,ParentID,ID,EnableAudienceTargeting,Audience/Title,Audience/ID , IsActive,Order0").expand("Audience").filter("IsActive eq 1").orderBy("Order0",true).getAll()
+      .then((res: any) => {
+        // console.log(res, ' let arrs=[]');
+
+
         //  arr.push(res)
-        arr = res;
+        // arr = res;
+        let securednavitems = res.filter((nav: any) => {
+          return (!nav.EnableAudienceTargeting || (nav.EnableAudienceTargeting && nav.Audience && nav.Audience.some((nv1: any) => { return grptitle.includes(nv1.Title.toLowerCase()) || nv1.ID == currentUser.Id })))
+        }
+        );
+
+        arr = securednavitems;
+
       })
+
       .catch((error: any) => {
         console.log("Error fetching data: ", error);
       });
-    console.log(arr, 'arr');
+    // console.log(arr, 'arr');
     return arr;
   }
-const fetchData = async () => {
-  try {
-    const sideNav = await getLeftNavitems();
-  } catch (error) {
-    console.error('Error fetching data:', error);
+  const fetchData = async () => {
+    try {
+      const sideNav = await getLeftNavitems();
+      // console.table(sideNav);
+      setnavItems(sideNav)
+
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const getIcon = (iconName: string) => {
+    const iconMap: { [key: string]: any } = {
+      home: FaHome,
+      setting: FaCog,
+      news: FaNewspaper,
+      announcement: GrAnnounce,
+      profile: CgProfile,
+      wifi:FaWifi 
+     
+    };
+    return iconMap[iconName] || null; // Return null if icon is not found
+  };
+
+  const renderNavItems = (items: any, parentId: number | null = null) => {
+    return items
+      .filter((item: any) => item.ParentID === parentId)
+      .map((item: any, index: number) => {
+        const IconComponent = getIcon(item.Icon); // Get the icon component dynamically
+        const hasChildren = items.some((child: any) => child.ParentID === item.ID);
+        const collapseId = `menu-${item.ID}`;
+        return (
+
+          // <li key={index} className="menu-item" >
+          //   {/* <a href={item.Url} className="menu-link" > */}
+          //   <a href="#menuTasks6" data-bs-toggle="collapse" className="menu-link">
+          //     <span className="menu-icon">
+          //       {IconComponent && <IconComponent size={18} />}
+          //     </span>
+          //     <span className="menu-text">{item.Title}</span>
+          //     <i className="material-symbols-outlined font-16 ms-1">expand_more</i>
+          //   </a>
+          //   <div className="collapse" id="menuTasks6">
+          //     <ul className="sub-menu">
+          //       <li className="menu-item">
+          //         <a href="about-the-department.html" className="menu-link">
+          //           <span className="menu-text">About the Department</span>
+          //         </a>
+          //       </li>
+          //       <li className="menu-item">
+          //         <a href="Section-Overview.html" className="menu-link">
+          //           <span className="menu-text">Section Overview</span>
+          //         </a>
+          //       </li>
+
+          //       <li className="menu-item">
+          //         <a href="team-profile.html" className="menu-link">
+          //           <span className="menu-text">Team Profile</span>
+          //         </a>
+          //       </li>
+
+          //       <li className="menu-item">
+          //         <a href="upeventnew.html" className="menu-link">
+          //           <span className="menu-text">Upcoming Events </span>
+          //         </a>
+          //       </li>
+          //       <li className="menu-item">
+          //         <a href="Suggestions.html" className="menu-link">
+          //           <span className="menu-text">Suggestions </span>
+          //         </a>
+          //       </li>
+          //       <li className="menu-item">
+          //         <a href="Employee-Recognition.html" className="menu-link">
+          //           <span className="menu-text">Employee Recognition </span>
+          //         </a>
+          //       </li>
+
+          //     </ul>
+          //   </div>
+          // </li>
+          <li key={item.ID || index} className="menu-item">
+            {hasChildren ? (
+              <>
+                <a
+                  href={`#${collapseId}`}
+                  data-bs-toggle="collapse"
+                  className="menu-link"
+                >
+                  <span className="menu-icon">
+                    {IconComponent && <IconComponent size={18} />}
+                  </span>
+                  <span className="menu-text">{item.Title}</span>
+                  <i className="material-symbols-outlined font-16 ms-1">
+                    expand_more
+                  </i>
+                </a>
+
+                <div className="collapse" id={collapseId}>
+                  <ul className="sub-menu">
+                    {renderNavItems(items, item.ID)}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              // <a href={item.Url} className="menu-link">
+               <NavLink  to={item.Url} className={({ isActive }) => isActive ? 'menu-link active' : 'menu-link'}> 
+                <span className="menu-icon">
+                  {IconComponent && <IconComponent size={18} />}
+                </span>
+                <span className="menu-text">{item.Title}</span>
+              
+             </NavLink > 
+              //  </a>
+            )}
+          </li>
+        )
+      })
   }
-};
+
   return (
     // <!-- menu-left -->
-     <div className={` scrollbar mt-1 left-nav ${isCollapsed ? 'collapsed' : ''}`}>
-    {/* // <div className="scrollbar mt-1"> */}
+    <nav>
+    <div className={` scrollbar mt-1 left-nav ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* // <div className="scrollbar mt-1"> */}
 
       {/* <!-- User box --> */}
       {/* <div className="user-box text-center">
@@ -95,229 +232,29 @@ const fetchData = async () => {
       <ul className="menu">
 
 
-        <li className="menu-item">
-          <a href="dashboard.html" className="menu-link" >
-            <span className="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-airplay"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg></span>
-            <span className="menu-text"> Home </span>
 
-          </a>
-          
-        </li>
+        {/* {navItems.map((item: any, index: number) => {
+          const IconComponent = getIcon(item.Icon);
+          return (
+            <li key={index} className="menu-item">
+              <a href={item.Url} className="menu-link">
+                <span className="menu-icon">
+                  {IconComponent && <IconComponent size={18} />}
+                </span>
+                <span className="menu-text">{item.Title}</span>
+              </a>
+            </li>
+          );
+        })} */}
+        {renderNavItems(navItems)}
 
-
-       
-        <li className="menu-item">
-          <a href="news-feed.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-file font-16"></i></span>
-            <span className="menu-text"> News </span>
-
-          </a>
-
-        </li>
-        <li className="menu-item">
-          <a href="announcements.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-bell font-16"></i></span>
-            <span className="menu-text"> Announcements </span>
-
-          </a>
-
-        </li>
-        {/* <li className="menu-item">
-          <a href="Strategy-dashboard.html" className="menu-link">
-            <span className="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></span>
-            <span className="menu-text"> Strategy </span>
-
-          </a>
-
-        </li> */}
-        <li className="menu-item">
-          <a href="#menuTasks6" data-bs-toggle="collapse" className="menu-link">
-            <span className="menu-icon"><i className="fe-user"></i></span>
-
-            <span className="menu-text"> Department Profile</span>
-            <i className="material-symbols-outlined font-16 ms-1">expand_more</i>
-          </a>
-          <div className="collapse" id="menuTasks6">
-            <ul className="sub-menu">
-              <li className="menu-item">
-                <a href="about-the-department.html" className="menu-link">
-                  <span className="menu-text">About the Department</span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="Section-Overview.html" className="menu-link">
-                  <span className="menu-text">Section Overview</span>
-                </a>
-              </li>
-
-              <li className="menu-item">
-                <a href="team-profile.html" className="menu-link">
-                  <span className="menu-text">Team Profile</span>
-                </a>
-              </li>
-
-              <li className="menu-item">
-                <a href="upeventnew.html" className="menu-link">
-                  <span className="menu-text">Upcoming Events </span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="Suggestions.html" className="menu-link">
-                  <span className="menu-text">Suggestions </span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="Employee-Recognition.html" className="menu-link">
-                  <span className="menu-text">Employee Recognition </span>
-                </a>
-              </li>
-
-            </ul>
-          </div>
-        </li>
-
-        <li className="menu-item">
-          <a href="#menuTasks16" data-bs-toggle="collapse" className="menu-link">
-            <span className="menu-icon"><i data-feather="rss"></i></span>
-
-            <span className="menu-text"> Resource Libraries</span>
-            <i className="material-symbols-outlined font-16 ms-1">expand_more</i>
-          </a>
-          <div className="collapse" id="menuTasks16">
-            <ul className="sub-menu">
-              <li className="menu-item">
-                <a href="resdash.html" className="menu-link">
-                  <span className="menu-text">Dashboard</span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="policyproce.html" className="menu-link">
-                  <span className="menu-text">Policy and Procedures</span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="bacannualpl.html" className="menu-link">
-                  <span className="menu-text">BAC Annual Planning</span>
-                </a>
-              </li>
-
-              <li className="menu-item">
-                <a href="Trainingmate.html" className="menu-link">
-                  <span className="menu-text">Training Materials </span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="Templates.html" className="menu-link">
-                  <span className="menu-text">Templates and Forms </span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="faqn.html" className="menu-link">
-                  <span className="menu-text">FAQ </span>
-                </a>
-              </li>
-
-              <li className="menu-item">
-                <a href="contact-info.html" className="menu-link">
-                  <span className="menu-text">Contact Information </span>
-                </a>
-              </li>
-
-            </ul>
-          </div>
-        </li>
-
-        {/* <li className="menu-item">
-          <a href="innovation.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-sunrise font-16"></i></span>
-            <span className="menu-text"> Innovation </span>
-
-          </a>
-
-        </li> */}
-        {/* <li className="menu-item">
-          <a href="pmo.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-file-text font-16"></i></span>
-            <span className="menu-text"> PMO  </span>
-
-          </a>
-
-        </li> */}
-        {/* <li className="menu-item">
-          <a href="ims.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-users font-16"></i></span>
-            <span className="menu-text"> IMS
-            </span>
-
-          </a>
-
-        </li> */}
-
-        <li className="menu-item">
-          <a href="pages-gallery-old.html" className="menu-link">
-            <span className="menu-icon"><i className="fe-image font-16"></i></span>
-            <span className="menu-text"> Photo Gallery </span>
-
-          </a>
-
-        </li>
-
-
-        {/* <li className="menu-item">
-          <a href="#menuTasks" data-bs-toggle="collapse" className="menu-link">
-            <span className="menu-icon"><i data-feather="rss"></i></span>
-
-            <span className="menu-text"> Support Initiative</span>
-            <i className="material-symbols-outlined font-16 ms-1">expand_more</i>
-          </a>
-          <div className="collapse" id="menuTasks">
-            <ul className="sub-menu">
-              <li className="menu-item">
-                <a href="digital-transformation.html" className="menu-link">
-                  <span className="menu-text">Digital Transformation</span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="hse.html" className="menu-link">
-                  <span className="menu-text">HSE</span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="csr.html" className="menu-link">
-                  <span className="menu-text">CSR </span>
-                </a>
-              </li>
-              <li className="menu-item">
-                <a href="training.html" className="menu-link">
-                  <span className="menu-text">Training </span>
-                </a>
-              </li>
-
-            </ul>
-          </div>
-        </li> */}
-
-        <li className="menu-item">
-          <a href="projects.html" className="menu-link">
-            <span className="menu-icon"><i data-feather="clipboard"></i></span>
-            <span className="menu-text"> Projects </span>
-
-          </a>
-        </li>
-
-
-        <li className="menu-item">
-          <a href="settings.html" className="menu-link">
-            <span className="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-cpu"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg></span>
-            <span className="menu-text"> Settings  </span>
-          </a>
-        </li>
 
 
       </ul>
 
       <div className="clearfix"></div>
     </div>
+    </nav>
   )
 }
 

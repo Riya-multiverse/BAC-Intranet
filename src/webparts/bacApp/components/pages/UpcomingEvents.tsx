@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { spfi, SPFx } from "@pnp/sp";
+import { SPFI, spfi, SPFx } from "@pnp/sp";
 import { IItem } from "@pnp/sp/items";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 
@@ -10,21 +10,20 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../../../styles/global.scss";
 
 import * as feather from "feather-icons";
+import { getSP } from "../../loc/pnpjsConfig";
+import CustomBreadcrumb from "../common/CustomBreadcrumb";
 
-interface IUpcomingEventsProps {
-  context: WebPartContext;
-}
 
 interface IEventItem {
   EventTitle: string;
   EventDate: string;
 }
 
-const UpcomingEvents: React.FC<IUpcomingEventsProps> = ({ context }) => {
+const UpcomingEvents = () => {
   const [events, setEvents] = useState<IEventItem[]>([]);
 
   useEffect(() => {
-    const sp = spfi().using(SPFx(context));
+    const sp: SPFI = getSP();
 
     const start = new Date();
     start.setHours(0, 0, 0, 0);
@@ -44,11 +43,33 @@ const UpcomingEvents: React.FC<IUpcomingEventsProps> = ({ context }) => {
         setEvents(sorted);
       })
       .catch((error) => console.error(" Error fetching events:", error));
-  }, [context]);
+  }, []);
 
   useEffect(() => {
     feather.replace();
   }, [events]);
+  const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Home",
+
+            "MainComponentURl": "Home",
+
+
+        },
+
+        {
+
+            "MainComponent": "Upcoming Events",
+
+            "MainComponentURl": "UpcomingEvents",
+
+
+        }
+
+    ];
+  
 
   return (
     <div className="content">
@@ -59,7 +80,7 @@ const UpcomingEvents: React.FC<IUpcomingEventsProps> = ({ context }) => {
           <div className="col-xl-12 col-lg-12">
             <div className="row">
               <div className="col-lg-12">
-                <h4 className="page-title fw-bold mb-1 font-20">
+                {/* <h4 className="page-title fw-bold mb-1 font-20">
                   Upcoming Events
                 </h4>
                 <ol className="breadcrumb m-0">
@@ -70,7 +91,8 @@ const UpcomingEvents: React.FC<IUpcomingEventsProps> = ({ context }) => {
                     <span className="fe-chevron-right"></span>
                   </li>
                   <li className="breadcrumb-item active">Upcoming Events</li>
-                </ol>
+                </ol> */}
+                 <CustomBreadcrumb Breadcrumb={Breadcrumb} />
               </div>
             </div>
 

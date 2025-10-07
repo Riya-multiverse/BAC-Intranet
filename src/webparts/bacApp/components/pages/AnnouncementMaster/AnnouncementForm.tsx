@@ -24,14 +24,19 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-interface INewsFormProps {
+interface IAnnouncementFormProps {
   item?: any;
   onCancel: () => void;
   onSave: (data: any) => void;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
+const AnnouncementForm = ({
+  item,
+  onCancel,
+  onSave,
+  setLoading,
+}: IAnnouncementFormProps) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [department, setDepartment] = useState<any>(null);
@@ -39,10 +44,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
   const [category, setCategory] = useState<any>(null);
   const [overview, setOverview] = useState<string>("");
   const [departments, setDepartments] = useState<any[]>([]);
-  const [categories] = useState<any[]>([
-    { value: "Internal", label: "Internal" },
-    { value: "External", label: "External" },
-  ]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [existingThumbnails, setExistingThumbnails] = useState<
     { id: number; name: string; url: string }[]
   >([]);
@@ -52,7 +54,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
   const [showModal, setShowModal] = useState(false);
   const [showFile, setShowFile] = useState(false);
   const [deletedFileIds, setDeletedFileIds] = useState<number[]>([]);
-
+  const [isFeatured, setIsFeatured] = useState<boolean>(false);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const openFile = (fileObj: any, action: "Open" | "Download") => {
     const fileUrl =
@@ -167,9 +169,37 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
     };
 
     fetchDepartments();
+    const fetchCategories = async () => {
+      console.log(
+        "Announcement Fetching categories from AnnouncementCategoryMasterList..."
+      );
+      setLoading(true);
+      try {
+        const sp: SPFI = getSP();
+        const catItems = await sp.web.lists
+          .getByTitle("AnnouncementCategoryMasterList")
+          .items.select("Id", "Category")();
+
+        console.log("Announcement Raw category items:", catItems);
+
+        const catOptions = catItems.map((c: any) => ({
+          value: c.Id,
+          label: c.Category,
+        }));
+
+        console.log(" Transformed category dropdown options:", catOptions);
+        setCategories(catOptions);
+      } catch (err) {
+        console.error(" Error fetching categories:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
   }, [setLoading]);
 
-  //  Validation function for NewsForm
+  //  Validation function for AnnouncementForm
   const validateForm = async () => {
     // Remove previous error highlights
     Array.prototype.slice
@@ -240,7 +270,6 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
     const uploadedIds: number[] = [];
 
     try {
-      //  Step 1: Upload Thumbnails if any
       //  Step 1: Upload thumbnails (new files) with datetime filename
       let uploadedIds: number[] = [];
       if (thumbnails && thumbnails.length > 0) {
@@ -250,7 +279,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
       }
       const finalFileIds = [...existingThumbnailIds, ...uploadedIds];
 
-      // Announcement Step X: Delete files marked for removal from the document library
+      // Announcement : Delete files marked for removal from the document library
       if (deletedFileIds.length > 0) {
         console.log("Announcement Deleting files from library:", deletedFileIds);
         for (const fileId of deletedFileIds) {
@@ -270,11 +299,12 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
       const payload: any = {
         Title: title,
         Description: description,
-        Category: category?.value || "",
+        AnnouncementCategoryId: category?.value || null,
         DepartmentId: department?.value || null,
         AnnouncementandNewsImageIDId: finalFileIds,
         Overview: overview,
-        SourceType: "News",
+        FeaturedAnnouncement: isFeatured ? "Yes" : "No",
+         SourceType: "Announcements",
       };
 
       console.log(
@@ -403,7 +433,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
         };
         setDepartment(deptOption);
       } else if (item.department && item.departmentId) {
-        // fallback if your API uses lowercase keys
+        // fallback if API uses lowercase keys
         const deptOption = {
           value: item.departmentId,
           label: item.department,
@@ -414,18 +444,27 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
         setDepartment(null);
       }
 
-      if (item.category) {
-        const matchedCat =
-          categories.filter((c: any) => c.value === item.category)[0] || null;
-
-        setCategory(matchedCat || null);
+      if (item.AnnouncementCategory && item.AnnouncementCategory.Id) {
+        const catOption = {
+          value: item.AnnouncementCategory.Id,
+          label: item.AnnouncementCategory.Category,
+        };
+        setCategory(catOption);
+      } else if (item.categoryId && item.category) {
+        const catOption = {
+          value: item.categoryId,
+          label: item.category,
+        };
+        setCategory(catOption);
+      } else {
+        setCategory(null);
       }
 
       const fetchExistingThumbnails = async () => {
         if (!item || !item.id) return;
         const sp = getSP();
 
-        console.log(" Fetching existing images for News ID:", item.id);
+        console.log(" Fetching existing images for Announcement ID:", item.id);
 
         try {
           // Step 1: Get lookup IDs from main list
@@ -479,6 +518,13 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
 
       fetchExistingThumbnails();
     }
+
+if (item.FeaturedAnnouncement === "Yes" || item.featured === "Yes" || item.featured === true) {
+  setIsFeatured(true);
+} else {
+  setIsFeatured(false);
+}
+
   }, [item]);
   //  Helper: Remove datetime prefix from file name for display
   const getNewFileName = (fileName: string): string => {
@@ -510,7 +556,9 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
       {/* // <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
+          <h4 className="page-title fw-bold mb-1 font-20">
+            Announcement Master
+          </h4>
           <ol className="breadcrumb m-0">
             <li className="breadcrumb-item">
               <a href="settings.html">Settings</a>
@@ -520,7 +568,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
               <ChevronRight size={20} color="#000" />
             </li>
 
-            <li className="breadcrumb-item active">News Master</li>
+            <li className="breadcrumb-item active">Announcement Master</li>
           </ol>
         </div>
         <div className="col-lg-8">
@@ -550,7 +598,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
                 <div className="col-lg-6">
                   <div className="mb-3">
                     <label htmlFor="simpleinput" className="form-label">
-                      News Title<span className="text-danger">*</span>
+                      Title<span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -603,7 +651,8 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
                   <div className="mb-3">
                     <div className="d-flex justify-content-between align-items-center mb-1">
                       <label htmlFor="newsThumbnails" className="form-label">
-                        News Gallery <span className="text-danger">*</span>
+                        Announcement Gallery{" "}
+                        <span className="text-danger">*</span>
                       </label>
 
                       {(existingThumbnails.length > 0 ||
@@ -628,77 +677,83 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
                     </div>
 
                     <input
-  type="file"
-  id="newsThumbnails"
-  className="form-control"
-  accept="image/jpeg,image/png,image/jpg"
-  multiple
-  onChange={(e) => {
-    const inputEl = e.target as HTMLInputElement;
-    const files: File[] = e.target.files ? [...(e.target.files as any)] : [];
-    console.log(" Files selected:", files);
+                      type="file"
+                      id="newsThumbnails"
+                      className="form-control"
+                      accept="image/jpeg,image/png,image/jpg"
+                      multiple
+                      onChange={(e) => {
+                        const inputEl = e.target as HTMLInputElement;
+                        const files: File[] = e.target.files
+                          ? [...(e.target.files as any)]
+                          : [];
+                        console.log(" Files selected:", files);
 
-    if (files.length > 0) {
-      const allowedImageTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-      ];
-      const allowedExtensions = [".jpg", ".jpeg", ".png"];
+                        if (files.length > 0) {
+                          const allowedImageTypes = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/jpg",
+                          ];
+                          const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
-      //  Regex for allowed filename pattern
-      const fileNameRegex = /^[A-Za-z0-9]+[A-Za-z0-9 _.-]*[A-Za-z0-9]+(\.[A-Za-z0-9]+)?$/;
+                          //  Regex for allowed filename pattern
+                          const fileNameRegex =
+                            /^[A-Za-z0-9]+[A-Za-z0-9 _.-]*[A-Za-z0-9]+(\.[A-Za-z0-9]+)?$/;
 
-      const invalidFiles = files.filter((file) => {
-        const fileExtension = file.name
-          .substring(file.name.lastIndexOf("."))
-          .toLowerCase();
+                          const invalidFiles = files.filter((file) => {
+                            const fileExtension = file.name
+                              .substring(file.name.lastIndexOf("."))
+                              .toLowerCase();
 
-        const fileTypeValid = allowedImageTypes.indexOf(file.type) !== -1;
-        const fileExtValid = allowedExtensions.indexOf(fileExtension) !== -1;
-        const nameValid = fileNameRegex.test(file.name);
+                            const fileTypeValid =
+                              allowedImageTypes.indexOf(file.type) !== -1;
+                            const fileExtValid =
+                              allowedExtensions.indexOf(fileExtension) !== -1;
+                            const nameValid = fileNameRegex.test(file.name);
 
-        const startsWithSpaceOrDot = /^[ .]/.test(file.name);
-        const endsWithSpaceOrDot = /[ .]$/.test(file.name);
-        const hasConsecutiveDots = /\.\./.test(file.name);
+                            const startsWithSpaceOrDot = /^[ .]/.test(
+                              file.name
+                            );
+                            const endsWithSpaceOrDot = /[ .]$/.test(file.name);
+                            const hasConsecutiveDots = /\.\./.test(file.name);
 
-        const isInvalid = !(
-          fileTypeValid &&
-          fileExtValid &&
-          nameValid &&
-          !startsWithSpaceOrDot &&
-          !endsWithSpaceOrDot &&
-          !hasConsecutiveDots
-        );
+                            const isInvalid = !(
+                              fileTypeValid &&
+                              fileExtValid &&
+                              nameValid &&
+                              !startsWithSpaceOrDot &&
+                              !endsWithSpaceOrDot &&
+                              !hasConsecutiveDots
+                            );
 
-        console.log(" isInvalid:", isInvalid);
-        return isInvalid;
-      });
+                            console.log(" isInvalid:", isInvalid);
+                            return isInvalid;
+                          });
 
-      console.log(" Invalid files found:", invalidFiles);
+                          console.log(" Invalid files found:", invalidFiles);
 
-      if (invalidFiles.length > 0) {
-        const invalidNames = invalidFiles.map(f => f.name).join(", ");
-         Swal.fire({
+                          if (invalidFiles.length > 0) {
+                            const invalidNames = invalidFiles
+                              .map((f) => f.name)
+                              .join(", ");
+                            Swal.fire({
                               icon: "error",
                               title: "Invalid File Type",
                               backdrop: false,
                               text: "Only image files are allowed (jpeg, jpg, png).",
                             });
 
+                            (e.target as HTMLInputElement).value = "";
+                            return;
+                          }
 
-
-        (e.target as HTMLInputElement).value = "";
-        return;
-      }
-
-      console.log(" All selected files passed validation.");
-      setThumbnails(files);
-      inputEl.value = "";
-    }
-  }}
-/>
-
+                          console.log(" All selected files passed validation.");
+                          setThumbnails(files);
+                          inputEl.value = "";
+                        }
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -735,7 +790,23 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
                     ></textarea>
                   </div>
                 </div>
-
+                <div className="col-lg-6">
+                  <div className="form-check mt-3">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="featuredCheckbox"
+                      checked={isFeatured}
+                      onChange={(e) => setIsFeatured(e.target.checked)}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="featuredCheckbox"
+                    >
+                      Featured Announcement
+                    </label>
+                  </div>
+                </div>
                 <div className="row mt-3">
                   <div className="col-12 text-center">
                     <button
@@ -774,7 +845,7 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
               Attachment Details
             </h4>
             <p className="text-muted font-14 mb-0 fw-400">
-              Below are the attachment details for News Gallery
+              Below are the attachment details for Announcement Gallery
             </p>
           </Modal.Title>
         </Modal.Header>
@@ -905,4 +976,4 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
   );
 };
 
-export default NewsForm;
+export default AnnouncementForm;

@@ -3,8 +3,31 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import '../../../../styles/global.scss';
+import CustomBreadcrumb from '../common/CustomBreadcrumb';
 
 const SectionOverview = () => {
+
+  const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Home",
+
+            "MainComponentURl": "Home",
+           
+
+        },
+
+        {
+
+            "MainComponent": "Section Overview",
+
+            "MainComponentURl": "SectionOverview",
+             
+
+        }
+
+    ];
   return (
    <div id="wrapper">
 
@@ -12,7 +35,7 @@ const SectionOverview = () => {
       <div className="container-fluid paddb">
         <div className="row">
           <div className="col-xl-12 col-lg-12">
-            <div className="row">
+            {/* <div className="row">
               <div className="col-lg-12">
                 <h4 className="page-title fw-bold mb-1 font-20">Section Overview</h4>
                 <ol className="breadcrumb m-0">
@@ -21,10 +44,11 @@ const SectionOverview = () => {
                   <li className="breadcrumb-item active">Section Overview</li>
                 </ol>
               </div>
-            </div>
+            </div> */}
+             <CustomBreadcrumb Breadcrumb={Breadcrumb}/>
 
             <main>
-              <div className="grid">
+              <div className="grid mt-4">
                 <div>
                   {/* Overview Card */}
                   <div className="row">
