@@ -6,7 +6,7 @@ const QuickLink = () => {
     
          const [showForm, setShowForm] = React.useState(false);
       const [editItem, setEditItem] = React.useState<any>(null); 
-    
+      const [Loading, setLoading] = React.useState(false);
         
       const handleAdd = () => {
         setEditItem(null);
@@ -29,11 +29,29 @@ const QuickLink = () => {
       };
    return (
     <div>
-      {/* <h2>News Master</h2> */}
+      {Loading && (
+        <div className="loadernewadd mt-10">
+          <div>
+            <img
+              src={require("../../../assets/BAC_loader.gif")}
+              className="alignrightl"
+              alt="Loading..."
+            />
+          </div>
+          <span>Loading </span>{" "}
+          <span>
+            <img
+              src={require("../../../assets/edcnew.gif")}
+              className="alignrightl"
+              alt="Loading..."
+            />
+          </span>
+        </div>
+      )}
       {showForm ? (
-        <QuickLinkForm item={editItem} onCancel={handleCancel} onSave={handleSave} />
+        <QuickLinkForm item={editItem} onCancel={handleCancel} onSave={handleSave} setLoading={setLoading}/>
       ) : (
-        <QuickLinkTable onAdd={handleAdd} onEdit={handleEdit} />
+        <QuickLinkTable onAdd={handleAdd} onEdit={handleEdit} setLoading={setLoading}/>
       )}
     </div>
   )

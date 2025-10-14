@@ -4,18 +4,19 @@ import type { IBacAppProps } from './IBacAppProps';
 import LeftNav from './MainLayout/LeftNav';
 // import { escape } from '@microsoft/sp-lodash-s
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 import TopNav from './MainLayout/TopNav';
 import Footer from './MainLayout/Footer';
-import Settings from './pages/settings';
-import SectionOverview from './pages/SectionOverview';
+// import Settings from './pages/settings';
+// import SectionOverview from './pages/SectionOverview';
 import Layout from './MainLayout/Layout';
-import News from './pages/NewsMaster/News';
+// import News from './pages/NewsMaster/News';
 // import * as feather from 'feather-icons';
 // import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from './pages/dashboard';
+// import Dashboard from './pages/dashboard';
 // import ReactDOM from "react-dom/client";
 // import { BrowserRouter, useLocation } from "react-router-dom";
 import { APP_URL } from '../../../Shared/Constant';
@@ -54,18 +55,49 @@ const BacApp = () => {
           className={`app-menu ${isCollapsed ? 'collapsed' : ''}`}
           id="myHeader">
           <div className="logo-box">
-            <a href="dashboard.html" className="logo-light">
+            {/* <a href="dashboard.html" className="logo-light">
               <img src={require("../assets/logo-light.png")} alt="logo" className="logo-lg" style={{ display: isCollapsed ? 'none' : 'block' }} />
               <img src={require("../assets/logo-sm.png")} alt="small logo" className="logo-sm" style={{ display: isCollapsed ? 'block' : 'none' }} />
-              {/* {!isCollapsed&&<img src={require("../assets/logo-light.png")} alt="logo" className="logo-lg"/>}
-                       {isCollapsed&&<img src={require("../assets/logo-sm.png")} alt="small logo" className="logo-sm"/>} */}
+             
             </a>
             <a href="dashboard.html" className="logo-dark">
               {!isCollapsed && <img src={require("../assets/logo-dark.png")} alt="dark logo" className="logo-lg" />}
               {isCollapsed && <img src={require("../assets/logo-sm.png")} alt="small logo" className="logo-sm" />}
 
-            </a>
+            </a> */}
+            <NavLink to="/Home" className="logo-light">
+              <img
+                src={require("../assets/logo-light.png")}
+                alt="logo"
+                className="logo-lg"
+                style={{ display: isCollapsed ? "none" : "block" }}
+              />
+              <img
+                src={require("../assets/logo-sm.png")}
+                alt="small logo"
+                className="logo-sm"
+                style={{ display: isCollapsed ? "block" : "none" }}
+              />
+            </NavLink>
+
+            <NavLink to="/Home" className="logo-dark">
+              {!isCollapsed && (
+                <img
+                  src={require("../assets/logo-dark.png")}
+                  alt="dark logo"
+                  className="logo-lg"
+                />
+              )}
+              {isCollapsed && (
+                <img
+                  src={require("../assets/logo-sm.png")}
+                  alt="small logo"
+                  className="logo-sm"
+                />
+              )}
+            </NavLink>
           </div>
+
 
           <LeftNav isCollapsed={isCollapsed} />
         </div>
@@ -81,19 +113,10 @@ const BacApp = () => {
 
               {/* main content goes here */}
 
-              {/* <BrowserRouter > */}
+             
               <Layout />
-              {/* </BrowserRouter> */}
-              {/* <Faq/> */}
-
-              {/* <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/Home" element={<Dashboard />} />
-                <Route path="/Settings" element={<Settings />} />
-                <Route path="/News" element={<News />} />
-               
-                <Route path="*" element={<h4>404 - Page Not Found</h4>} />
-              </Routes> */}
+              {/* <NewNav/> */}
+              
 
 
 

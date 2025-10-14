@@ -1,31 +1,25 @@
 import * as React from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-// import '../../../../styles/global.scss';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'material-symbols/index.css';
-// import * as feather from 'feather-icons';
-import { ChevronRight, Edit, Trash2 } from 'react-feather';
+import { ArrowLeft, ChevronRight, Edit, PlusCircle, Trash2 } from 'react-feather';
 import { faArrowLeft, faEllipsisV, faFileExport, faPlusCircle, faSort } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CustomBreadcrumb from '../../common/CustomBreadcrumb';
 import { SPFI } from "@pnp/sp/presets/all";
 import { getSP } from '../../../loc/pnpjsConfig';
 import * as XLSX from "xlsx";
-interface IQuickLinkTableProps {
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+interface IMyTableProps {
     onAdd: () => void;
     onEdit: (item: any) => void;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
-
-const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
+const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
     const sp: SPFI = getSP();
-    // const [quickLinkData, setQuickLinkData] = React.useState<any[]>([]);
-    const [QuickLinklistdata, setQuickLinkData] = React.useState<any[]>([]);
+    const [masterlistdata, setmasterlistdata] = React.useState<any[]>([]);
     const [sortConfig, setSortConfig] = React.useState({ key: '', direction: 'ascending' });
     const [isOpen, setIsOpen] = React.useState(false);
-
+    const navigate = useNavigate();
     const toggleDropdown = () => {
 
         setIsOpen(!isOpen);
@@ -35,18 +29,18 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
 
         {
 
-            "MainComponent": "Home",
+            "MainComponent": "Settings",
 
-            "MainComponentURl": "Home",
+            "MainComponentURl": "Settings",
 
 
         },
 
         {
 
-            "MainComponent": "Quick Link",
+            "MainComponent": "Project Master",
 
-            "MainComponentURl": "QuickLinkMaster",
+            "MainComponentURl": "ProjectMaster",
 
 
         }
@@ -60,22 +54,19 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
     const ApiCall = async () => {
         let QuickLinkArr: any[] = [];
 
-        QuickLinkArr = await getQuickLinkList();
+        QuickLinkArr = await getMasterListData();
 
 
-        setQuickLinkData(QuickLinkArr);
+        setmasterlistdata(QuickLinkArr);
 
     };
 
-
-
-
-    const getQuickLinkList = async () => {
+    const getMasterListData = async () => {
         let arr: any[] = []
         const currentUser = await sp.web.currentUser();
 
         //   if (isSuperAdmin == "Yes") {
-        await sp.web.lists.getByTitle("QuickLinks").items.select("*,QuickLinksID/ID,Department/ID,Department/DepartmentName").expand("QuickLinksID,Department").orderBy("Created", false).getAll()
+        await sp.web.lists.getByTitle("Projects").items.select("*,Attachment/ID,Department/ID,Department/DepartmentName,TeamMembers/ID,TeamMembers/Title,TeamMembers/EMail").expand("TeamMembers,Attachment,Department").orderBy("Created", false).getAll()
             .then((res) => {
 
                 arr = res;
@@ -88,29 +79,36 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
     }
     const [filters, setFilters] = React.useState({
         SNo: '',
-        Title: '',
-        URL: '',
-        RedirectToNewTab: '',
-        Department: {ID:'',DepartmentName:''},
-        IsActive: ''
+        ProjectName: '',
+
+        Department: { ID: '', DepartmentName: '' },
+        Status: '',
+        ProjectOverview: '',
+        ProjectPrivacy: '',
+        StartDate: '',
+        DueDate: '',
+        // TeamMembers: { ID: '', Title: '', EMail: '' },
+        ProjectPriority: '',
+        Budget: '',
 
     });
+
     const applyFiltersAndSorting = (data: any[]) => {
         // debugger
         // Filter data
         const filteredData = data.filter((item, index) => {
             return (
                 (filters.SNo === '' || String(index + 1).includes(filters.SNo)) &&
-                (filters.Title === '' || item.Title.toLowerCase().includes(filters.Title.toLowerCase())) &&
-                (filters.URL === '' || item.URL.toLowerCase().includes(filters.URL.toLowerCase())) &&
-                // (filters.RedirectToNewTab === '' || String(item.RedirectToNewTab).toLowerCase() === filters.RedirectToNewTab.toLowerCase())&&
-                (filters.RedirectToNewTab === '' || String(item.RedirectToNewTab ? 'Yes' : 'No').toLowerCase() === filters.RedirectToNewTab.toLowerCase()) &&
-
+                (filters.ProjectName === '' || item.ProjectName.toLowerCase().includes(filters.ProjectName.toLowerCase())) &&
+                (filters.Status === '' || item.Status.toLowerCase().includes(filters.Status.toLowerCase())) &&
+                (filters.ProjectOverview === '' || String(item.ProjectOverview).toLowerCase() === filters.ProjectOverview.toLowerCase()) &&
+                (filters.Budget === '' || String(item.Budget).toLowerCase() === filters.Budget.toLowerCase()) &&
+                (filters.ProjectPrivacy === '' || item.ProjectPrivacy.toLowerCase().includes(filters.ProjectPrivacy.toLowerCase())) &&
                 // (filters?.RedirectToNewTab === '' || item?.RedirectToNewTab?.toLowerCase().includes(filters?.RedirectToNewTab?.toLowerCase()))&&
                 (Object.keys(filters.Department).length === 0 || item.Department?.DepartmentName?.toLowerCase().includes(filters.Department.DepartmentName.toLowerCase())) &&
-                (filters.IsActive === '' || String(item.IsActive ? 'Yes' : 'No').toLowerCase() === filters.IsActive.toLowerCase())
+                // (filters.IsActive === '' || String(item.IsActive ? 'Yes' : 'No').toLowerCase() === filters.IsActive.toLowerCase())
 
-                // (filters?.IsActive === '' || item?.IsActive?.toLowerCase().includes(filters?.IsActive?.toLowerCase()))
+                (filters?.ProjectPriority === '' || item?.ProjectPriority?.toLowerCase().includes(filters?.ProjectPriority?.toLowerCase()))
             );
         });
         const sortedData = filteredData.sort((a, b) => {
@@ -122,22 +120,39 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                 return sortConfig.direction === 'ascending' ? aIndex - bIndex : bIndex - aIndex;
             } else if (sortConfig.key) {
                 // Sort by other keys
-                const aValue = a[sortConfig.key] ? a[sortConfig.key].toLowerCase() : '';
-                const bValue = b[sortConfig.key] ? b[sortConfig.key].toLowerCase() : '';
+                if (sortConfig.key === "Department") {
+                    const aValue = a.Department?.DepartmentName?.toLowerCase() || '';
+                    const bValue = b.Department?.DepartmentName?.toLowerCase() || '';
+                    if (aValue < bValue) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
 
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
+
                 }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                else {
+                    const aValue = a[sortConfig.key] ? a[sortConfig.key].toLowerCase() : '';
+                    const bValue = b[sortConfig.key] ? b[sortConfig.key].toLowerCase() : '';
+                    if (aValue < bValue) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
                 }
+
+
+
+
             }
             return 0;
         });
         return sortedData;
     };
 
-    const filteredQuickLinkData = applyFiltersAndSorting(QuickLinklistdata);
+    const filteredQuickLinkData = applyFiltersAndSorting(masterlistdata);
 
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 10;
@@ -163,7 +178,9 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
         setFilters((prevFilters) => ({
             ...prevFilters,
-            [field]: e.target.value // Update other fields normally
+            ...(field === "Department"
+                ? { Department: { ...prevFilters.Department, DepartmentName: e.target.value } } // Corrected bracket placement
+                : { [field]: e.target.value }) // Update other fields normally
         }));
     };
 
@@ -180,10 +197,10 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
 
             Title: item.Title,
 
-            URL: item.URL,
+            // URL: item.URL,
             Department: item.Department.DepartmentName,
 
-            "Redirect to new tab": item.RedirectToNewTab,
+            // "Redirect to new tab": item.RedirectToNewTab,
 
             Active: item.IsActive,
 
@@ -198,9 +215,74 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
         XLSX.writeFile(workbook, `${fileName}.xlsx`);
     };
-    //#endregion
 
+    const handleDelete = async (id: number) => {
+        Swal.fire({
+            title: "Do you want to delete this record?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            reverseButtons: false,
+            backdrop: false,
+            allowOutsideClick: false,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setLoading(true);
+                try {
+                    //   const sp = getSP();
+                    //   const item = await sp.web.lists
+                    //   .getByTitle("AnnouncementAndNews")
+                    //   .items.getById(id)
+                    //   .select("Id", "AnnouncementandNewsImageID/Id")
+                    //   .expand("AnnouncementandNewsImageID")();
 
+                    // const fileIds = item?.AnnouncementandNewsImageID?.map((f: any) => f.Id) || [];
+                    // console.log(" Related file IDs to delete:", fileIds);
+
+                    // // Delete related files from document library
+                    // for (const fileId of fileIds) {
+                    //   try {
+                    //     await sp.web.lists
+                    //       .getByTitle("AnnouncementandNewsDocs")
+                    //       .items.getById(fileId)
+                    //       .delete();
+                    //     console.log(` File with ID ${fileId} deleted from document library`);
+                    //   } catch (fileErr) {
+                    //     console.error(` Failed to delete file ID ${fileId}`, fileErr);
+                    //   }
+                    // }
+                    await sp.web.lists
+                        .getByTitle("QuickLinks")
+                        .items.getById(id)
+                        .delete();
+
+                    //  Remove deleted item from local state
+                    setmasterlistdata((prev) => prev.filter((n) => n.id !== id));
+
+                    //  Success Alert
+                    Swal.fire({
+                        backdrop: false,
+                        title: "Deleted successfully.",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                        allowOutsideClick: false,
+                    });
+                } catch (err) {
+                    console.error("Error deleting item:", err);
+                    Swal.fire({
+                        title: "Error",
+                        text: "Failed to delete the record.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
+    };
     return (
         <>
 
@@ -208,7 +290,7 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
             <div className="row">
                 <div className="col-lg-4">
                     <CustomBreadcrumb Breadcrumb={Breadcrumb} />
-                    
+
                 </div>
                 <div className="col-lg-8">
                     <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
@@ -216,12 +298,12 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
 
 
 
-                            <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={onAdd}><i className="fe-arrow-left me-1"></i>Back</button>
+                            <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={() => navigate("/Settings")}> <ArrowLeft size={18} className="me-1" />Back</button>
 
-                            <button type="button" className="btn btn-primary waves-effect waves-light" onClick={onEdit}><i className="fe-plus-circle me-1"></i>Add</button>
+                            <button type="button" className="btn btn-primary waves-effect waves-light" onClick={onEdit}><PlusCircle className="me-1" size={18} />Add</button>
 
 
-                           </form>
+                        </form>
 
 
 
@@ -267,9 +349,9 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                         <th style={{ minWidth: '120px', maxWidth: '120px' }}>
                                             <div className="d-flex flex-column bd-highlight ">
                                                 <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
-                                                    <span >Title</span>  <span onClick={() => handleSortChange('Title')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                    <span >ProjectName</span>  <span onClick={() => handleSortChange('ProjectName')}><FontAwesomeIcon icon={faSort} /> </span></div>
                                                 <div className=" bd-highlight">
-                                                    <input type="text" placeholder="Filter by Title" onChange={(e) => handleFilterChange(e, 'Title')}
+                                                    <input type="text" placeholder="Filter by ProjectName" onChange={(e) => handleFilterChange(e, 'ProjectName')}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                                 e.preventDefault(); // Prevents the new line in textarea
@@ -283,9 +365,9 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                         <th style={{ minWidth: '120px', maxWidth: '120px' }}>
                                             <div className="d-flex flex-column bd-highlight ">
                                                 <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
-                                                    <span >URL</span>  <span onClick={() => handleSortChange('URL')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                    <span >Project Privacy</span>  <span onClick={() => handleSortChange('ProjectPrivacy')}><FontAwesomeIcon icon={faSort} /> </span></div>
                                                 <div className=" bd-highlight">
-                                                    <input type="text" placeholder="Filter by URL" onChange={(e) => handleFilterChange(e, 'URL')}
+                                                    <input type="text" placeholder="Filter by Project Privacy" onChange={(e) => handleFilterChange(e, 'ProjectPrivacy')}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                                 e.preventDefault(); // Prevents the new line in textarea
@@ -296,12 +378,12 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                             </div>
                                         </th>
 
-                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
                                             <div className="d-flex flex-column bd-highlight ">
                                                 <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
                                                     <span >Department</span>  <span onClick={() => handleSortChange('Department')}><FontAwesomeIcon icon={faSort} /> </span></div>
                                                 <div className=" bd-highlight">
-                                                    <input type="text" placeholder="Filter by Department" onChange={(e) => handleFilterChange(e, 'Entity')}
+                                                    <input type="text" placeholder="Filter by Department" onChange={(e) => handleFilterChange(e, 'Department')}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                                 e.preventDefault(); // Prevents the new line in textarea
@@ -314,12 +396,12 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
 
 
 
-                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
                                             <div className="d-flex flex-column bd-highlight ">
                                                 <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
-                                                    <span >Redirect to other tab</span>  <span onClick={() => handleSortChange('RedirectToNewTab')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                    <span >Project Priority</span>  <span onClick={() => handleSortChange('ProjectPriority')}><FontAwesomeIcon icon={faSort} /> </span></div>
                                                 <div className=" bd-highlight">
-                                                    <input type="text" placeholder="Filter by Redirect" onChange={(e) => handleFilterChange(e, 'RedirectToNewTab')}
+                                                    <input type="text" placeholder="Filter by Project Priority" onChange={(e) => handleFilterChange(e, 'ProjectPriority')}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                                 e.preventDefault(); // Prevents the new line in textarea
@@ -329,12 +411,12 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                                 </div>
                                             </div>
                                         </th>
-                                        <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
                                             <div className="d-flex flex-column bd-highlight ">
                                                 <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
-                                                    <span >Active</span>  <span onClick={() => handleSortChange('IsActive')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                    <span >Start Date</span>  <span onClick={() => handleSortChange('StartDate')}><FontAwesomeIcon icon={faSort} /> </span></div>
                                                 <div className=" bd-highlight">
-                                                    <input type="text" placeholder="Filter by Active" onChange={(e) => handleFilterChange(e, 'IsActive')}
+                                                    <input type="text" placeholder="Filter by Start Date" onChange={(e) => handleFilterChange(e, 'StartDate')}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                                 e.preventDefault(); // Prevents the new line in textarea
@@ -344,6 +426,36 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                                 </div>
                                             </div>
                                         </th>
+                                        <th style={{ minWidth: '120px', maxWidth: '120px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Due Date</span>  <span onClick={() => handleSortChange('DueDate')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Due Date" onChange={(e) => handleFilterChange(e, 'DueDate')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th>
+                                        {/* <th style={{ minWidth: '80px', maxWidth: '80px' }}>
+                                            <div className="d-flex flex-column bd-highlight ">
+                                                <div className="d-flex pb-2" style={{ justifyContent: 'space-evenly' }}>
+                                                    <span >Status</span>  <span onClick={() => handleSortChange('Status')}><FontAwesomeIcon icon={faSort} /> </span></div>
+                                                <div className=" bd-highlight">
+                                                    <input type="text" placeholder="Filter by Status" onChange={(e) => handleFilterChange(e, 'Status')}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                                e.preventDefault(); // Prevents the new line in textarea
+                                                            }
+                                                        }}
+                                                        className='inputcss' style={{ width: '100%' }} />
+                                                </div>
+                                            </div>
+                                        </th> */}
 
 
                                         <th style={{ textAlign: 'center', minWidth: '80px', maxWidth: '80px', borderBottomRightRadius: '0px', borderTopRightRadius: '0px' }}> <div className="d-flex flex-column bd-highlight pb-2">
@@ -382,15 +494,32 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                         )
                                         :
                                         currentData.map((item, index) => {
+                                            const date = new Date(item.StartDate);
+                                            const StartDateday = date.getDate();
+                                            const StartDatemonth = date.toLocaleString("default", {
+                                                month: "short",
+                                            });
+                                             const StartDateyear = date.getFullYear();
+                                             const date2 = new Date(item.DueDate);
+                                            const DueDateday = date2.getDate();
+                                            const DueDatemonth = date2.toLocaleString("default", {
+                                                month: "short",
+                                            });
+                                             const DueDateyear = date2.getFullYear();
                                             // const ImageUrl = item.BannerImage == undefined || item.BannerImage == null ? "" : JSON.parse(item.BannerImage);
                                             return (
                                                 <tr key={index}>
                                                     <td style={{ minWidth: '40px', maxWidth: '40px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>
-                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.Title}</td>
-                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.URL}</td>
+
+                                                    {/* <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.URL}</td> */}
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.ProjectName}</td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.ProjectPrivacy}</td>
                                                     <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item?.Department?.DepartmentName}</td>
-                                                    <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.RedirectToNewTab ? "Yes" : "No"} </div> </td>
-                                                    <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.IsActive ? "Yes" : "No"} </div> </td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.ProjectPriority}</td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}> {`${StartDateday} ${StartDatemonth} ${StartDateyear}`}</td>
+                                                    <td style={{ minWidth: '120px', maxWidth: '120px' }}> {`${DueDateday} ${DueDatemonth} ${DueDateyear}`}</td>
+                                                    {/* <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.RedirectToNewTab ? "Yes" : "No"} </div> </td> */}
+                                                    {/* <td style={{ minWidth: '80px', maxWidth: '80px', textAlign: 'center' }}>  <div className='btn btn-status newlight'> {item.IsActive} </div> </td> */}
                                                     {/* <td style={{ minWidth: '80px', maxWidth: '80px' }} className="ng-binding">
                                                         <div className="d-flex  pb-0" style={{ justifyContent: 'center', gap: '5px' }}>
                                                             <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={onAdd}><i className="fe-arrow-left me-1"></i>Back</button>
@@ -398,15 +527,20 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
                                                             
                                                         </div>
                                                     </td> */}
-                                                    <td style={{ minWidth: "50px", maxWidth: "50px" }} className="ng-binding">
-                                                        {/* Edit button */}
-                                                        <a href="edit-news.html" className="action-icon text-primary">
-                                                            <Edit size={16} />
+                                                    <td style={{ minWidth: "80px", maxWidth: "80px" }} className="ng-binding">
+                                                        <a
+                                                            href="javascript:void(0);"
+                                                            className="action-icon text-primary"
+                                                            onClick={() => onEdit(item)}
+                                                        >
+                                                            <Edit size={18} />
                                                         </a>
-
-                                                        {/* Trash button */}
-                                                        <a href="javascript:void(0);" className="action-icon text-danger">
-                                                            <Trash2 size={16} />
+                                                        <a
+                                                            href="javascript:void(0);"
+                                                            className="action-icon text-danger"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        >
+                                                            <Trash2 size={18} />
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -460,4 +594,4 @@ const QuickLinkTable = ({ onAdd, onEdit }: IQuickLinkTableProps) => {
     )
 }
 
-export default QuickLinkTable
+export default ProjectTable

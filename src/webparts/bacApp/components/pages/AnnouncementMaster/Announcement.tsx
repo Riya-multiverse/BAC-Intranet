@@ -39,7 +39,7 @@ const Announcement = () => {
         <div className="loadernewadd mt-10">
           <div>
             <img
-              src={require("../../../assets/edc-gif.gif")}
+              src={require("../../../assets/BAC_loader.gif")}
               className="alignrightl"
               alt="Loading..."
             />

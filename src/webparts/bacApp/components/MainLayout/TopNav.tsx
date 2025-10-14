@@ -4,7 +4,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
-// import feather from 'feather-icons';
+
+import * as feather from "feather-icons";
 interface ITopNavProps {
   toggleMenu: () => void;
   isCollapsed: boolean;
@@ -46,7 +47,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                   {/* <!-- Topbar Search Form --> */}
                   <li className="app-search dropdown me-3 d-none d-lg-block">
                     <form>
-                      <a href="advance-search.html"> <input type="search" className="form-control rounded-pill" placeholder="Search..." id="top-search"/>
+                      <a href="javascript:void(0);"> <input type="search" className="form-control rounded-pill" placeholder="Search..." id="top-search"/>
                         <span className="fe-search search-icon font-16"></span> </a>
                     </form>
                     <div className="dropdown-menu dropdown-menu-animated dropdown-lg" id="search-dropdown">

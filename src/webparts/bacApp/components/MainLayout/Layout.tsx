@@ -1,6 +1,6 @@
 import * as React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../../../styles/global.scss';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import '../../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 import { useRoutes } from "react-router-dom";
@@ -19,11 +19,23 @@ import {
   Navigate,
 } from "react-router-dom";
 import SectionOverview from '../pages/SectionOverview';
-import QuickLink from '../pages/QuickLinks/QuickLink';
+import QuickLink from '../pages/QuickLinksMaster/QuickLink';
 import NewsMain from '../pages/News/NewsMain';
 import TeamProfile from '../pages/TeamProfile';
 import Announcement from '../pages/AnnouncementMaster/Announcement';
 import UpcomingEvents from '../pages/UpcomingEvents';
+import Suggestions from '../pages/Suggestions';
+import ContactInformation from '../pages/ContactInformation';
+import EmployeeRecognition from '../pages/EmployeeRecognition';
+import Banner from '../pages/BannerMaster/Banner';
+import Faq from '../pages/FaqMaster/Faq';
+import Projects from '../pages/Project Master/Projects';
+import TeamAchievements from '../pages/TeamAchievementsMaster/TeamAchievements';
+import AboutTheDepartment from '../pages/AboutTheDepartment';
+import Event from '../pages/EventMaster/Event';
+import SuccessStories from '../pages/SuccessStoryMaster/SuccessStories';
+import PhotoGallery from '../pages/PhotoGalleryMaster/PhotoGallery';
+
 
 const Layout = () => {
 
@@ -41,7 +53,66 @@ const Layout = () => {
       <Route path="/TeamProfile" element={<TeamProfile />} />
       <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
       <Route path="/AnnouncementMaster" element={<Announcement />} />
-      <Route path="*" element={<h4>404 - Page Not Found</h4>} />
+      <Route path="/BannerMaster" element={<Banner />} />
+      <Route path="/ProjectMaster" element={<Projects />} />
+      <Route path="/FAQMaster" element={<Faq />} />
+      <Route path="/TeamAchievementMaster" element={<TeamAchievements />} />
+      <Route path="/EventMaster" element={<Event />} />
+      <Route path="/SuccessStoriesMaster" element={<SuccessStories />} />
+      <Route path="/PhotoGalleryMaster" element={<PhotoGallery />} />
+      <Route path="/Suggestions" element={<Suggestions />} />
+      <Route path="/ContactInformation" element={<ContactInformation />} />
+      <Route path="/AboutTheDepartment" element={<AboutTheDepartment />} />
+      <Route path="/EmployeeRecognition" element={<EmployeeRecognition />} />
+      <Route path="/EmployeeRecognitionMaster" element={<EmployeeRecognition />} />
+      <Route
+        path="*"
+        element={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100vh",
+              backgroundColor: "#f4f6f8",
+              fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            }}
+          >
+            <div
+              style={{
+                textAlign: "center",
+                background: "white",
+                padding: "60px 40px",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                maxWidth: "400px",
+                color: "#333",
+              }}
+            >
+              <h1 style={{ fontSize: "80px", margin: 0, color: "#0078d4" }}>404</h1>
+              <h2 style={{ margin: "10px 0 20px" }}>Page Not Found</h2>
+              <p style={{ marginBottom: "30px", color: "#666" }}>
+                The page you’re looking for doesn’t exist or has been moved.
+              </p>
+              <a
+                href="#/Home"
+                style={{
+                  display: "inline-block",
+                  padding: "10px 24px",
+                  backgroundColor: "#0078d4",
+                  color: "#fff",
+                  textDecoration: "none",
+                  borderRadius: "6px",
+                  fontWeight: 500,
+                }}
+              >
+                Go to Home
+              </a>
+            </div>
+          </div>
+        }
+      />
+
     </Routes>
 
   );

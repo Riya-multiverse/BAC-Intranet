@@ -1,21 +1,25 @@
 import * as React from 'react'
-import NewsListing from './NewsListing';
-import NewsDetails from './NewsDetails';
+import TeamAchievementsForm from './TeamAchievementsForm'
+import TeamAchievementsTable from './TeamAchievementsTable'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../../../../styles/global.scss';
 
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
-const NewsMain = () => {
-  const [showForm, setShowForm] = React.useState(false);
+
+const TeamAchievements = () => {
+
+     const [showForm, setShowForm] = React.useState(false);
   const [editItem, setEditItem] = React.useState<any>(null); 
   const [Loading, setLoading] = React.useState(false);
+  const [faqList, setFaqList] = React.useState<any[]>([]);
+
     
-//   const handleAdd = () => {
-//     setEditItem(null);
-//     setShowForm(true);
-//   };
+  const handleAdd = () => {
+    setEditItem(null);
+    setShowForm(true);
+  };
 
   const handleEdit = (item: any) => {
     setEditItem(item);
@@ -26,12 +30,11 @@ const NewsMain = () => {
     setShowForm(false);
   };
 
-//   const handleSave = (data: any) => {
-//     console.log("Saved data", data);
-//     setShowForm(false);
-//     // 🔄 refresh table here (optional via state)
-//   };
-
+  const handleSave = (data: any) => {
+    console.log("Saved data", data);
+    setShowForm(false);
+    // 🔄 refresh table here (optional via state)
+  };
   return (
     <div>
        {Loading && (
@@ -55,13 +58,12 @@ const NewsMain = () => {
       )}
       {/* <h2>News Master</h2> */}
       {showForm ? (
-        <NewsDetails item={editItem} onCancel={handleCancel}  setLoading={setLoading}/>
+        <TeamAchievementsForm item={editItem} onCancel={handleCancel} onSave={handleSave} setLoading={setLoading} />
       ) : (
-        <NewsListing  onEdit={handleEdit} setLoading={setLoading} />
+        <TeamAchievementsTable onAdd={handleAdd} onEdit={handleEdit} setLoading={setLoading}/>
       )}
-      {/* <NewsListing  onEdit={handleEdit} setLoading={setLoading} /> */}
     </div>
   )
 }
 
-export default NewsMain
+export default TeamAchievements

@@ -16,7 +16,7 @@ import CustomBreadcrumb from "../common/CustomBreadcrumb";
 
 interface IEventItem {
   EventTitle: string;
-  EventDate: string;
+  UpcomingEventDate: string;
 }
 
 const UpcomingEvents = () => {
@@ -31,14 +31,14 @@ const UpcomingEvents = () => {
 
     sp.web.lists
       .getByTitle("Events")
-      .items.select("EventTitle", "EventDate")
-      .filter(`EventDate ge datetime'${startIso}'`)
-      .orderBy("EventDate", true)
+      .items.select("EventTitle", "UpcomingEventDate")
+      .filter(`UpcomingEventDate ge datetime'${startIso}'`)
+      .orderBy("UpcomingEventDate", true)
       .top(4)()
       .then((data: any[]) => {
         const sorted = (data as IEventItem[]).sort(
           (a, b) =>
-            new Date(a.EventDate).getTime() - new Date(b.EventDate).getTime()
+            new Date(a.UpcomingEventDate).getTime() - new Date(b.UpcomingEventDate).getTime()
         );
         setEvents(sorted);
       })
@@ -104,7 +104,7 @@ const UpcomingEvents = () => {
                       <p>No upcoming events found.</p>
                     ) : (
                       events.map((item, index) => {
-                        const date = new Date(item.EventDate);
+                        const date = new Date(item.UpcomingEventDate);
                         const day = date.getDate();
                         const month = date.toLocaleString("default", {
                           month: "short",

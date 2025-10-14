@@ -23,6 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CustomBreadcrumb from "../../common/CustomBreadcrumb";
 
 interface INewsFormProps {
   item?: any;
@@ -504,24 +505,46 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
 
     return fileName;
   };
+   const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Settings",
+
+            "MainComponentURl": "Settings",
+
+
+        },
+
+        {
+
+            "MainComponent": "News Master",
+
+            "MainComponentURl": "NewsMaster",
+
+
+        }
+
+    ];
 
   return (
     <>
       {/* // <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
+          <CustomBreadcrumb Breadcrumb={Breadcrumb} />
+          {/* <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
           <ol className="breadcrumb m-0">
             <li className="breadcrumb-item">
               <a href="settings.html">Settings</a>
             </li>
             <li className="breadcrumb-item">
-              {/* <span className="fe-chevron-right"></span> */}
+              
               <ChevronRight size={20} color="#000" />
             </li>
 
             <li className="breadcrumb-item active">News Master</li>
-          </ol>
+          </ol> */}
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">

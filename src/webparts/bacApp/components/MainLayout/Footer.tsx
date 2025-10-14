@@ -1,7 +1,7 @@
 import * as React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '../../../../styles/global.scss';
+// import '../../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 const Footer = () => {

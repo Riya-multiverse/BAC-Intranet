@@ -115,6 +115,7 @@ const sp: SPFI = getSP();
 
               {/* Main Content */}
               <main>
+                <div className="Team-profile">
                 <div className="grid">
                   {users.map((user) => {
                     const profilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${user.email}`;
@@ -142,6 +143,7 @@ const sp: SPFI = getSP();
                       </div>
                     );
                   })}
+                </div>
                 </div>
               </main>
             </div>

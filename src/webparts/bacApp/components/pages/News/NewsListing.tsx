@@ -1,21 +1,44 @@
 import * as React from 'react'
 import { Breadcrumb } from 'react-bootstrap';
 import CustomBreadcrumb from '../../common/CustomBreadcrumb';
-import { Share2, Share,Calendar } from 'react-feather';
+import { Share2, Share, Calendar } from 'react-feather';
 import { getSP } from '../../../loc/pnpjsConfig';
 import { SPFI } from '@pnp/sp';
+import * as moment from 'moment';
 interface INewsListingProps {
-    
+
     onEdit: (item: any) => void;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const NewsListing = ({onEdit, setLoading }: INewsListingProps) => {
+const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
+    const sp: SPFI = getSP();
     const [newsItems, setNewsItems] = React.useState<any[]>([]);
+    const getDocumentLinkByID = async (AttachmentId: number[]) => {
+        if (!AttachmentId || AttachmentId.length === 0) return [];
+
+        try {
+            const results = await Promise.all(
+                AttachmentId.map(async (id) => {
+                    const res = await sp.web.lists
+                        .getByTitle("AnnouncementandNewsDocs")
+                        .items.getById(id)
+                        .select("*,FileRef,FileLeafRef")();
+                    return res;
+                })
+            );
+
+            return results; // Now results contains all fetched items
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+            return [];
+        }
+    };
     React.useEffect(() => {
 
         const fetchNews = async () => {
             try {
-                const sp: SPFI = getSP();
+
+
                 const items = await sp.web.lists
                     .getByTitle("AnnouncementAndNews")
                     .items.select(
@@ -26,34 +49,56 @@ const NewsListing = ({onEdit, setLoading }: INewsListingProps) => {
                         "Department/DepartmentName",
                         "Department/Id",
                         "Overview",
-                        "Created"
+                        "Created",
+                        "Author/Title",
+                        "Author/Id",
+                        "Author/EMail",
+                        "AnnouncementandNewsImageID/ID"
                     )
-                    .expand("Department").filter("SourceType eq 'News'")
+                    .expand("Department,Author,AnnouncementandNewsImageID")
+                    .filter("SourceType eq 'News'")
                     .orderBy("Created", false)();
 
-                console.log(" Raw News items:", items);
+                console.log("Raw News items:", items);
 
-                const formatted = items.map((item: any, index: number) => ({
-                    id: item.Id,
-                    sno: index + 1,
-                    title: item.Title,
-                    description: item.Description,
-                    department: item.Department?.DepartmentName || "",
-                    departmentId: item.Department?.Id || null,
-                    category: item.Category || "",
-                    overview: item.Overview || "",
-                    created: new Date(item.Created).toLocaleDateString(),
-                }));
+                // 🔹 Use Promise.all to wait for image fetch for each news item
+                const formatted = await Promise.all(
+                    items.map(async (item: any, index: number) => {
+                        const imageIds =
+                            item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+                        const imageLinks = imageIds.length > 0
+                            ? await getDocumentLinkByID(imageIds)
+                            : [];
+
+                        return {
+                            id: item.Id,
+                            sno: index + 1,
+                            title: item.Title,
+                            description: item.Description,
+                            department: item.Department?.DepartmentName || "",
+                            departmentId: item.Department?.Id || null,
+                            category: item.Category || "",
+                            overview: item.Overview || "",
+                            created: new Date(item.Created),
+                            author: item.Author?.Title,
+                            images: imageLinks.map((img: any) => ({
+                                name: img.FileLeafRef,
+                                url: img.FileRef,
+                            })),
+                        };
+                    })
+                );
 
                 setNewsItems(formatted);
-                console.log(" Formatted news data:", formatted);
+                console.log("Formatted news with images:", formatted);
             } catch (err) {
-                console.error(" Error fetching news data:", err);
-            }
-            finally {
+                console.error("Error fetching news data:", err);
+            } finally {
                 setLoading(false);
             }
         };
+
 
         fetchNews();
     }, []);
@@ -85,13 +130,7 @@ const NewsListing = ({onEdit, setLoading }: INewsListingProps) => {
             <div className="row">
                 <div className="col-lg-2">
                     <CustomBreadcrumb Breadcrumb={Breadcrumb} />
-                    {/* <h4 className="page-title fw-bold mb-1 font-20">News</h4>
-                    <ol className="breadcrumb m-0">
 
-                        <li className="breadcrumb-item"><a href="dashboard.html">Home</a></li>
-                        <li className="breadcrumb-item"> <span className="fe-chevron-right"></span></li>
-                        <li className="breadcrumb-item active">News</li>
-                    </ol> */}
                 </div>
                 <div className="col-lg-10">
                     <div className="d-flex flex-wrap align-items-center justify-content-end mt-3 mb-3">
@@ -123,11 +162,16 @@ const NewsListing = ({onEdit, setLoading }: INewsListingProps) => {
 
             </div>
 
-            <div className="row mt-2">
+            {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
                 <div className="col-lg-5">
-                    <div className="imagemani mt-2 me-2">
+                    {/* <div className="imagemani mt-2 me-2">
                         <img src={require("../../../assets/Banner1.png")} data-themekey="#" />
-                    </div>
+                    </div> */}
+                    {item.images.slice(0, 1).map((img: any, index: number) => (
+                        <div key={index} className="imagemani mt-2 me-2">
+                            <img src={img.url} alt={img.name || `image-${index}`} data-themekey="#" />
+                        </div>
+                    ))}
                 </div>
                 <div className="col-lg-7">
                     <div className="row">
@@ -136,55 +180,68 @@ const NewsListing = ({onEdit, setLoading }: INewsListingProps) => {
 
                         </div>
                         <div className="col-lg-12">
-                            <h4 style={{ "lineHeight": "34px" }} className="page-title fw-700 mb-1  pe-5 font-28">Bahrain Airport Company Signs MOU with Valo Aviation, at Paris Airshow 2025, highlighting its Commitment...
+                            <h4 style={{ "lineHeight": "34px" }} className="page-title fw-700 mb-1  pe-5 font-28">{item.title}
                             </h4>
                         </div>
                         <div className="row">
                             <div className="col-sm-12">
                                 <p className="mb-2 mt-1 d-block">
                                     <span style={{ "fontWeight": 400 }} className="pe-2 text-nowrap color-new font-12 mb-0 d-inline-block">
-                                        <Calendar className="fe-calendar" />  17 Jun 2025  &nbsp;  &nbsp;  &nbsp;|
+                                        <Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
                                     </span>
                                     <span style={{ "fontWeight": 400 }} className="text-nowrap mb-0 color-new font-12 d-inline-block">
-                                        Author: <span style={{ "color": "#009157", "fontWeight": 600 }}>Ali Rashid &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
+                                        Author: <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.author} &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
                                         </span>
                                         <span className="text-nowrap mb-0 color-new font-12 d-inline-block">
                                             4 min read
                                         </span>
                                     </span></p>
 
-                                <div style={{ "clear": "both", "lineHeight": "22px" }}> <p style={{ "lineHeight": "20px", "fontWeight": 400 }} className="d-block color-new font-14">His Excellency Dr. Shaikh Abdullah bin Ahmed Al Khalifa, Minister of Transportation and Telecommunications, affirmed the Kingdom of Bahrain’s continued commitment to the development of the business aviation sector as an integral part of the national air transport system, in line with regional and international advancements in the aviation industry.</p>
+                                <div style={{ "clear": "both", "lineHeight": "22px" }}> <p style={{ "lineHeight": "20px", "fontWeight": 400 }} className="d-block color-new font-14">
+                                    {item.description}
+                                </p>
                                 </div>
-                                <a href="newsnew-internal.html"> <div style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div> </a>
+                                {/* <a href="newsnew-internal.html"> */}
+                                <div onClick={() => onEdit(item)} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div>
+
+                                {/* </a> */}
 
                             </div>
                         </div>
                     </div>
 
                 </div>
-            </div>
+            </div>))}
             <div className="tab-content mt-4">
                 <div className="tab-pane show active" id="home1">
-                    {newsItems.map((item, index) => (
+                    {newsItems.slice(1).map((item, index) => (
                         <div className="card mb-2">
                             <div className="card-body">
                                 <div className="row align-items-start">
-                                    <div className="col-sm-2">
-                                        <a href="NewsInternal">   <div className="imagehright">
+                                    <div className="col-sm-2" onClick={() => onEdit(item)} style={{ cursor: 'pointer' }}>
+                                        {/* <a href="NewsInternal">  */}
+                                        {/* <div className="imagehright">
                                             <img className="d-flex align-self-center me-3 w-100" src={require("../../../assets/Banner1.png")} alt="Generic placeholder image" />
 
-                                        </div> </a>
+                                        </div> */}
+                                        {item.images.slice(0, 1).map((img: any, index: number) => (
+                                            <div key={index} className="imagehright">
+                                                <img className="d-flex align-self-center me-3 w-100" src={img.url} alt={img.name || `image-${index}`} data-themekey="#" />
+                                            </div>
+                                        ))}
+                                        {/* </a> */}
                                     </div>
                                     <div className="col-sm-9">
                                         <div className="row">
-                                            <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {item.created}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
+                                            <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
 
                                         </div>
-                                        <a href="newsnew-internal.html">  <div className="w-100">
+                                        {/* <a href="newsnew-internal.html"> */}
+                                        <div className="w-100" onClick={() => onEdit(item)} style={{ cursor: 'pointer' }}>
                                             <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding">{item.title}</h4>
                                             <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding">{item.description}</p>
                                             <p className="read-more">Read more..</p>
-                                        </div> </a>
+                                        </div> {/* </a> */}
 
                                     </div>
                                     <div className="col-sm-1">

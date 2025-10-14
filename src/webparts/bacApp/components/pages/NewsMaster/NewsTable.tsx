@@ -12,7 +12,8 @@ import { useEffect, useState } from "react";
 import { SPFI } from "@pnp/sp";
 import { getSP } from "../../../loc/pnpjsConfig";
 import Swal from "sweetalert2";
-
+import CustomBreadcrumb from "../../common/CustomBreadcrumb";
+import { useNavigate } from 'react-router-dom';
 interface INewsTableProps {
   onAdd: () => void;
   onEdit: (item: any) => void;
@@ -20,6 +21,7 @@ interface INewsTableProps {
 }
 
 const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
+  const navigate = useNavigate();
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -154,13 +156,34 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+   const Breadcrumb = [
+
+        {
+
+            "MainComponent": "Settings",
+
+            "MainComponentURl": "Settings",
+
+
+        },
+
+        {
+
+            "MainComponent": "News Master",
+
+            "MainComponentURl": "NewsMaster",
+
+
+        }
+
+    ];
 
   return (
     <>
       {/* <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
+          {/* <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
           <ol className="breadcrumb m-0">
             <li className="breadcrumb-item">
               <a href="settings.html">Settings</a>
@@ -169,12 +192,13 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
               <ChevronRight size={20} color="#000" />
             </li>
             <li className="breadcrumb-item active">News Master</li>
-          </ol>
+          </ol> */}
+           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <button
+              {/* <button
                 type="button"
                 className="btn btn-secondary me-1 waves-effect waves-light"
                 onClick={onAdd}
@@ -182,7 +206,9 @@ const NewsTable = ({ onAdd, onEdit,setLoading }: INewsTableProps) => {
                 <i className="fe-arrow-left me-1"></i>{" "}
                 <ArrowLeft size={18} className="me-1" />
                 Back
-              </button>
+              </button> */}
+              <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" onClick={() => navigate("/Settings")}> <ArrowLeft size={18} className="me-1" />Back</button>
+              
               <button
                 type="button"
                 className="btn btn-primary waves-effect waves-light"
