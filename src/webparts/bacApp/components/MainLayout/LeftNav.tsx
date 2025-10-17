@@ -8,7 +8,7 @@ import { getSP } from '../../loc/pnpjsConfig';
 import { SPFI } from '@pnp/sp';
 import "@pnp/sp/items/get-all";
 // import { getLeftNavitems } from '../../../../APIService/LeftNavService';
-import { FaHome, FaCog, FaNewspaper, FaWifi } from "react-icons/fa";
+import { FaHome, FaCog, FaNewspaper, FaWifi ,FaRegImage ,FaRegClipboard } from "react-icons/fa";
 import { GrAnnounce } from "react-icons/gr";
 import { CgProfile } from "react-icons/cg";
 import { Link, NavLink } from 'react-router-dom';
@@ -382,7 +382,9 @@ const LeftNav: React.FC<ILeftNavProps> = ({ isCollapsed }) => {
       news: FaNewspaper,
       announcement: GrAnnounce,
       profile: CgProfile,
-      wifi: FaWifi
+      wifi: FaWifi,
+      photo: FaRegImage,
+      clipboard:FaRegClipboard 
 
     };
     return iconMap[iconName] || null; // Return null if icon is not found

@@ -4,13 +4,32 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../../../styles/global.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
-
+import { getSP } from '../../loc/pnpjsConfig';
+import { SPFI } from '@pnp/sp';
 import * as feather from "feather-icons";
+import { SITE_URL } from '../../../../Shared/Constant';
 interface ITopNavProps {
   toggleMenu: () => void;
   isCollapsed: boolean;
 }
 const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
+  const [currentUserPic, setCurrentUserPic] = React.useState<any>(null);
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+  const sp: SPFI = getSP();
+  React.useEffect(() => {
+
+    Apicall();
+
+  }, []);
+
+  const Apicall = async () => {
+    const currentUser = await sp.web.currentUser();
+    const CurrprofilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${currentUser?.Email}`;
+    setCurrentUserPic(CurrprofilePicUrl);
+    setCurrentUser(currentUser);
+  }
+
+
   return (
     <div className="navbar-custom">
       <div className="topbar">
@@ -20,67 +39,67 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
           <div className="logo-box">
             {/* <!-- Brand Logo Light --> */}
             <a href="index.html" className="logo-light">
-              <img src={require("../../assets/logo-light.png")} alt="logo" className="logo-lg"/>
-                <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm"/>
-                </a>
+              <img src={require("../../assets/logo-light.png")} alt="logo" className="logo-lg" />
+              <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm" />
+            </a>
 
-                {/* <!-- Brand Logo Dark --> */}
-                <a href="index.html" className="logo-dark">
-                  <img src={require("../../assets/logo-dark.png")} alt="dark logo" className="logo-lg"/>
-                    <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm"/>
-                    </a>
-                  </div>
+            {/* <!-- Brand Logo Dark --> */}
+            <a href="index.html" className="logo-dark">
+              <img src={require("../../assets/logo-dark.png")} alt="dark logo" className="logo-lg" />
+              <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm" />
+            </a>
+          </div>
 
-                  {/* <!-- Sidebar Menu Toggle Button --> */}
+          {/* <!-- Sidebar Menu Toggle Button --> */}
 
 
-                  {/* <!-- Dropdown Menu --> */}
-                  
-                  <button type='button' className="button-toggle-menu " onClick={toggleMenu}>
-                    <i className="material-symbols-outlined mt-2">menu</i>
-                  </button>
-                  {/* <!-- Mega Menu Dropdown --> */}
+          {/* <!-- Dropdown Menu --> */}
 
-                </div>
+          <button type='button' className="button-toggle-menu " onClick={toggleMenu}>
+            <i className="material-symbols-outlined mt-2">menu</i>
+          </button>
+          {/* <!-- Mega Menu Dropdown --> */}
 
-                <ul className="topbar-menu d-flex align-items-center">
-                  {/* <!-- Topbar Search Form --> */}
-                  <li className="app-search dropdown me-3 d-none d-lg-block">
+        </div>
+
+        <ul className="topbar-menu d-flex align-items-center">
+          {/* <!-- Topbar Search Form --> */}
+          {/* <li className="app-search dropdown me-3 d-none d-lg-block">
                     <form>
                       <a href="javascript:void(0);"> <input type="search" className="form-control rounded-pill" placeholder="Search..." id="top-search"/>
                         <span className="fe-search search-icon font-16"></span> </a>
                     </form>
                     <div className="dropdown-menu dropdown-menu-animated dropdown-lg" id="search-dropdown">
-                      {/* */}
+                      
                       <div className="dropdown-header noti-title">
                         <h5 className="text-overflow mb-2">Found 22 results</h5>
                       </div>
 
-                      {/* */}
+                      
                       <a href="javascript:void(0);" className="dropdown-item notify-item">
                         <i className="fe-home me-1"></i>
                         <span>Analytics Report</span>
                       </a>
 
-                      {/* */}
+                      
                       <a href="javascript:void(0);" className="dropdown-item notify-item">
                         <i className="fe-aperture me-1"></i>
                         <span>How can I help you?</span>
                       </a>
 
-                      {/* */}
+                      
                       <a href="javascript:void(0);" className="dropdown-item notify-item">
                         <i className="fe-settings me-1"></i>
                         <span>User profile settings</span>
                       </a>
 
-                      {/* */}
+                      
                       <div className="dropdown-header noti-title">
                         <h6 className="text-overflow mb-2 text-uppercase">Users</h6>
                       </div>
 
                       <div className="notification-list">
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item notify-item">
                           <div className="d-flex align-items-start">
                             <img className="d-flex me-2 rounded-circle" src={require("../../assets/user-2.jpg")} alt="Generic placeholder image" height="32"/>
@@ -91,7 +110,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                           </div>
                         </a>
 
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item notify-item">
                           <div className="d-flex align-items-start">
                             <img className="d-flex me-2 rounded-circle" src={require("../../assets/user-5.jpg")} alt="Generic placeholder image" height="32"/>
@@ -103,17 +122,17 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                         </a>
                       </div>
                     </div>
-                  </li>
+                  </li> */}
 
-                  {/* <!-- Fullscreen Button --> */}
-                  <li className="d-none d-md-inline-block">
+          {/* <!-- Fullscreen Button --> */}
+          {/* <li className="d-none d-md-inline-block">
                     <a className="nav-link waves-effect waves-light" href="#" data-toggle="fullscreen">
                       <i className="fe-maximize font-22"></i>
                     </a>
-                  </li>
+                  </li> */}
 
-                  {/* <!-- Search Dropdown (for Mobile/Tablet) --> */}
-                  <li className="dropdown d-lg-none">
+          {/* <!-- Search Dropdown (for Mobile/Tablet) --> */}
+          {/* <li className="dropdown d-lg-none">
                     <a className="nav-link dropdown-toggle waves-effect waves-light arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                       <i className="ri-search-line font-22"></i>
                     </a>
@@ -122,18 +141,18 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                         <input type="search" className="form-control" placeholder="Search ..." aria-label="Recipient's username"/>
                       </form>
                     </div>
-                  </li>
+                  </li> */}
 
-                  {/* <!-- App Dropdown --> */}
-                  
-
-              
+          {/* <!-- App Dropdown --> */}
 
 
-                  {/* <!-- Notofication dropdown --> */}
-                  <li className="dropdown notification-list">
+
+
+
+          {/* <!-- Notofication dropdown --> */}
+          {/* <li className="dropdown notification-list">
                     <a className="nav-link dropdown-toggle waves-effect waves-light arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                      {/* <i className="fe-bell font-22"></i> */}
+                     
                        <i data-feather="bell"></i>
                       <span className="badge bg-danger rounded-circle noti-icon-badge">9</span>
                     </a>
@@ -154,7 +173,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                       <div className="px-1" style={{ maxHeight: '300px' }} data-simplebar>
 
                         <h5 className="text-muted font-13 fw-normal mt-2">Today</h5>
-                        {/* */}
+                        
 
                         <a href="javascript:void(0);" className="dropdown-item p-0 notify-item card unread-noti shadow-none mb-1">
                           <div className="card-body">
@@ -173,7 +192,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                           </div>
                         </a>
 
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                           <div className="card-body">
                             <span className="float-end noti-close-btn text-muted"><i className="mdi mdi-close"></i></span>
@@ -193,7 +212,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
 
                         <h5 className="text-muted font-13 fw-normal mt-0">Yesterday</h5>
 
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                           <div className="card-body">
                             <span className="float-end noti-close-btn text-muted"><i className="mdi mdi-close"></i></span>
@@ -213,7 +232,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
 
                         <h5 className="text-muted font-13 fw-normal mt-0">30 Dec 2021</h5>
 
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                           <div className="card-body">
                             <span className="float-end noti-close-btn text-muted"><i className="mdi mdi-close"></i></span>
@@ -231,7 +250,7 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                           </div>
                         </a>
 
-                        {/* */}
+                        
                         <a href="javascript:void(0);" className="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                           <div className="card-body">
                             <span className="float-end noti-close-btn text-muted"><i className="mdi mdi-close"></i></span>
@@ -254,31 +273,34 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                         </div>
                       </div>
 
-                      {/* <!-- All--> */}
+                      
                       <a href="javascript:void(0);" className="dropdown-item text-center text-primary notify-item border-top border-light py-2">
                         View All
                       </a>
 
                     </div>
-                  </li>
+                  </li> */}
 
-                  {/* <!-- Light/Dark Mode Toggle Button --> */}
-                  <li className="d-none d-sm-inline-block">
+          {/* <!-- Light/Dark Mode Toggle Button --> */}
+          {/* <li className="d-none d-sm-inline-block">
                     <div className="nav-link waves-effect waves-light" id="light-dark-mode">
 
                       <i className="fe-moon font-22"></i>
                     </div>
-                  </li>
+                  </li> */}
 
-                  {/* <!-- User Dropdown --> */}
-                  <li className="dropdown">
-                    <a className="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                      <img src={require("../../assets/user-1.jpg")} alt="user-image" className="rounded-circle"/>
-                        <span className="ms-1 d-none d-md-inline-block">
-                          Hi Ali Rashid <i style={{ fontSize: '12px' }} className="material-symbols-outlined ms-1">expand_more</i>
-                        </span>
-                    </a>
-                    <div className="dropdown-menu dropdown-menu-end profile-dropdown ">
+          {/* <!-- User Dropdown --> */}
+          <li className="dropdown">
+            <a className="nav-link  nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+
+              {/* <a className="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false"> */}
+              <img src={currentUserPic} alt="user-image" className="rounded-circle" />
+              <span className="ms-1 d-none d-md-inline-block">
+                {currentUser?.Title}
+                {/* <i style={{ fontSize: '12px' }} className="material-symbols-outlined ms-1">expand_more</i> */}
+              </span>
+            </a>
+            {/* <div className="dropdown-menu dropdown-menu-end profile-dropdown ">
                      
                       <div className="dropdown-header noti-title">
                         <h6 className="text-overflow m-0">Welcome !</h6>
@@ -310,19 +332,19 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
                         <span>Logout</span>
                       </a>
 
-                    </div>
-                  </li>
+                    </div> */}
+          </li>
 
-                  {/* <!-- Right Bar offcanvas button (Theme Customization Panel) --> */}
-                  <li>
-                    <a className="nav-link waves-effect waves-light" data-bs-toggle="offcanvas" href="#theme-settings-offcanvas">
-                      <i className="fe-settings font-22"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-          </div>
-          )
+          {/* <!-- Right Bar offcanvas button (Theme Customization Panel) --> */}
+          <li>
+            <a className="nav-link waves-effect waves-light" data-bs-toggle="offcanvas" href="#theme-settings-offcanvas">
+              <i className="fe-settings font-22"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  )
 }
 
-          export default TopNav
+export default TopNav

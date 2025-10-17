@@ -12,15 +12,55 @@ interface INewsCommentsProps {
 
 const CommentsCard = ({ newsId, comments }: INewsCommentsProps) => {
     const sp: SPFI = getSP();
+    const [currentUser, setCurrentUser] = React.useState<any>(null);
     const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
     const [likedComments, setLikedComments] = useState<{ [key: number]: boolean }>({});
+    const [likesData, setLikesData] = useState<{ [key: number]: { count: number; likedByUser: boolean } }>({});
 
-  const [localComments, setLocalComments] = useState<any[]>(comments);
+    const [localComments, setLocalComments] = useState<any[]>(comments);
 
-React.useEffect(() => {
-  setLocalComments(comments);
-}, [comments]);
+    React.useEffect(() => {
+        // const currentUser = await sp.web.currentUser();
+        // setCurrentUser(sp.web.currentUser());
+        setLocalComments(comments);
 
+        fetchLikesForVisibleComments();
+
+    }, [comments]);
+
+    const fetchLikesForVisibleComments = async () => {
+        try {
+            const currentUser = await sp.web.currentUser();
+            setCurrentUser(currentUser);
+            const commentIds = comments.map(c => c.ID);
+
+            if (commentIds.length === 0) return;
+
+            // Fetch likes for only these comment IDs
+            const likeItems = await sp.web.lists
+                .getByTitle("NewsandAnnouncementCommentLikes")
+                .items.select("ID", "CommentID/ID", "User/ID")
+                .expand("CommentID", "User")();
+
+            // Filter likes only for comments in current page
+            const filteredLikes = likeItems.filter(l => commentIds.includes(l.CommentID?.ID));
+
+            // Build dictionary for quick lookup
+            const data: { [key: number]: { count: number; likedByUser: boolean } } = {};
+
+            commentIds.forEach(id => {
+                const likesForComment = filteredLikes.filter(l => l.CommentID?.ID === id);
+                data[id] = {
+                    count: likesForComment.length,
+                    likedByUser: likesForComment.some(l => l.User?.ID === currentUser.Id)
+                };
+            });
+
+            setLikesData(data);
+        } catch (err) {
+            console.error("Error fetching likes:", err);
+        }
+    };
 
 
     // const handleReplySubmit = async (parentId: number) => {
@@ -40,52 +80,122 @@ React.useEffect(() => {
     //     }
     // };
     const handleReplySubmit = async (parentId: number) => {
-  if (!replyText[parentId]?.trim()) return;
+        if (!replyText[parentId]?.trim()) return;
 
-  try {
-    // ✅ Add reply to SharePoint list
-    const addedItem = await sp.web.lists
-      .getByTitle("NewsandAnnouncementComments")
-      .items.add({
-        CommentText: replyText[parentId],
-        NewsIDId: newsId,
-        ParentCommentIDId: parentId,
-      });
+        try {
+            // ✅ Add reply to SharePoint list
+            const addedItem = await sp.web.lists
+                .getByTitle("NewsandAnnouncementComments")
+                .items.add({
+                    CommentText: replyText[parentId],
+                    NewsIDId: newsId,
+                    ParentCommentIDId: parentId,
+                });
 
-    // ✅ Get current user (for reply display)
-    const currentUser = await sp.web.currentUser();
+            // ✅ Get current user (for reply display)
+            const currentUser = await sp.web.currentUser();
 
-    // ✅ Build new reply object (mimic structure)
-    const newReply = {
-      ID: addedItem.data.ID,
-      CommentText: replyText[parentId],
-      Created: new Date().toISOString(),
-      Author: {
-        Title: currentUser.Title,
-        EMail: currentUser.Email,
-      },
+            // ✅ Build new reply object (mimic structure)
+            const newReply = {
+                ID: addedItem.data.ID,
+                CommentText: replyText[parentId],
+                Created: new Date().toISOString(),
+                Author: {
+                    Title: currentUser.Title,
+                    EMail: currentUser.Email,
+                },
+            };
+
+            // ✅ Clear input box
+            setReplyText((prev) => ({ ...prev, [parentId]: "" }));
+
+            // ✅ Update local state with new reply
+            setLocalComments((prev) =>
+                prev.map((comment) =>
+                    comment.ID === parentId
+                        ? { ...comment, Replies: [newReply, ...(comment.Replies || [])] } // ✅ new reply on top
+                        : comment
+                )
+            );
+
+        } catch (error) {
+            console.error("Error submitting reply:", error);
+        }
     };
 
-    // ✅ Clear input box
-    setReplyText((prev) => ({ ...prev, [parentId]: "" }));
 
-    // ✅ Update local state with new reply
-    setLocalComments((prev) =>
-      prev.map((comment) =>
-        comment.ID === parentId
-          ? { ...comment, Replies: [...(comment.Replies || []), newReply] }
-          : comment
-      )
-    );
-  } catch (error) {
-    console.error("Error submitting reply:", error);
-  }
-};
+    // const toggleLike = (commentId: number) => {
+    //     setLikedComments((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
+    // };
+    const toggleLike = async (commentId: number) => {
+        try {
+            const currentUser = await sp.web.currentUser();
+            const current = likesData[commentId];
 
+            if (!current?.likedByUser) {
+                // ➕ LIKE
 
-    const toggleLike = (commentId: number) => {
-        setLikedComments((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
+                // 1️⃣ Add entry in Likes list
+                await sp.web.lists.getByTitle("NewsandAnnouncementCommentLikes").items.add({
+                    CommentIDId: commentId,
+                    UserId: currentUser.Id
+                });
+
+                // 2️⃣ Update count in Comments list
+                await sp.web.lists
+                    .getByTitle("NewsandAnnouncementComments")
+                    .items.getById(commentId)
+                    .update({
+                        LikesCount: (current?.count || 0) + 1
+                    });
+
+                // 3️⃣ Update state locally
+                setLikesData(prev => ({
+                    ...prev,
+                    [commentId]: {
+                        count: (current?.count || 0) + 1,
+                        likedByUser: true
+                    }
+                }));
+
+            } else {
+                // ➖ UNLIKE
+
+                // 1️⃣ Find the existing like item
+                const existingLike = await sp.web.lists
+                    .getByTitle("NewsandAnnouncementCommentLikes")
+                    .items.filter(`CommentID/ID eq ${commentId} and User/ID eq ${currentUser.Id}`)
+                    .select("ID")();
+
+                if (existingLike.length > 0) {
+                    await sp.web.lists
+                        .getByTitle("NewsandAnnouncementCommentLikes")
+                        .items.getById(existingLike[0].ID)
+                        .delete();
+                }
+
+                // 2️⃣ Update count in Comments list
+                await sp.web.lists
+                    .getByTitle("NewsandAnnouncementComments")
+                    .items.getById(commentId)
+                    .update({
+                        LikesCount: Math.max((current?.count || 1) - 1, 0)
+                    });
+
+                // 3️⃣ Update local state
+                setLikesData(prev => ({
+                    ...prev,
+                    [commentId]: {
+                        count: Math.max((current?.count || 1) - 1, 0),
+                        likedByUser: false
+                    }
+                }));
+            }
+        } catch (err) {
+            console.error("Error updating like:", err);
+        }
     };
+
 
 
     return (
@@ -93,6 +203,8 @@ React.useEffect(() => {
         <div className="row mt-2">
             {localComments.map((comment) => {
                 const profilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${comment.Author?.EMail}`;
+                const commentedDate = moment.utc(comment.Created).local().format("DD MMM YYYY, hh:mm A");
+                const CurrprofilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${currentUser?.Email}`;
                 return (<div className="col-xl-6" key={comment.ID}>
                     <div className="card team-fedd">
                         <div className="card-body nose mx-2 mb-2 mt-2">
@@ -110,7 +222,7 @@ React.useEffect(() => {
                                             </a>
                                         </h5>
                                         <p className="text-muted font-12">
-                                            <small>{moment.utc(comment.Created).local().format("DD MMM YYYY, hh:mm A")}</small>
+                                            <small>{commentedDate}</small>
                                         </p>
                                     </div>
                                 </div>
@@ -118,16 +230,25 @@ React.useEffect(() => {
                                 <p className="mt-2">{comment.CommentText}</p>
 
                                 <div className="mt-0 mb-2">
-                                    <a href="javascript:void(0);" className="btn btn-sm btn-link text-muted ps-0">
+                                    {/* <a href="javascript:void(0);" className="btn btn-sm btn-link text-muted ps-0">
                                         <i
                                             className={`bi ${likedComments[comment.ID] ? "bi-heart-fill text-danger" : "bi-heart text-danger"}`}
                                             style={{ fontSize: "20px", cursor: "pointer" }}
                                             onClick={() => toggleLike(comment.ID)}
                                         ></i>{" "}
                                         2k Likes
+                                    </a> */}
+                                    <a href="javascript:void(0);" className="btn btn-sm btn-link text-muted ps-0">
+                                        <i
+                                            className={`bi ${likesData[comment.ID]?.likedByUser ? "bi-heart-fill text-danger" : "bi-heart text-danger"}`}
+                                            style={{ fontSize: "20px", cursor: "pointer" }}
+                                            onClick={() => toggleLike(comment.ID)}
+                                        ></i>{" "}
+                                        {likesData[comment.ID]?.count || 0} Likes
                                     </a>
+
                                     <a href="javascript:void(0);" className="btn btn-sm btn-link text-muted">
-                                        <i className="mdi mdi-comment-multiple-outline"></i>{" "}
+                                        <i className="bi bi-chat"></i>{" "}
                                         {comment.Replies?.length || 0} Replies
                                     </a>
                                 </div>
@@ -138,7 +259,7 @@ React.useEffect(() => {
                                     <ul className="timeline1 mt-0 pt-0" style={{ marginLeft: 7, padding: 0 }}>
                                         {comment.Replies.map((reply: any) => {
                                             const profilePicUrl = `${SITE_URL}/_layouts/15/userphoto.aspx?size=L&username=${reply.Author?.EMail}`;
-
+                                            const commentedDate = moment.utc(reply.Created).local().format("DD MMM YYYY, hh:mm A");
                                             return (
                                                 <li className="timeline-item" key={reply.ID}>
                                                     <span className="img-time">
@@ -148,7 +269,7 @@ React.useEffect(() => {
                                                         <h5 className="text-dark fw-bold font-14">{reply.Author?.Title}</h5>
                                                         <p className="mb-0">{reply.CommentText}</p>
                                                         <p className="mb-0 text-muted font-12">
-                                                            {moment.utc(reply.Created).local().format("DD MMM YYYY, hh:mm A")}
+                                                            {commentedDate}
                                                         </p>
                                                     </span>
                                                 </li>
@@ -161,7 +282,7 @@ React.useEffect(() => {
                             {/* Reply box */}
                             <div className="d-flex position-relative align-items-start mt-3">
                                 <div className="al nice me-2 mt-2">
-                                    <img src={profilePicUrl} className="w30" />
+                                    <img src={CurrprofilePicUrl} className="w30" />
                                 </div>
                                 <div className="w-100">
                                     <input

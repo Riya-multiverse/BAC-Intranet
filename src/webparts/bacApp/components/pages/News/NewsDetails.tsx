@@ -7,6 +7,7 @@ import { getSP } from '../../../loc/pnpjsConfig';
 import { SPFI } from '@pnp/sp';
 import Swal from 'sweetalert2';
 import CommentsCard from '../../common/CommentsCard';
+import '../../../../../styles/global.scss';
 interface INewsDetailsProps {
     item?: any;
     onCancel: () => void;
@@ -72,7 +73,7 @@ const NewsDetails = ({ item, onCancel, setLoading }: INewsDetailsProps) => {
     }, [showModal, item.images.length]);
     React.useEffect(() => {
         fetchComments();
-    }, [[item.id]]);
+    }, [item.id]);
 
 
     const fetchComments = async () => {
@@ -440,7 +441,7 @@ const submitComment = async () => {
                     <div className="custom-carousel text-center position-relative">
                         <img
                             key={selectedIndex} // key triggers smooth fade
-                            src={item.images[selectedIndex].url}
+                            src={item?.images[selectedIndex]?.url}
                             alt={`slide-${selectedIndex}`}
                             className="img-fluid rounded"
                             style={{

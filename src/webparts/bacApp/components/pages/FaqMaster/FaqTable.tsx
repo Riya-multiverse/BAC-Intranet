@@ -21,6 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CustomBreadcrumb from '../../common/CustomBreadcrumb';
+import { useNavigate } from 'react-router-dom';
 
 // Interface defining props received from parent component
 interface IFaqTableProps {
@@ -31,23 +32,23 @@ interface IFaqTableProps {
 }
 const Breadcrumb = [
 
-    {
+  {
 
-        "MainComponent": "Settings",
+    "MainComponent": "Settings",
 
-        "MainComponentURl": "Settings",
-
-
-    },
-
-    {
-
-        "MainComponent": "FAQ Master",
-
-        "MainComponentURl": "FAQMaster",
+    "MainComponentURl": "Settings",
 
 
-    }
+  },
+
+  {
+
+    "MainComponent": "FAQ Master",
+
+    "MainComponentURl": "FAQMaster",
+
+
+  }
 
 ];
 
@@ -55,17 +56,17 @@ const Breadcrumb = [
 // Main FaqTable component
 const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
 
- 
+
   //State Definitions
-   
+
   const [faqList, setFaqList] = React.useState<any[]>([]);
   const [showForm, setShowForm] = React.useState(false);
   const [editItem, setEditItem] = React.useState<any>(null);
   const _sp: SPFI = getSP();
+const navigate = useNavigate();
 
- 
-    //Fetch FAQ List Data from SharePoint
-   
+  //Fetch FAQ List Data from SharePoint
+
   React.useEffect(() => {
     setLoading(true);
     const fetchFAQData = async () => {
@@ -86,7 +87,7 @@ const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
       } catch (error) {
         console.error("Error fetching FAQ data:", error);
       }
-      finally{
+      finally {
         setLoading(false);
       }
     };
@@ -97,9 +98,9 @@ const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
   /* Handle Edit - Called when edit icon is clicked */
   const handleEdit = (item: any) => {
     console.log("Editing FAQ item:", item);
-    setEditItem(item); 
+    setEditItem(item);
     setShowForm(true);
-    onEdit(item); 
+    onEdit(item);
   };
 
   //  Deletes  record from SharePoint
@@ -115,7 +116,7 @@ const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
       allowOutsideClick: false,
     }).then(async (result) => {
       if (result.isConfirmed) {
-         setLoading(true);
+        setLoading(true);
         try {
           const sp = getSP();
 
@@ -144,8 +145,8 @@ const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
             icon: "error",
             confirmButtonText: "OK",
           });
-        }finally {
-           setLoading(false);
+        } finally {
+          setLoading(false);
         }
       }
     });
@@ -252,8 +253,9 @@ const FaqTable = ({ onAdd, onEdit, setLoading }: IFaqTableProps) => {
               <button
                 type="button"
                 className="btn btn-secondary me-1 waves-effect waves-light"
-                onClick={onAdd}
+                onClick={() => navigate("/Settings")}
               >
+                {" "}
                 <ArrowLeft size={18} className="me-1" />
                 Back
               </button>

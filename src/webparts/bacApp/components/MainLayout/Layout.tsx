@@ -36,6 +36,20 @@ import Event from '../pages/EventMaster/Event';
 import SuccessStories from '../pages/SuccessStoryMaster/SuccessStories';
 import PhotoGallery from '../pages/PhotoGalleryMaster/PhotoGallery';
 
+import NewsInternal from '../pages/News/NewsInternal';
+import AnnouncementMain from '../pages/Announcement/AnnouncementMain';
+import AnnouncementDetails from '../pages/Announcement/AnnouncementDetails';
+
+// import Template from '../pages/TemplateAndFormsMaster/TemplateandForms';
+import TrainingMaterial from '../pages/TrainingMaterialMaster/TrainingMaterial';
+import PhotoGalleryMain from '../pages/PhotoGallery/PhotoGalleryMain';
+import PhotoGalleryInternal from '../pages/PhotoGallery/PhotoGalleryInternal';
+import Template from '../pages/TemplateAndFormsMaster/TemplateandForms';
+import QuickLinks from '../pages/QuickLinks';
+import ProjectsMain from '../pages/ProjectsMain';
+import TemplateandForms from '../pages/TemplatesandForms';
+import TrainingMaterials from '../pages/TrainingMaterials';
+
 
 const Layout = () => {
 
@@ -47,6 +61,9 @@ const Layout = () => {
       <Route path="/Settings" element={<Settings />} />
       <Route path="/NewsMaster" element={<News />} />
       <Route path="/News" element={<NewsMain />} />
+       <Route path="/Announcements" element={<AnnouncementMain />} />
+       <Route path="/AnnouncementsDetails" element={<AnnouncementDetails />} />
+       <Route path="/NewsDetails" element={<NewsInternal />} />
       <Route path="/FAQs" element={<FAQ />} />
       <Route path="/SectionOverview" element={<SectionOverview />} />
       <Route path="/QuickLinksMaster" element={<QuickLink />} />
@@ -65,6 +82,14 @@ const Layout = () => {
       <Route path="/AboutTheDepartment" element={<AboutTheDepartment />} />
       <Route path="/EmployeeRecognition" element={<EmployeeRecognition />} />
       <Route path="/EmployeeRecognitionMaster" element={<EmployeeRecognition />} />
+      <Route path="/TemplatesandFormsMaster" element={<Template />} />
+      <Route path="/TemplatesandForms" element={<TemplateandForms />} />
+      <Route path="/TrainingMaterialsMaster" element={<TrainingMaterial />} />
+      <Route path="/TrainingMaterials" element={<TrainingMaterials />} />
+      <Route path="/PhotoGallery" element={<PhotoGalleryMain />} />
+       <Route path="/PhotoGalleryInternal" element={<PhotoGalleryInternal />} />
+        <Route path="/QuickLinks" element={<QuickLinks />} />
+         <Route path="/Projects" element={<ProjectsMain />} />
       <Route
         path="*"
         element={

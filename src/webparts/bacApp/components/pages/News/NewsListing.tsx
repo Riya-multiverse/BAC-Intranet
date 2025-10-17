@@ -5,14 +5,37 @@ import { Share2, Share, Calendar } from 'react-feather';
 import { getSP } from '../../../loc/pnpjsConfig';
 import { SPFI } from '@pnp/sp';
 import * as moment from 'moment';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { APP_URL } from '../../../../../Shared/Constant';
 interface INewsListingProps {
 
-    onEdit: (item: any) => void;
+    // onEdit: (item: any) => void;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
+const NewsListing = ({ setLoading }: INewsListingProps) => {
     const sp: SPFI = getSP();
+    const navigate = useNavigate();
     const [newsItems, setNewsItems] = React.useState<any[]>([]);
+    const [allNews, setAllNews] = React.useState<any[]>([]); // 🔹 Store all fetched news
+    const [category, setCategory] = React.useState<string>('All'); // 🔹 Category filter
+    const [fromDate, setFromDate] = React.useState<string>(''); // 🔹 From date
+    const [toDate, setToDate] = React.useState<string>(''); // 🔹 To date
+
+    const [openDropdownIndex, setOpenDropdownIndex] = React.useState<number | null>(null);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    // Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setOpenDropdownIndex(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const getDocumentLinkByID = async (AttachmentId: number[]) => {
         if (!AttachmentId || AttachmentId.length === 0) return [];
 
@@ -36,6 +59,7 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
     React.useEffect(() => {
 
         const fetchNews = async () => {
+            setLoading(true);
             try {
 
 
@@ -90,8 +114,10 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
                     })
                 );
 
+                setAllNews(formatted);
                 setNewsItems(formatted);
-                console.log("Formatted news with images:", formatted);
+                // console.log("Formatted news with images:", formatted);
+                setLoading(false);
             } catch (err) {
                 console.error("Error fetching news data:", err);
             } finally {
@@ -102,6 +128,38 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
 
         fetchNews();
     }, []);
+    // 🔹 Apply filters whenever category/fromDate/toDate changes
+    React.useEffect(() => {
+        let filtered = [...allNews];
+        // 🔸 Date validation
+        if (fromDate && toDate && moment(toDate).isBefore(moment(fromDate))) {
+            setToDate('');
+            Swal.fire("To Date cannot be earlier than From Date.");
+            return;
+        }
+
+        if (category !== 'All') {
+            filtered = filtered.filter(
+                (item) => item.category?.toLowerCase() === category.toLowerCase()
+            );
+        }
+
+        if (fromDate) {
+            const from = moment(fromDate).startOf('day');
+            filtered = filtered.filter((item) =>
+                moment(item.created).isSameOrAfter(from)
+            );
+        }
+
+        if (toDate) {
+            const to = moment(toDate).endOf('day');
+            filtered = filtered.filter((item) =>
+                moment(item.created).isSameOrBefore(to)
+            );
+        }
+
+        setNewsItems(filtered);
+    }, [category, fromDate, toDate, allNews]);
 
     const Breadcrumb = [
 
@@ -136,7 +194,12 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
                     <div className="d-flex flex-wrap align-items-center justify-content-end mt-3 mb-3">
                         <div style={{ width: '310px' }}>
                             <label style={{ float: 'left', textAlign: 'right', width: '150px' }} htmlFor="inputPassword2" className="me-2 mt-1">Select Category</label>
-                            <select style={{ float: 'left', width: '130px' }} className="form-select me-1">
+                            <select
+                                style={{ float: 'left', width: '130px' }}
+                                className="form-select me-1"
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)} // 🔹 Update category
+                            >
                                 <option>All</option>
                                 <option>Internal</option>
                                 <option>External</option>
@@ -144,12 +207,22 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
 
                         <label htmlFor="status-select" className="me-2">From</label>
                         <div className="me-3">
-                            <input type="date" className="form-control my-1 my-md-0" id="inputPassword2" placeholder="Search..." />
+                            <input
+                                type="date"
+                                className="form-control"
+                                value={fromDate}
+                                onChange={(e) => setFromDate(e.target.value)} // 🔹 Update fromDate
+                            />
                         </div>
 
                         <label htmlFor="status-select" className="me-2">To</label>
                         <div className="me-2">
-                            <input type="date" className="form-control my-1 my-md-0" id="inputPassword2" placeholder="Search..." />
+                            <input
+                                type="date"
+                                className="form-control"
+                                value={toDate}
+                                onChange={(e) => setToDate(e.target.value)} // 🔹 Update toDate
+                            />
                         </div>
 
 
@@ -161,6 +234,11 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
 
 
             </div>
+
+            {/* 🔹 News Cards Rendering */}
+            {newsItems.length === 0 && (
+                <p className="text-center text-muted mt-4">No news found.</p>
+            )}
 
             {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
                 <div className="col-lg-5">
@@ -202,7 +280,20 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
                                 </p>
                                 </div>
                                 {/* <a href="newsnew-internal.html"> */}
-                                <div onClick={() => onEdit(item)} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div>
+                                {/* <button
+                                                type="button"
+                                                className="btn btn-secondary me-1 waves-effect waves-light"
+                                                onClick={() => navigate("/Settings")}
+                                              >
+                                                {" "}
+                                                <ArrowLeft size={18} className="me-1" />
+                                                Back
+                                              </button> */}
+                                {/* <div onClick={() => onEdit(item)} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div> */}
+                                <div onClick={() => {
+                                    sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
+                                    sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails")
+                                }} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div>
 
                                 {/* </a> */}
 
@@ -218,7 +309,10 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
                         <div className="card mb-2">
                             <div className="card-body">
                                 <div className="row align-items-start">
-                                    <div className="col-sm-2" onClick={() => onEdit(item)} style={{ cursor: 'pointer' }}>
+                                    <div className="col-sm-2" onClick={() => {
+                                        sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
+                                        sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails");
+                                    }} style={{ cursor: 'pointer' }}>
                                         {/* <a href="NewsInternal">  */}
                                         {/* <div className="imagehright">
                                             <img className="d-flex align-self-center me-3 w-100" src={require("../../../assets/Banner1.png")} alt="Generic placeholder image" />
@@ -237,7 +331,10 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
 
                                         </div>
                                         {/* <a href="newsnew-internal.html"> */}
-                                        <div className="w-100" onClick={() => onEdit(item)} style={{ cursor: 'pointer' }}>
+                                        <div className="w-100" onClick={() => {
+                                            sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
+                                            sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails");
+                                        }} style={{ cursor: 'pointer' }}>
                                             <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding">{item.title}</h4>
                                             <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding">{item.description}</p>
                                             <p className="read-more">Read more..</p>
@@ -247,15 +344,67 @@ const NewsListing = ({ onEdit, setLoading }: INewsListingProps) => {
                                     <div className="col-sm-1">
                                         <div className="text-end mt-0 mt-sm-0">
                                             <div className="btn-group">
-                                                <button type="button" className="btn border-0 ps-0 pt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {/* <i className="fe-share-2 font-22 text-dark"></i> */}
+                                                <button
+                                                    type="button"
+                                                    className="btn border-0 ps-0 pt-0"
+                                                    onClick={() =>
+                                                        setOpenDropdownIndex(
+                                                            openDropdownIndex === index ? null : index
+                                                        )
+                                                    }
+                                                >
                                                     <Share2 size={20} color="#6c757d" />
                                                 </button>
-                                                <div className="dropdown-menu" >
-                                                    <a className="dropdown-item" href="#">Share by email</a>
-                                                    <a className="dropdown-item" href="#">Copy Link</a>
 
-                                                </div>
+                                                {openDropdownIndex === index && (
+                                                    <div
+                                                        className="dropdown-menu show shadow-sm rounded"
+                                                        style={{
+                                                            position: "absolute",
+                                                            right: 0,
+                                                            top: "100%",
+                                                            minWidth: "160px",
+                                                            display: "block",
+                                                            background: "#fff",
+                                                            zIndex: 1000,
+                                                        }}
+                                                    >
+                                                        <button
+                                                            className="dropdown-item"
+                                                            onClick={() => {
+                                                                const subject = encodeURIComponent(
+                                                                    `Check out this news: ${item.title}`
+                                                                );
+                                                                const body = encodeURIComponent(
+                                                                    `${item.description}\n\nLink: ${APP_URL}#/NewsDetails?newsId=${item.id}`
+                                                                );
+                                                                window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                                                                setOpenDropdownIndex(null);
+                                                            }}
+                                                        >
+                                                            Share by Email
+                                                        </button>
+                                                        <button
+                                                            className="dropdown-item"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(
+                                                                    `${APP_URL}#/NewsDetails?newsId=${item.id}`
+                                                                );
+                                                                Swal.fire({
+                                                                    backdrop: false,
+                                                                    title: "Link copied!",
+                                                                    icon: "success",
+                                                                    confirmButtonText: "OK",
+                                                                    showConfirmButton: true,
+                                                                    allowOutsideClick: true,
+                                                                });
+                                                                setOpenDropdownIndex(null);
+                                                            }}
+                                                        >
+                                                            Copy Link
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
 
 
