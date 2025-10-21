@@ -380,10 +380,7 @@ const QuickLinkForm = ({ item, onCancel, onSave, setLoading }: IQuickLinkTablePr
             .select("*")()
             .then((res) => {
                 console.log(res, ' let arrs=[]');
-                // const bannerimgobject = res.QuickLinkImage != "{}" && JSON.parse(res.QuickLinkImage)
-                // console.log(bannerimgobject[0], 'bannerimgobject');
-
-                // bannerimg.push(bannerimgobject);
+                
                 const parsedValues = {
                     ID: res?.ID,
                     Title: res.Title != undefined ? res.Title : "",

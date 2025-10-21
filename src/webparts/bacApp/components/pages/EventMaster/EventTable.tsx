@@ -267,7 +267,7 @@ const EventTable = ({ onAdd, onEdit, setLoading }: IEventTableProps) => {
           {/* <h4 className="page-title fw-bold mb-1 font-20">TeamAchievements Master</h4>
                                 <ol className="breadcrumb m-0">
                         
-                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
+                                    <li className="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
                                     <li className="breadcrumb-item"> 
                                        
                                         </li>
@@ -283,7 +283,7 @@ const EventTable = ({ onAdd, onEdit, setLoading }: IEventTableProps) => {
                                     
                                     </div> --> */}
 
-              {/* <a href="settings.html">  */}
+              {/* <a href="javascript:void(0)">  */}
               <button
                 type="button"
                 className="btn btn-secondary me-1 waves-effect waves-light"
@@ -294,7 +294,7 @@ const EventTable = ({ onAdd, onEdit, setLoading }: IEventTableProps) => {
                 Back
               </button>
               {/* </a>  */}
-              {/* <a href="add-news.html">  */}
+              {/* <a href="javascript:void(0)">  */}
               <button
                 type="button"
                 className="btn btn-primary waves-effect waves-light"

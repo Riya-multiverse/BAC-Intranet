@@ -355,40 +355,185 @@ const TemplateForm = ({
   };
 
   // submit
+  // const handleSubmit = async () => {
+  //   setLoading(true);
+  //   try {
+  //     let uploadedAttachmentIds: number[] = [];
+  //     let uploadedIconIds: number[] = [];
+
+  //     // Delete old attachments
+  //     if (deletedFileIds.length > 0) {
+  //       for (const fileId of deletedFileIds) {
+  //         await sp.web.lists
+  //           .getByTitle("TemplateDocs")
+  //           .items.getById(fileId)
+  //           .delete();
+  //       }
+  //     }
+
+  //     // Delete old icons
+  //     if (deletedIconIds.length > 0) {
+  //       for (const iconId of deletedIconIds) {
+  //         await sp.web.lists
+  //           .getByTitle("TemplateDocs")
+  //           .items.getById(iconId)
+  //           .delete();
+  //       }
+  //     }
+
+  //     // Upload new files
+  //     if (thumbnails.length > 0) {
+  //       uploadedAttachmentIds = await uploadFilesToLibrary(thumbnails);
+  //     }
+  //     if (Icons.length > 0) {
+  //       uploadedIconIds = await uploadFilesToLibrary(Icons);
+  //     }
+
+  //     const finalAttachmentId =
+  //       uploadedAttachmentIds.length > 0
+  //         ? uploadedAttachmentIds[0]
+  //         : existingThumbnailIds[0] || null;
+
+  //     const finalIconId =
+  //       uploadedIconIds.length > 0
+  //         ? uploadedIconIds[0]
+  //         : existingIconIds[0] || null;
+
+  //     // Build payload
+  //     const payload: any = {
+  //       Title: title,
+  //       Description: description,
+  //       DepartmentId: department?.value || null,
+  //       AttachmentIDId: finalAttachmentId,
+  //       IconIDId: finalIconId,
+  //     };
+
+  //     // Save to list
+  //     if (item && item.Id) {
+  //       await sp.web.lists
+  //         .getByTitle("TemplateAndForms")
+  //         .items.getById(item.Id)
+  //         .update(payload);
+  //     } else {
+  //       await sp.web.lists.getByTitle("TemplateAndForms").items.add(payload);
+  //     }
+
+  //     setDeletedFileIds([]);
+  //     setDeletedIconIds([]);
+  //     setThumbnails([]);
+  //     setIcons([]);
+  //     setExistingThumbnails([]);
+  //     setExistingIcons([]);
+  //     onSave(payload);
+  //   } catch (error) {
+  //     Swal.fire({
+  //       title: "Error",
+  //       text: "Failed to save the record.",
+  //       icon: "error",
+  //       backdrop: false,
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const confirmAndSubmit = async () => {
+  //   const isValid = await validateForm();
+  //   if (!isValid) {
+  //     Swal.fire({
+  //       title: "Please fill all the mandatory fields.",
+  //       icon: "warning",
+  //       confirmButtonText: "OK",
+  //       backdrop: false,
+  //       allowOutsideClick: false,
+  //     });
+  //     return;
+  //   }
+
+  //   const isEdit = item && item.Id;
+  //   Swal.fire({
+  //     title: isEdit
+  //       ? "Do you want to update this record?"
+  //       : "Do you want to submit this record?",
+  //     icon: "question",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Yes",
+  //     cancelButtonText: "No",
+  //     reverseButtons: false,
+  //     backdrop: false,
+  //     allowOutsideClick: false,
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         await handleSubmit();
+  //         Swal.fire({
+  //           title: isEdit ? "Updated successfully." : "Submitted successfully.",
+  //           icon: "success",
+  //           confirmButtonText: "OK",
+  //           backdrop: false,
+  //         });
+  //       } catch (error) {
+  //         Swal.fire({
+  //           title: "Error",
+  //           text: isEdit
+  //             ? "Failed to update record"
+  //             : "Failed to submit record",
+  //           icon: "error",
+  //           confirmButtonText: "OK",
+  //           backdrop: false,
+  //         });
+  //       }
+  //     }
+  //   });
+  // };
+
+
+  //  Enhanced handleSubmit with deep debugging
   const handleSubmit = async () => {
     setLoading(true);
+
     try {
       let uploadedAttachmentIds: number[] = [];
       let uploadedIconIds: number[] = [];
 
-      // Delete old attachments
+      // DELETE old attachments
       if (deletedFileIds.length > 0) {
         for (const fileId of deletedFileIds) {
-          await sp.web.lists
-            .getByTitle("TemplateDocs")
-            .items.getById(fileId)
-            .delete();
+          try {
+            await sp.web.lists.getByTitle("TemplateDocs").items.getById(fileId).delete();
+          } catch (err: any) {
+          }
         }
       }
 
-      // Delete old icons
+      //  DELETE old icons
       if (deletedIconIds.length > 0) {
         for (const iconId of deletedIconIds) {
-          await sp.web.lists
-            .getByTitle("TemplateDocs")
-            .items.getById(iconId)
-            .delete();
+          try {
+            await sp.web.lists.getByTitle("TemplateDocs").items.getById(iconId).delete();
+
+          } catch (err: any) {
+          }
         }
       }
 
-      // Upload new files
+      // UPLOAD new attachments
       if (thumbnails.length > 0) {
-        uploadedAttachmentIds = await uploadFilesToLibrary(thumbnails);
-      }
-      if (Icons.length > 0) {
-        uploadedIconIds = await uploadFilesToLibrary(Icons);
+        try {
+          uploadedAttachmentIds = await uploadFilesToLibrary(thumbnails);
+        } catch (err: any) {
+        }
       }
 
+      // UPLOAD new icons
+      if (Icons.length > 0) {
+        try {
+          uploadedIconIds = await uploadFilesToLibrary(Icons);
+        } catch (err: any) {
+        }
+      }
+
+      // Determine final IDs
       const finalAttachmentId =
         uploadedAttachmentIds.length > 0
           ? uploadedAttachmentIds[0]
@@ -399,23 +544,35 @@ const TemplateForm = ({
           ? uploadedIconIds[0]
           : existingIconIds[0] || null;
 
-      // Build payload
+      //  Build payload
       const payload: any = {
-        Title: title,
-        Description: description,
+        Title: title?.trim() || "",
+        Description: description?.trim() || "",
         DepartmentId: department?.value || null,
         AttachmentIDId: finalAttachmentId,
         IconIDId: finalIconId,
       };
-
-      // Save to list
+      //Execute Update or Add
       if (item && item.Id) {
-        await sp.web.lists
-          .getByTitle("TemplateAndForms")
-          .items.getById(item.Id)
-          .update(payload);
+        try {
+          const result = await sp.web.lists
+            .getByTitle("TemplateAndForms")
+            .items.getById(item.Id)
+            .update(payload);
+        } catch (err: any) {
+
+        }
       } else {
-        await sp.web.lists.getByTitle("TemplateAndForms").items.add(payload);
+
+        try {
+          const result = await sp.web.lists
+            .getByTitle("TemplateAndForms")
+            .items.add(payload);
+
+
+        } catch (err: any) {
+
+        }
       }
 
       setDeletedFileIds([]);
@@ -424,8 +581,10 @@ const TemplateForm = ({
       setIcons([]);
       setExistingThumbnails([]);
       setExistingIcons([]);
+
       onSave(payload);
-    } catch (error) {
+    } catch (error: any) {
+
       Swal.fire({
         title: "Error",
         text: "Failed to save the record.",
@@ -433,10 +592,12 @@ const TemplateForm = ({
         backdrop: false,
       });
     } finally {
+
       setLoading(false);
     }
   };
 
+  //  Enhanced confirmAndSubmit with logging
   const confirmAndSubmit = async () => {
     const isValid = await validateForm();
     if (!isValid) {
@@ -451,6 +612,7 @@ const TemplateForm = ({
     }
 
     const isEdit = item && item.Id;
+
     Swal.fire({
       title: isEdit
         ? "Do you want to update this record?"
@@ -464,6 +626,7 @@ const TemplateForm = ({
       allowOutsideClick: false,
     }).then(async (result) => {
       if (result.isConfirmed) {
+
         try {
           await handleSubmit();
           Swal.fire({
@@ -472,7 +635,7 @@ const TemplateForm = ({
             confirmButtonText: "OK",
             backdrop: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           Swal.fire({
             title: "Error",
             text: isEdit
@@ -483,6 +646,7 @@ const TemplateForm = ({
             backdrop: false,
           });
         }
+      } else {
       }
     });
   };
@@ -555,23 +719,23 @@ const TemplateForm = ({
 
                       {(existingThumbnails.length > 0 ||
                         thumbnails.length > 0) && (
-                        <a
-                          className="text-primary"
-                          style={{
-                            fontSize: "0.875rem",
-                            cursor: "pointer",
-                            textDecoration: "none",
-                          }}
-                          onClick={() => setShowModal(true)}
-                        >
-                          <FontAwesomeIcon icon={faPaperclip as any} />{" "}
-                          {existingThumbnails.length + thumbnails.length}{" "}
-                          {existingThumbnails.length + thumbnails.length > 1
-                            ? "files"
-                            : "file"}{" "}
-                          attached
-                        </a>
-                      )}
+                          <a
+                            className="text-primary"
+                            style={{
+                              fontSize: "0.875rem",
+                              cursor: "pointer",
+                              textDecoration: "none",
+                            }}
+                            onClick={() => setShowModal(true)}
+                          >
+                            <FontAwesomeIcon icon={faPaperclip as any} />{" "}
+                            {existingThumbnails.length + thumbnails.length}{" "}
+                            {existingThumbnails.length + thumbnails.length > 1
+                              ? "files"
+                              : "file"}{" "}
+                            attached
+                          </a>
+                        )}
                     </div>
 
                     <input
@@ -589,7 +753,7 @@ const TemplateForm = ({
                         if (selectedFiles.length > 0) {
                           const singleFile = selectedFiles[0];
 
-                          // ✅ Allowed document types
+                          //  Allowed document types
                           const allowedTypes = [
                             "application/pdf",
                             "application/msword",
@@ -612,7 +776,7 @@ const TemplateForm = ({
                             return;
                           }
 
-                          // ✅ Replace any existing file
+                          //  Replace any existing file
                           setThumbnails([singleFile]);
                           if (existingThumbnailIds.length > 0)
                             setDeletedFileIds(existingThumbnailIds);
@@ -667,7 +831,7 @@ const TemplateForm = ({
                         if (selectedFiles.length > 0) {
                           const singleFile = selectedFiles[0];
 
-                          // ✅ Allowed image types
+                          //  Allowed image types
                           const allowedImageTypes = [
                             "image/jpeg",
                             "image/png",
@@ -687,7 +851,7 @@ const TemplateForm = ({
                             return;
                           }
 
-                          // ✅ Replace any existing file
+                          //  Replace any existing file
                           setIcons([singleFile]);
                           if (existingIconIds.length > 0)
                             setDeletedIconIds(existingIconIds);

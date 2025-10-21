@@ -260,16 +260,7 @@ const NewsTable = ({ onAdd, onEdit, setLoading }: INewsTableProps) => {
       {/* <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          {/* <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
-          <ol className="breadcrumb m-0">
-            <li className="breadcrumb-item">
-              <a href="settings.html">Settings</a>
-            </li>
-            <li className="breadcrumb-item">
-              <ChevronRight size={20} color="#000" />
-            </li>
-            <li className="breadcrumb-item active">News Master</li>
-          </ol> */}
+          
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">

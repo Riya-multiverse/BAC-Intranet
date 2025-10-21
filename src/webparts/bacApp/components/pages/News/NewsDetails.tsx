@@ -141,13 +141,7 @@ const submitComment = async () => {
         <>
             <div className="row">
                 <div className="col-lg-2">
-                    {/* <h4 className="page-title fw-bold mb-1 font-20">News</h4>
-                    <ol className="breadcrumb m-0">
-
-                        <li className="breadcrumb-item"><a href="dashboard.html">Home</a></li>
-                        <li className="breadcrumb-item"> <span className="fe-chevron-right"></span></li>
-                        <li className="breadcrumb-item active"><a href="news-feed.html">News</a></li>
-                    </ol> */}
+                   
                     <CustomBreadcrumb Breadcrumb={Breadcrumb} />
                 </div>
 

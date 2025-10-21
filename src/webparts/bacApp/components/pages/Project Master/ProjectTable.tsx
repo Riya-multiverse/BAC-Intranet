@@ -506,7 +506,6 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
                                                 month: "short",
                                             });
                                              const DueDateyear = date2.getFullYear();
-                                            // const ImageUrl = item.BannerImage == undefined || item.BannerImage == null ? "" : JSON.parse(item.BannerImage);
                                             return (
                                                 <tr key={index}>
                                                     <td style={{ minWidth: '40px', maxWidth: '40px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>

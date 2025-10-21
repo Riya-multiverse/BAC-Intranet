@@ -279,16 +279,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                                     {item.description}
                                 </p>
                                 </div>
-                                {/* <a href="newsnew-internal.html"> */}
-                                {/* <button
-                                                type="button"
-                                                className="btn btn-secondary me-1 waves-effect waves-light"
-                                                onClick={() => navigate("/Settings")}
-                                              >
-                                                {" "}
-                                                <ArrowLeft size={18} className="me-1" />
-                                                Back
-                                              </button> */}
+                                
                                 {/* <div onClick={() => onEdit(item)} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div> */}
                                 <div onClick={() => {
                                     sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
@@ -330,7 +321,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                                             <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
 
                                         </div>
-                                        {/* <a href="newsnew-internal.html"> */}
+                                        {/* <a href="javascript:void(0)"> */}
                                         <div className="w-100" onClick={() => {
                                             sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                                             sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails");

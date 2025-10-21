@@ -1,6 +1,6 @@
 import * as React from 'react';
 // import styles from './BacApp.module.scss';
-import type { IBacAppProps } from './IBacAppProps';
+// import type { IBacAppProps } from './IBacAppProps';
 import LeftNav from './MainLayout/LeftNav';
 // import { escape } from '@microsoft/sp-lodash-s
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -10,16 +10,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 import TopNav from './MainLayout/TopNav';
 import Footer from './MainLayout/Footer';
-// import Settings from './pages/settings';
-// import SectionOverview from './pages/SectionOverview';
+
 import Layout from './MainLayout/Layout';
-// import News from './pages/NewsMaster/News';
-// import * as feather from 'feather-icons';
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Dashboard from './pages/dashboard';
-// import ReactDOM from "react-dom/client";
-// import { BrowserRouter, useLocation } from "react-router-dom";
-import { APP_URL } from '../../../Shared/Constant';
+
+
 
 import {
   HashRouter as Router,
@@ -30,7 +24,7 @@ import {
   HashRouter,
 
 } from "react-router-dom";
-import Faq from './pages/faq';
+
 
 
 const BacApp = () => {
@@ -55,16 +49,7 @@ const BacApp = () => {
           className={`app-menu ${isCollapsed ? 'collapsed' : ''}`}
           id="myHeader">
           <div className="logo-box">
-            {/* <a href="dashboard.html" className="logo-light">
-              <img src={require("../assets/logo-light.png")} alt="logo" className="logo-lg" style={{ display: isCollapsed ? 'none' : 'block' }} />
-              <img src={require("../assets/logo-sm.png")} alt="small logo" className="logo-sm" style={{ display: isCollapsed ? 'block' : 'none' }} />
-             
-            </a>
-            <a href="dashboard.html" className="logo-dark">
-              {!isCollapsed && <img src={require("../assets/logo-dark.png")} alt="dark logo" className="logo-lg" />}
-              {isCollapsed && <img src={require("../assets/logo-sm.png")} alt="small logo" className="logo-sm" />}
-
-            </a> */}
+            
             <NavLink to="/Home" className="logo-light">
               <img
                 src={require("../assets/logo-light.png")}
@@ -115,7 +100,7 @@ const BacApp = () => {
 
              
               <Layout />
-              {/* <NewNav/> */}
+             
               
 
 

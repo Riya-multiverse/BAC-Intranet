@@ -49,6 +49,7 @@ import QuickLinks from '../pages/QuickLinks';
 import ProjectsMain from '../pages/ProjectsMain';
 import TemplateandForms from '../pages/TemplatesandForms';
 import TrainingMaterials from '../pages/TrainingMaterials';
+import PolicyandProcedures from '../pages/PolicyandProcedures';
 
 
 const Layout = () => {
@@ -90,6 +91,7 @@ const Layout = () => {
        <Route path="/PhotoGalleryInternal" element={<PhotoGalleryInternal />} />
         <Route path="/QuickLinks" element={<QuickLinks />} />
          <Route path="/Projects" element={<ProjectsMain />} />
+         <Route path="/PolicyandProcedures" element={<PolicyandProcedures />} />
       <Route
         path="*"
         element={

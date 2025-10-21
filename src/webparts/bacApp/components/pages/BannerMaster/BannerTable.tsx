@@ -456,7 +456,6 @@ const BannerTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
                                         )
                                         :
                                         currentData.map((item, index) => {
-                                            // const ImageUrl = item.BannerImage == undefined || item.BannerImage == null ? "" : JSON.parse(item.BannerImage);
                                             return (
                                                 <tr key={index}>
                                                     <td style={{ minWidth: '40px', maxWidth: '40px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>

@@ -56,9 +56,9 @@ const NewsInternal = () => {
         const showDetail = sessionStorage.getItem("showNewsDetails") === "true";
 
         if (savedItem && showDetail) {
-            setEditItem(JSON.parse(savedItem));
-            //   setShowForm(true);
-            fetchComments(JSON.parse(savedItem));
+            // setEditItem(JSON.parse(savedItem));
+           
+            // fetchComments(JSON.parse(savedItem));
         }
         const hash = window.location.hash; // e.g. "#/NewsDetails?newsId=44"
         if (hash.startsWith("#/NewsDetails")) {
@@ -276,13 +276,7 @@ const NewsInternal = () => {
             <>
                 <div className="row">
                     <div className="col-lg-2">
-                        {/* <h4 className="page-title fw-bold mb-1 font-20">News</h4>
-                    <ol className="breadcrumb m-0">
-
-                        <li className="breadcrumb-item"><a href="dashboard.html">Home</a></li>
-                        <li className="breadcrumb-item"> <span className="fe-chevron-right"></span></li>
-                        <li className="breadcrumb-item active"><a href="news-feed.html">News</a></li>
-                    </ol> */}
+                      
                         <CustomBreadcrumb Breadcrumb={Breadcrumb} />
                     </div>
 

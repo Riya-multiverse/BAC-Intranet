@@ -598,7 +598,7 @@ const PolicyandProcedureForm = ({
           </h4>
           <ol className="breadcrumb m-0">
             <li className="breadcrumb-item">
-              <a href="settings.html">Settings</a>
+              <a href="javascript:void(0)">Settings</a>
             </li>
             <li className="breadcrumb-item">
             
@@ -611,7 +611,7 @@ const PolicyandProcedureForm = ({
                 <div className="col-lg-8">
                     <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
                         <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-                            {/* <a href="settings.html">
+                            {/* <a href="javascript:void(0)">
                 {" "}
                 <button
                   type="button"

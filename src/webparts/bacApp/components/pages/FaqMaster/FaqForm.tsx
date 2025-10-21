@@ -189,7 +189,7 @@ const FaqForm = ({ item, onCancel, onSave ,setLoading}: IFaqFormProps) => {
                                 {/* <h4 className="page-title fw-bold mb-1 font-20">FAQ Master</h4>
                                 <ol className="breadcrumb m-0">
                         
-                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
+                                    <li className="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
                                     <li className="breadcrumb-item"> 
                                         <span className="fe-chevron-right"></span>
                                         
@@ -206,8 +206,8 @@ const FaqForm = ({ item, onCancel, onSave ,setLoading}: IFaqFormProps) => {
                                     
                                     
                                   
-                                    {/* <a href="settings.html"> <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" ><i className="fe-arrow-left me-1"></i>Back</button></a> 
-                                 <a href="add-news.html">  <button type="button" className="btn btn-primary waves-effect waves-light" ><i className="fe-plus-circle me-1"></i>Add</button></a>  */}
+                                    {/* <a href="javascript:void(0)"> <button type="button" className="btn btn-secondary me-1 waves-effect waves-light" ><i className="fe-arrow-left me-1"></i>Back</button></a> 
+                                 <a href="javascript:void(0)">  <button type="button" className="btn btn-primary waves-effect waves-light" ><i className="fe-plus-circle me-1"></i>Add</button></a>  */}
                                 </form>
                                 
                                 

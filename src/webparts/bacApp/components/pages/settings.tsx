@@ -107,7 +107,7 @@ const settings = () => {
                  <div className="col-md-3">
                      <NavLink to={`/${item.LinkUrl.replace(/^\//, '')}`}>
 
-                    {/* <a href="Approvals-Master.html"> */}
+                    {/* <a href="javascript:void(0)"> */}
                         <div className="card-master box1">
                             <div className="icon">
                                 <img src={require("../../assets/noun-approval-5526052.png")} data-themekey="#" />
@@ -123,7 +123,7 @@ const settings = () => {
                
 
                 {/* <div className="col-md-3">
-                    <a href="mediaevent.html">
+                    <a href="javascript:void(0)">
                         <div className="card-master box1">
                             <div className="icon">
                                 <img src={require("../../assets/noun-awards-3455472.png")} data-themekey="#" />
@@ -136,7 +136,7 @@ const settings = () => {
 
                 <div className="col-md-3">
 
-                    <a href="news-master.html">
+                    <a href="javascript:void(0)">
                         <div className="card-master box1">
                             <div className="icon">
                                 <img src={require("../../assets/noun_news_518193bn.png")} data-themekey="#" />
@@ -151,7 +151,7 @@ const settings = () => {
 
                 <div className="col-md-3">
 
-                    <a href="announcement-master.html">
+                    <a href="javascript:void(0)">
                         <div className="card-master box1">
                             <div className="icon">
                                 <img src={require("../../assets/noun-publication-4594256.png")} data-themekey="#" />

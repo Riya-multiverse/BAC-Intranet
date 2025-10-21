@@ -455,7 +455,6 @@ const TrainingTable = ({ onAdd, onEdit, setLoading }: IMaterialProps) => {
                     </div>
                   ) : (
                     currentData.map((item, index) => {
-                      // const ImageUrl = item.BannerImage == undefined || item.BannerImage == null ? "" : JSON.parse(item.BannerImage);
                       return (
                         <tr key={index}>
                           <td style={{ minWidth: "40px", maxWidth: "40px" }}>

@@ -235,14 +235,7 @@ const navigate = useNavigate();
       {/* Page Title and Header */}
       <div className="row">
         <div className="col-lg-4">
-          {/* <h4 className="page-title fw-bold mb-1 font-20">FAQ Master</h4>
-          <ol className="breadcrumb m-0">
-            <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
-            <li className="breadcrumb-item">
-              
-            </li>
-            <li className="breadcrumb-item active">FAQ Master</li>
-          </ol> */}
+         
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
 

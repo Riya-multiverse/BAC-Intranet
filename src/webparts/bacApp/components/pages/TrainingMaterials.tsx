@@ -181,7 +181,7 @@ const TrainingMaterials = () => {
                     <div className="col-lg-12">
                         {/* <h4 className="page-title fw-bold mb-1 font-20">Training Materials</h4>
             <ol className="breadcrumb m-0">
-              <li className="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+              <li className="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
               <li className="breadcrumb-item"> <span className="fe-chevron-right"></span></li>
               <li className="breadcrumb-item active">Training Materials</li>
             </ol> */}

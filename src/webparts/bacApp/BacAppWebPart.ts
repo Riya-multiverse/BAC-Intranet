@@ -45,42 +45,48 @@ export default class BacAppWebPart extends BaseClientSideWebPart<IBacAppWebPartP
   //   });
   // }
 
-   protected onInit(): Promise<void> {
-    return super.onInit().then(_ => {
+  //  protected onInit(): Promise<void> {
+  //   return super.onInit().then(_ => {
  
-      // Initialize PnP SP only after context is ready
-      getSP(this.context);
+  //     // Initialize PnP SP only after context is ready
+  //     getSP(this.context);
  
-    });
+  //   });
+  // }
+  protected async onInit(): Promise<void> {
+   
+
+    await super.onInit();
+    getSP(this.context);
   }
 
 
-  private _getEnvironmentMessage(): Promise<string> {
-    if (!!this.context.sdks.microsoftTeams) { // running in Teams, office.com or Outlook
-      return this.context.sdks.microsoftTeams.teamsJs.app.getContext()
-        .then(context => {
-          let environmentMessage: string = '';
-          switch (context.app.host.name) {
-            case 'Office': // running in Office
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOffice : strings.AppOfficeEnvironment;
-              break;
-            case 'Outlook': // running in Outlook
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOutlook : strings.AppOutlookEnvironment;
-              break;
-            case 'Teams': // running in Teams
-            case 'TeamsModern':
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentTeams : strings.AppTeamsTabEnvironment;
-              break;
-            default:
-              environmentMessage = strings.UnknownEnvironment;
-          }
+  // private _getEnvironmentMessage(): Promise<string> {
+  //   if (!!this.context.sdks.microsoftTeams) { // running in Teams, office.com or Outlook
+  //     return this.context.sdks.microsoftTeams.teamsJs.app.getContext()
+  //       .then(context => {
+  //         let environmentMessage: string = '';
+  //         switch (context.app.host.name) {
+  //           case 'Office': // running in Office
+  //             environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOffice : strings.AppOfficeEnvironment;
+  //             break;
+  //           case 'Outlook': // running in Outlook
+  //             environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOutlook : strings.AppOutlookEnvironment;
+  //             break;
+  //           case 'Teams': // running in Teams
+  //           case 'TeamsModern':
+  //             environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentTeams : strings.AppTeamsTabEnvironment;
+  //             break;
+  //           default:
+  //             environmentMessage = strings.UnknownEnvironment;
+  //         }
 
-          return environmentMessage;
-        });
-    }
+  //         return environmentMessage;
+  //       });
+  //   }
 
-    return Promise.resolve(this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment);
-  }
+  //   return Promise.resolve(this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment);
+  // }
 
   protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
     if (!currentTheme) {

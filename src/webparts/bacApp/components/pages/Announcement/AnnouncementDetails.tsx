@@ -49,16 +49,16 @@ const AnnouncementDetails = () => {
     }, 3000); // 3 seconds interval
 
     return () => clearInterval(interval); // cleanup when modal closes or unmounts
-  }, [showModal, item?.images.length]);
+  }, [showModal, item?.images?.length]);
 
   React.useEffect(() => {
     const savedItem = sessionStorage.getItem("selectedNewsItem");
     const showDetail = sessionStorage.getItem("showNewsDetails") === "true";
 
     if (savedItem && showDetail) {
-      setEditItem(JSON.parse(savedItem));
-      //   setShowForm(true);
-      fetchComments(JSON.parse(savedItem));
+      // setEditItem(JSON.parse(savedItem));
+      
+      // fetchComments(JSON.parse(savedItem));
     }
     const hash = window.location.hash; // e.g. "#/AnnouncementsDetails?aId=44"
     if (hash.startsWith("#/AnnouncementsDetails")) {
@@ -359,7 +359,7 @@ const AnnouncementDetails = () => {
 
             <div className="row internalmedia filterable-content mt-3">
 
-              {item?.images.map((img: any, index: number) => (
+              {item?.images?.map((img: any, index: number) => (
                 <div className={`col-sm-6 col-xl-3 filter-item all ${index % 2 === 0 ? "web illustrator" : "graphic photography"
                   }`}>
                   <div className="gal-box">
@@ -434,10 +434,10 @@ const AnnouncementDetails = () => {
         >
           <Modal.Header closeButton />
           <Modal.Body>
-            <div className="custom-carousel text-center position-relative">
+         {item?.images && item.images.length > 0 && (   <div className="custom-carousel text-center position-relative">
               <img
                 key={selectedIndex} // key triggers smooth fade
-                src={item?.images[selectedIndex]?.url}
+                src={item?.images[selectedIndex]?.url||""}
                 alt={`slide-${selectedIndex}`}
                 className="img-fluid rounded"
                 style={{
@@ -464,7 +464,7 @@ const AnnouncementDetails = () => {
               >
                 <span className="carousel-control-next-icon"></span>
               </button>
-            </div>
+            </div>)}
           </Modal.Body>
         </Modal>
       </>

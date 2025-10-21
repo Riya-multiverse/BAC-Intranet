@@ -75,7 +75,7 @@ const faq = () => {
                 </h4>
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="dashboard.html">Home</a>
+                    <a href="javascript:void(0)">Home</a>
                   </li>
                   <li className="breadcrumb-item">
                     <ChevronRight size={14} />

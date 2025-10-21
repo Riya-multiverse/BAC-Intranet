@@ -200,7 +200,7 @@ const EventForm = ({ item, onCancel, onSave, setLoading }: IEventProps) => {
           {/* <h4 className="page-title fw-bold mb-1 font-20">TeamAchievements Master</h4>
                                 <ol className="breadcrumb m-0">
                         
-                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
+                                    <li className="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
                                     <li className="breadcrumb-item"> 
                                         
                                         
@@ -213,7 +213,7 @@ const EventForm = ({ item, onCancel, onSave, setLoading }: IEventProps) => {
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <a href="settings.html">
+              <a href="javascript:void(0)">
                 {" "}
                 {/* <button
                   type="button"
@@ -222,7 +222,7 @@ const EventForm = ({ item, onCancel, onSave, setLoading }: IEventProps) => {
                   <i className="fe-arrow-left me-1"></i>Back
                 </button> */}
               </a>
-              <a href="add-news.html">
+              <a href="javascript:void(0)">
                 {" "}
                 {/* <button
                   type="button"

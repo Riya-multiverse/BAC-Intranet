@@ -196,23 +196,13 @@ const TeamAchievements = ({
       {/* // <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          {/* <h4 className="page-title fw-bold mb-1 font-20">TeamAchievements Master</h4>
-                                <ol className="breadcrumb m-0">
-                        
-                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
-                                    <li className="breadcrumb-item"> 
-                                        
-                                        
-                                        </li>
-                                
-                                    <li className="breadcrumb-item active">TeamAchievements Master</li>
-                                </ol> */}
+          
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <a href="settings.html">
+              <a href="javascript:void(0)">
                 {" "}
                 <button
                   type="button"
@@ -221,7 +211,7 @@ const TeamAchievements = ({
                   <i className="fe-arrow-left me-1"></i>Back
                 </button>
               </a>
-              <a href="add-news.html">
+              <a href="javascript:void(0)">
                 {" "}
                 <button
                   type="button"

@@ -533,32 +533,12 @@ const NewsForm = ({ item, onCancel, onSave, setLoading }: INewsFormProps) => {
       <div className="row">
         <div className="col-lg-4">
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
-          {/* <h4 className="page-title fw-bold mb-1 font-20">News Master</h4>
-          <ol className="breadcrumb m-0">
-            <li className="breadcrumb-item">
-              <a href="settings.html">Settings</a>
-            </li>
-            <li className="breadcrumb-item">
-              
-              <ChevronRight size={20} color="#000" />
-            </li>
-
-            <li className="breadcrumb-item active">News Master</li>
-          </ol> */}
+         
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              {/* <a href="settings.html">
-                {" "}
-                <button
-                  type="button"
-                  className="btn btn-secondary me-1 waves-effect waves-light"
-                >
-                  <ArrowLeft className="me-1" size={16} /> Back
-
-                </button>
-              </a> */}
+             
             </form>
           </div>
         </div>

@@ -85,7 +85,7 @@ const UpcomingEvents = () => {
                 </h4>
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="dashboard.html">Home</a>
+                    <a href="javascript:void(0)">Home</a>
                   </li>
                   <li className="breadcrumb-item">
                     <span className="fe-chevron-right"></span>

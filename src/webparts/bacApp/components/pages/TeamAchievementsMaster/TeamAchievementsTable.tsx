@@ -218,26 +218,13 @@ const TeamAchievementsTable = ({
       {/* <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          {/* <h4 className="page-title fw-bold mb-1 font-20">TeamAchievements Master</h4>
-                                <ol className="breadcrumb m-0">
-                        
-                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
-                                    <li className="breadcrumb-item"> 
-                                       
-                                        </li>
-                                
-                                    <li className="breadcrumb-item active">TeamAchievements Master</li>
-                                </ol> */}
+          
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              {/* <!-- <label for="status-select" className="me-2">Sort By</label>
-                                    
-                                    </div> --> */}
-
-              {/* <a href="settings.html">  */}
+             
               <button
                 type="button"
                 className="btn btn-secondary me-1 waves-effect waves-light"
@@ -247,8 +234,7 @@ const TeamAchievementsTable = ({
                 <ArrowLeft size={18} className="me-1" />
                 Back
               </button>
-              {/* </a>  */}
-              {/* <a href="add-news.html">  */}
+             
               <button
                 type="button"
                 className="btn btn-primary waves-effect waves-light"
@@ -258,7 +244,7 @@ const TeamAchievementsTable = ({
                 <PlusCircle className="me-1" size={18} />
                 Add
               </button>
-              {/* </a>  */}
+           
             </form>
 
             {/* <!-- <button type="button" className="btn btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#custom-modal"><i className="fe-filter me-1"></i>Filter</button> --> */}

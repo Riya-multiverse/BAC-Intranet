@@ -314,7 +314,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                   {item.description}
                 </p>
                 </div>
-                {/* <a href="newsnew-internal.html"> */}
+                {/* <a href="javascript:void(0)"> */}
                 {/* <button
                                                 type="button"
                                                 className="btn btn-secondary me-1 waves-effect waves-light"
@@ -365,7 +365,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                       <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp; &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
 
                     </div>
-                    {/* <a href="newsnew-internal.html"> */}
+                    {/* <a href="javascript:void(0)"> */}
                     <div className="w-100" onClick={() => {
                       sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                       sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails");

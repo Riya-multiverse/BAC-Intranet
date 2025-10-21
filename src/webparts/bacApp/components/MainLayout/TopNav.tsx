@@ -38,13 +38,13 @@ const TopNav: React.FC<ITopNavProps> = ({ toggleMenu, isCollapsed }) => {
           {/* <!-- Topbar Brand Logo --> */}
           <div className="logo-box">
             {/* <!-- Brand Logo Light --> */}
-            <a href="index.html" className="logo-light">
+            <a href="javascript.void(0)" className="logo-light">
               <img src={require("../../assets/logo-light.png")} alt="logo" className="logo-lg" />
               <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm" />
             </a>
 
             {/* <!-- Brand Logo Dark --> */}
-            <a href="index.html" className="logo-dark">
+            <a href="javascript.void(0)" className="logo-dark">
               <img src={require("../../assets/logo-dark.png")} alt="dark logo" className="logo-lg" />
               <img src={require("../../assets/logo-sm.png")} alt="small logo" className="logo-sm" />
             </a>

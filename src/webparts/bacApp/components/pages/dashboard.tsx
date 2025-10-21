@@ -23,6 +23,27 @@ const dashboard = () => {
     const [policies, setPolicies] = useState<any[]>([]);
     const [showFileViewer, setShowFileViewer] = useState(false);
     const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+    //  Define dashboard display limits for "View All" visibility
+    //  Define limits for dashboard sections
+    const DISPLAY_LIMITS = {
+        news: 2,
+        announcements: 2,
+        quickLinks: 6,
+        recognitions: 4,
+        policies: 4,
+        projects: 3,
+    };
+
+    //  Truncate by word count
+    const truncateByWords = (text: string, maxWords: number): string => {
+        if (!text) return "";
+        const words = text.split(" ");
+        if (words.length <= maxWords) return text;
+        return words.slice(0, maxWords).join(" ") + "...";
+    };
+
+
+
 
     const sp: SPFI = getSP();
     // const slides = [
@@ -136,7 +157,7 @@ const dashboard = () => {
                     .expand("AnnouncementandNewsImageID")
                     .filter("SourceType eq 'News' and IsActive eq 'Yes'")
                     .orderBy("Created", false) // latest first
-                    .top(2)(); // only top 2 for dashboard display
+                    .top(DISPLAY_LIMITS.news + 1)(); // only top 2 for dashboard display
 
                 //  Helper to get image URLs from doc library
                 const getDocumentLinkByID = async (AttachmentId: number[]) => {
@@ -207,12 +228,20 @@ const dashboard = () => {
                         "Created",
                         "IsActive",
                         "SourceType",
+                        "Description",
+                        "Department/DepartmentName",
+                        "Department/Id",
+                        "Overview",
+                        "Created",
+                        "Author/Title",
+                        "Author/Id",
+                        "Author/EMail",
                         "AnnouncementandNewsImageID/ID"
                     )
-                    .expand("AnnouncementandNewsImageID")
+                    .expand("AnnouncementandNewsImageID,Department,Author")
                     .filter("SourceType eq 'Announcements' and IsActive eq 'Yes'")
                     .orderBy("Created", false)
-                    .top(3)(); // only top 2 for dashboard
+                    .top(DISPLAY_LIMITS.announcements + 1)(); // only top 2 for dashboard
 
                 //  Fetch all comments with linked NewsID (Announcement ID)
                 const allComments = await sp.web.lists
@@ -304,7 +333,7 @@ const dashboard = () => {
                     .expand("QuickLinksID")
                     .filter("IsActive eq 1")
                     .orderBy("ID", true)
-                    .top(6)();
+                    .top(DISPLAY_LIMITS.quickLinks + 1)();
 
                 //  Fetch actual image files from QuickLinkDocs
                 const mappedLinks = await Promise.all(
@@ -363,7 +392,7 @@ const dashboard = () => {
                     )
                     .expand("EmployeeName")
                     .orderBy("Id", false)
-                    .top(4)(); // Top 10 staff recognitions
+                    .top(DISPLAY_LIMITS.recognitions + 1)(); // Top 10 staff recognitions
 
                 //  Get all site users (those who have access)
                 const allUsers = await sp.web.siteUsers();
@@ -424,7 +453,7 @@ const dashboard = () => {
 
                     const profileUrl = person.Id
                         ? `/SitePages/Profile.aspx?userId=${person.Id}`
-                        : "contacts-profile.html";
+                        : "javascript:void(0)";
 
                     return {
                         id: it.Id,
@@ -722,6 +751,18 @@ const dashboard = () => {
         fetchProjects();
     }, []);
 
+
+    //  Control "View All" button visibility dynamically
+    const showViewAll = {
+        announcements: announcements.length > DISPLAY_LIMITS.announcements,
+        quickLinks: quickLinks.length > DISPLAY_LIMITS.quickLinks,
+        recognitions: recognitions.length > DISPLAY_LIMITS.recognitions,
+        policies: policies.length > DISPLAY_LIMITS.policies,
+        projects: projects.length > DISPLAY_LIMITS.projects,
+    };
+
+
+
     return (
         <>
             {loading ? (
@@ -756,12 +797,12 @@ const dashboard = () => {
                                             data-bs-ride="carousel"
                                         >
                                             <ol className="carousel-indicators">
-                                               {banners && banners.length > 0 && (
-                                                    banners.map((banner: any, index: number) => ( <li
-                                                    data-bs-target="#carouselExampleIndicators"
-                                                    data-bs-slide-to={index}
-                                                    className={`${index === 0 ? "active" : ""}`}
-                                                ></li>)))}
+                                                {banners && banners.length > 0 && (
+                                                    banners.map((banner: any, index: number) => (<li
+                                                        data-bs-target="#carouselExampleIndicators"
+                                                        data-bs-slide-to={index}
+                                                        className={`${index === 0 ? "active" : ""}`}
+                                                    ></li>)))}
                                                 {/* <li
                                                     data-bs-target="#carouselExampleIndicators"
                                                     data-bs-slide-to="1"
@@ -783,7 +824,7 @@ const dashboard = () => {
                                                                 style={{ width: "100%" }}
                                                                 src={
                                                                     banner.ImageUrl
-                                                                       
+
                                                                 }
                                                                 alt={banner.Title || "..."}
                                                                 className="d-block img-fluid"
@@ -797,7 +838,7 @@ const dashboard = () => {
                                                     ))
                                                 ) : (
                                                     <>
-                                                       <div>No Banner Found.</div>
+                                                        <div>No Banner Found.</div>
                                                     </>
                                                 )}
                                             </div>
@@ -811,27 +852,30 @@ const dashboard = () => {
                                         <div className="card-body pb-0 height">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Latest Announcement
-                                                <NavLink
-                                                    to="/Announcements"
-                                                    style={{ float: "right" }}
-                                                    className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                                >
-                                                    View All
-                                                </NavLink>
+                                                {showViewAll.announcements && (
+                                                    <NavLink
+                                                        to="/Announcements"
+                                                        style={{ float: "right" }}
+                                                        className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                                    >
+                                                        View All
+                                                    </NavLink>
+                                                )}
                                             </h4>
 
+
                                             {announcements && announcements.length > 0 ? (
-                                                announcements.map((item, index) => (
+                                                announcements.slice(0, DISPLAY_LIMITS.announcements).map((item, index) => (
                                                     <div onClick={() => {
-                                                    sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
-                                                    sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails")
-                                                }}
+                                                        sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
+                                                        sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails")
+                                                    }}
                                                         key={item.id}
                                                         className={`${index === 0 ? "border-bottom mt-1" : "mt-2"
                                                             }`}
                                                     >
                                                         <h4 className="mb-0 text-dark fw-bold font-14 mt-0 ng-binding">
-                                                            {item.title}
+                                                            {truncateByWords(item.title, 12)}
                                                         </h4>
                                                         <p
                                                             style={{ marginTop: "5px", lineHeight: "18px" }}
@@ -886,25 +930,21 @@ const dashboard = () => {
                                         <div className="card-body">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Quick Links
-                                                {/* <a
-                          style={{ float: "right" }}
-                          className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                          href="quick-links.html"
-                        >
-                          View All
-                        </a> */}
-                                                <NavLink
-                                                    to="/QuickLinks"
-                                                    style={{ float: "right" }}
-                                                    className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                                >
-                                                    View All
-                                                </NavLink>
+                                                
+                                                {showViewAll.quickLinks && (
+                                                    <NavLink
+                                                        to="/QuickLinks"
+                                                        style={{ float: "right" }}
+                                                        className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                                    >
+                                                        View All
+                                                    </NavLink>
+                                                )}
                                             </h4>
 
                                             <div className="row mt-3">
                                                 {quickLinks && quickLinks.length > 0 ? (
-                                                    quickLinks.map((link: any, index: number) => (
+                                                    quickLinks.slice(0, DISPLAY_LIMITS.quickLinks).map((link: any, index: number) => (
                                                         <div className="col-sm-2" key={index}>
                                                             <a
                                                                 href={link.URL}
@@ -947,18 +987,20 @@ const dashboard = () => {
                                         <div className="card-body pb-3 gheight">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Staff Recognition
-                                                <NavLink
-                                                    to="/EmployeeRecognition"
-                                                    style={{ float: "right" }}
-                                                    className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                                >
-                                                    View All
-                                                </NavLink>
+                                                {showViewAll.recognitions && (
+                                                    <NavLink
+                                                        to="/EmployeeRecognition"
+                                                        style={{ float: "right" }}
+                                                        className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                                    >
+                                                        View All
+                                                    </NavLink>
+                                                )}
                                             </h4>
 
                                             <div className="inbox-widget">
                                                 {recognitions && recognitions.length > 0 ? (
-                                                    recognitions.map((rec: any, idx: number) => (
+                                                    recognitions.slice(0, DISPLAY_LIMITS.recognitions).map((rec: any, idx: number) => (
                                                         <div
                                                             key={rec.id || idx}
                                                             className={`inbox-item ${idx === recognitions.length - 1
@@ -1029,7 +1071,7 @@ const dashboard = () => {
                                                 <a
                                                     style={{ float: "right" }}
                                                     className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                                    href="policy-procedure.html"
+                                                    href="javascript:void(0)"
                                                 >
                                                     View All
                                                 </a>
@@ -1091,7 +1133,8 @@ const dashboard = () => {
                                                                             }}
                                                                             className="inbox-item-text fw-bold font-14 mb-0 text-dark"
                                                                         >
-                                                                            {policy.Title}
+                                                                            {truncateByWords(policy.Title, 3)}
+
                                                                         </h5>
                                                                         <span
                                                                             style={{
@@ -1100,10 +1143,7 @@ const dashboard = () => {
                                                                             }}
                                                                             className="font-12"
                                                                         >
-                                                                            {policy.Description?.length > 60
-                                                                                ? policy.Description.slice(0, 60) +
-                                                                                "..."
-                                                                                : policy.Description}
+                                                                            {truncateByWords(policy.Description, 5)}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -1173,19 +1213,21 @@ const dashboard = () => {
                                 <div className="card-body pb-1 news-fedd">
                                     <h4 className="header-title text-dark fw-bold mb-0">
                                         Latest News
-                                        <NavLink
-                                            to="/News"
-                                            style={{ float: "right" }}
-                                            className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                        >
-                                            ViewAll
-                                        </NavLink>
+                                        {newsItems.length > DISPLAY_LIMITS.news && (
+                                            <NavLink
+                                                to="/News"
+                                                style={{ float: "right" }}
+                                                className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                            >
+                                                ViewAll
+                                            </NavLink>
+                                        )}
                                     </h4>
                                     {/* <!-- <h4 className="header-title mb-3">News Feed</h4> --> */}
                                     <div style={{ paddingTop: "12px" }}>
                                         {newsItems &&
                                             newsItems.length > 0 &&
-                                            newsItems.map((news: any, index: number) => (
+                                            newsItems.slice(0, DISPLAY_LIMITS.news).map((news: any, index: number) => (
                                                 <div onClick={() => {
                                                     sessionStorage.setItem("selectedNewsItem", JSON.stringify(news));
                                                     sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails")
@@ -1211,17 +1253,13 @@ const dashboard = () => {
                                                         style={{ lineHeight: "22px" }}
                                                         className="fw-bold font-16 text-dark ng-binding"
                                                     >
-                                                        {news.title?.length > 60
-                                                            ? news.title.substring(0, 60) + ".."
-                                                            : news.title}
+                                                        {truncateByWords(news.title, 6)}
                                                     </h4>
                                                     <p
                                                         style={{ lineHeight: "22px" }}
                                                         className="mb-2 font-14 ng-binding"
                                                     >
-                                                        {news.description?.length > 70
-                                                            ? news.description.substring(0, 70) + ".."
-                                                            : news.description}
+                                                        {truncateByWords(news.description, 10)}
                                                     </p>
                                                     <p className="mb-1 font-14 ng-binding">
                                                         {new Date(news.created).toLocaleDateString(
@@ -1312,7 +1350,7 @@ const dashboard = () => {
                                         <a
                                             style={{ float: "right" }}
                                             className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
-                                            href="projects.html"
+                                            href="javascript:void(0)"
                                         >
                                             View All
                                         </a>
@@ -1376,7 +1414,7 @@ const dashboard = () => {
                                                                 style={{ color: "#98a6ad" }}
                                                                 className="date-color font-12 mb-3 sp-line-2"
                                                             >
-                                                                {proj.overview?.substring(0, 100)}...
+                                                                {truncateByWords(proj.overview, 15)}{" "}
                                                                 <a
                                                                     href="javascript:void(0);"
                                                                     className="fw-bold text-muted"
