@@ -83,7 +83,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                     .filter("SourceType eq 'News'")
                     .orderBy("Created", false)();
 
-                console.log("Raw News items:", items);
+                // console.log("Raw News items:", items);
 
                 // 🔹 Use Promise.all to wait for image fetch for each news item
                 const formatted = await Promise.all(

@@ -117,7 +117,7 @@ const NewsTable = ({ onAdd, onEdit, setLoading }: INewsTableProps) => {
           .expand("Department")
           .orderBy("Created", false)();
 
-        console.log(" Raw News items:", items);
+        // console.log(" Raw News items:", items);
 
         const formatted = items.map((item: any, index: number) => ({
           id: item.Id,

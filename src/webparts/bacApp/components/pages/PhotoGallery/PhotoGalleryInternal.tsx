@@ -32,7 +32,7 @@ const PhotoGalleryInternal = () => {
     const showDetail = sessionStorage.getItem("showDetails") === "true";
 
     if (savedItem && showDetail) {
-      // setEditItem(JSON.parse(savedItem));
+      setEditItem(JSON.parse(savedItem));
       
     }
     // const hash = window.location.hash; // e.g. "#/AnnouncementsDetails?aId=44"

@@ -50,6 +50,8 @@ import ProjectsMain from '../pages/ProjectsMain';
 import TemplateandForms from '../pages/TemplatesandForms';
 import TrainingMaterials from '../pages/TrainingMaterials';
 import PolicyandProcedures from '../pages/PolicyandProcedures';
+import ResouceDashboard from '../pages/ResourceDashboard';
+import PolicyandProcedure from '../pages/PolicyandProcedureMaster/PolicyandProcedure';
 
 
 const Layout = () => {
@@ -62,9 +64,9 @@ const Layout = () => {
       <Route path="/Settings" element={<Settings />} />
       <Route path="/NewsMaster" element={<News />} />
       <Route path="/News" element={<NewsMain />} />
-       <Route path="/Announcements" element={<AnnouncementMain />} />
-       <Route path="/AnnouncementsDetails" element={<AnnouncementDetails />} />
-       <Route path="/NewsDetails" element={<NewsInternal />} />
+      <Route path="/Announcements" element={<AnnouncementMain />} />
+      <Route path="/AnnouncementsDetails" element={<AnnouncementDetails />} />
+      <Route path="/NewsDetails" element={<NewsInternal />} />
       <Route path="/FAQs" element={<FAQ />} />
       <Route path="/SectionOverview" element={<SectionOverview />} />
       <Route path="/QuickLinksMaster" element={<QuickLink />} />
@@ -88,10 +90,13 @@ const Layout = () => {
       <Route path="/TrainingMaterialsMaster" element={<TrainingMaterial />} />
       <Route path="/TrainingMaterials" element={<TrainingMaterials />} />
       <Route path="/PhotoGallery" element={<PhotoGalleryMain />} />
-       <Route path="/PhotoGalleryInternal" element={<PhotoGalleryInternal />} />
-        <Route path="/QuickLinks" element={<QuickLinks />} />
-         <Route path="/Projects" element={<ProjectsMain />} />
-         <Route path="/PolicyandProcedures" element={<PolicyandProcedures />} />
+      <Route path="/PhotoGalleryInternal" element={<PhotoGalleryInternal />} />
+      <Route path="/QuickLinks" element={<QuickLinks />} />
+      <Route path="/Projects" element={<ProjectsMain />} />
+      <Route path="/PolicyandProcedures" element={<PolicyandProcedures />} />
+      <Route path="/ResourceDashboard" element={<ResouceDashboard />} />
+       <Route path="/PolicyandProceduresMaster" element={<PolicyandProcedure />} />
+
       <Route
         path="*"
         element={

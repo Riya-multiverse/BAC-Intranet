@@ -56,9 +56,9 @@ const NewsInternal = () => {
         const showDetail = sessionStorage.getItem("showNewsDetails") === "true";
 
         if (savedItem && showDetail) {
-            // setEditItem(JSON.parse(savedItem));
+            setEditItem(JSON.parse(savedItem));
            
-            // fetchComments(JSON.parse(savedItem));
+            fetchComments(JSON.parse(savedItem));
         }
         const hash = window.location.hash; // e.g. "#/NewsDetails?newsId=44"
         if (hash.startsWith("#/NewsDetails")) {

@@ -18,28 +18,28 @@ const NewsMain = () => {
   //     setShowForm(true);
   //   };
   React.useEffect(() => {
-    // const savedItem = sessionStorage.getItem("selectedNewsItem");
-    // const showDetail = sessionStorage.getItem("showNewsDetails") === "true";
+    const savedItem = sessionStorage.getItem("selectedNewsItem");
+    const showDetail = sessionStorage.getItem("showNewsDetails") === "true";
 
-    // if (savedItem && showDetail) {
-    //   setEditItem(JSON.parse(savedItem));
-    //   setShowForm(true);
-    // }
-    // const hash = window.location.hash; // e.g. "#/News?newsId=44"
-    // if (hash.startsWith("#/News")) {
-    //   // parse query params inside hash
-    //   const queryString = hash.split("?")[1]; // "newsId=44"
-    //   const params = new URLSearchParams(queryString);
-    //   const newsId = params.get("newsId"); // "44"
-    //   console.log(newsId); // "44"
-    //   if (newsId) {
-    //     // setShowForm(true);
-    //     sessionStorage.removeItem("selectedNewsItem");
-    //     sessionStorage.removeItem("showNewsDetails");
-    //     loadNewsItem(parseInt(newsId, 10));
+    if (savedItem && showDetail) {
+      setEditItem(JSON.parse(savedItem));
+      setShowForm(true);
+    }
+    const hash = window.location.hash; // e.g. "#/News?newsId=44"
+    if (hash.startsWith("#/News")) {
+      // parse query params inside hash
+      const queryString = hash.split("?")[1]; // "newsId=44"
+      const params = new URLSearchParams(queryString);
+      const newsId = params.get("newsId"); // "44"
+      console.log(newsId); // "44"
+      if (newsId) {
+        // setShowForm(true);
+        sessionStorage.removeItem("selectedNewsItem");
+        sessionStorage.removeItem("showNewsDetails");
+        loadNewsItem(parseInt(newsId, 10));
         
-    //   }
-    // }
+      }
+    }
   }, []);
   const getDocumentLinkByID = async (AttachmentId: number[]) => {
     if (!AttachmentId || AttachmentId.length === 0) return [];

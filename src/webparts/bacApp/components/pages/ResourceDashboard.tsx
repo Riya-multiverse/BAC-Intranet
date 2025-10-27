@@ -602,7 +602,7 @@ const ResouceDashboard = () => {
                                     }}
                                     title={item.Title || ""}
                                   >
-                                    <div className="newbg">
+                                    <div className="newbg2">
                                       {item.FileRef.toLowerCase().endsWith(
                                         ".mp4"
                                       ) ||

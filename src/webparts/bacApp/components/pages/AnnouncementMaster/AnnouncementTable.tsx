@@ -131,7 +131,7 @@ const AnnouncementTable = ({
           .expand("Department", "AnnouncementCategory")
           .orderBy("Created", false)();
 
-        console.log(" Raw News items:", items);
+        // console.log(" Raw News items:", items);
 
         const formatted = items.map((item: any, index: number) => ({
           id: item.Id,
