@@ -1,96 +1,123 @@
 import * as React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+// import '../../../../styles/global.scss';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "material-symbols/index.css";
+// import * as feather from 'feather-icons';
+import { ChevronRight } from "react-feather";
 import {
   faArrowLeft,
   faEllipsisV,
   faFileExport,
   faPlusCircle,
+  faQ,
   faSort,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChevronRight, Edit, Trash2, ArrowLeft, PlusCircle } from "react-feather";
+import { useEffect, useState } from "react";
 import { SPFI } from "@pnp/sp";
 import { getSP } from "../../../loc/pnpjsConfig";
 import Swal from "sweetalert2";
+import { Edit, Trash2, ArrowLeft, PlusCircle } from "react-feather";
 import CustomBreadcrumb from "../../common/CustomBreadcrumb";
-import { useNavigate } from "react-router-dom";
-import * as moment from "moment";
-
-interface ISuccessProps {
+interface IEmployeeRecognitionTableProps {
   onAdd: () => void;
   onEdit: (item: any) => void;
+
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Breadcrumb = [
   {
     MainComponent: "Settings",
+
     MainComponentURl: "Settings",
   },
+
   {
-    MainComponent: "Success Stories",
-    MainComponentURl: "SuccessStoriesMaster",
+    MainComponent: "Employee Recognition Master",
+
+    MainComponentURl: "EmployeeRecognitionMaster",
   },
 ];
-
-const SuccessTable = ({ onAdd, onEdit, setLoading }: ISuccessProps) => {
-  const navigate = useNavigate();
-  const [SuccessList, setSuccessList] = React.useState<any[]>([]);
+const EmployeeRecognitionTable = ({
+  onAdd,
+  onEdit,
+  setLoading,
+}: IEmployeeRecognitionTableProps) => {
+  const [achievementList, setAchievementList] = React.useState<any[]>([]);
   const [filters, setFilters] = React.useState({
     SNo: "",
-    SuccessStories: "",
-    Department: "",
+    AchievementTitle: "",
+    EmployeeName: "",
+    AchievementDetail: "",
+    TopStar: "",
   });
 
-  // Sorting
+  //  For Sorting
   const [sortConfig, setSortConfig] = React.useState({
     key: "",
     direction: "ascending",
   });
 
-  // Pagination
+  //  For Pagination
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
   const sp: SPFI = getSP();
 
-  // Fetch data from SharePoint
+  //  Fetch data from SharePoint
   React.useEffect(() => {
     setLoading(true);
-    const fetchSuccessStories = async () => {
+    const fetchTeamAchievements = async () => {
       try {
         const items = await sp.web.lists
-          .getByTitle("SuccessStories")
+          .getByTitle("EmployeeRecognition")
+
           .items.select(
             "Id",
-            "SuccessStories",
-            "Department/Id",
-            "Department/DepartmentName"
+            "AchievementTitle",
+            "EmployeeName/Id",
+            "EmployeeName/Title",
+            "EmployeeName/EMail",
+            "TopStar",
+            "AchievementDetail"
           )
-          .expand("Department")
+          .expand("EmployeeName")
           .orderBy("Created", false)();
 
-        const formatted = items.map((item: any, index: number) => ({
+        const formatted = items.map((item: any) => ({
           Id: item.Id,
-          SNo: index + 1,
-          SuccessStories: item.SuccessStories || "",
-          Department: item.Department?.DepartmentName || "",
+          AchievementTitle: item.AchievementTitle || "",
+          EmployeeName: item.EmployeeName
+            ? {
+                Id: item.EmployeeName.Id,
+                Title: item.EmployeeName.Title,
+                EMail: item.EmployeeName.EMail,
+              }
+            : null,
+          AchievementDetail: item.AchievementDetail || "",
+          TopStar: item.TopStar || "-",
         }));
 
-        setSuccessList(formatted);
+        setAchievementList(formatted);
       } catch (error) {
-        console.error("Error fetching SuccessStories:", error);
+        console.error(" Error fetching TeamAchievements data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSuccessStories();
+    fetchTeamAchievements();
   }, [setLoading]);
 
-  // Delete item
+  //  Edit item
+  const handleEdit = (item: any) => {
+    console.log("Editing Team Achievement:", item);
+    onEdit(item);
+  };
+
+  //  Delete item
   const handleDelete = async (id: number) => {
     Swal.fire({
       title: "Do you want to delete this record?",
@@ -105,8 +132,11 @@ const SuccessTable = ({ onAdd, onEdit, setLoading }: ISuccessProps) => {
       if (result.isConfirmed) {
         setLoading(true);
         try {
-          await sp.web.lists.getByTitle("SuccessStories").items.getById(id).delete();
-          setSuccessList((prev) => prev.filter((item) => item.Id !== id));
+          await sp.web.lists
+            .getByTitle("EmployeeRecognition")
+            .items.getById(id)
+            .delete();
+          setAchievementList((prev) => prev.filter((item) => item.Id !== id));
 
           Swal.fire({
             backdrop: false,
@@ -116,7 +146,7 @@ const SuccessTable = ({ onAdd, onEdit, setLoading }: ISuccessProps) => {
             allowOutsideClick: false,
           });
         } catch (error) {
-          console.error("Error deleting SuccessStory:", error);
+          console.error(" Error deleting record:", error);
           Swal.fire({
             title: "Error",
             text: "Failed to delete the record.",
@@ -130,62 +160,62 @@ const SuccessTable = ({ onAdd, onEdit, setLoading }: ISuccessProps) => {
     });
   };
 
-  // Apply filters and sorting
+  //  Apply filters and sorting (like QuickLinks)
+  const applyFiltersAndSorting = (data: any[]) => {
+    if (!data) return [];
 
-const applyFiltersAndSorting = (data: any[]) => {
-  if (!data) return [];
+    //  Filtering logic
+    const filtered = data.filter((item, index) => {
+      return (
+        (filters.SNo === "" || String(index + 1).includes(filters.SNo)) &&
+        (filters.AchievementTitle === "" ||
+          (item.AchievementTitle || "")
+            .toLowerCase()
+            .includes(filters.AchievementTitle.toLowerCase())) &&
+        (filters.EmployeeName === "" ||
+          (item.EmployeeName?.Title || "")
+            .toLowerCase()
+            .includes(filters.EmployeeName.toLowerCase())) &&
+        (filters.AchievementDetail === "" ||
+          (item.AchievementDetail || "")
+            .toLowerCase()
+            .includes(filters.AchievementDetail.toLowerCase())) &&
+        (filters.TopStar === "" ||
+          (item.TopStar || "")
+            .toLowerCase()
+            .includes(filters.TopStar.toLowerCase()))
+      );
+    });
 
-  const filtered = data.filter((item, index) => {
-    return (
-      (filters.SNo === "" || String(index + 1).includes(filters.SNo)) &&
-      (filters.SuccessStories === "" ||
-        item.SuccessStories.toLowerCase().includes(filters.SuccessStories.toLowerCase())) &&
-      (filters.Department === "" ||
-        item.Department.toLowerCase().includes(filters.Department.toLowerCase()))
-    );
-  });
+    //  Sorting logic
+    const sorted = filtered.sort((a, b) => {
+      const direction = sortConfig.direction === "ascending" ? 1 : -1;
+      const key = sortConfig.key;
 
-  // Proper sorting with cloned array
-// Proper sorting with cloned array (fixed)
-const sorted = [...filtered].sort((a, b) => {
-  const dir = sortConfig.direction === "ascending" ? 1 : -1;
-  const key = sortConfig.key;
+      if (!key) return 0;
 
-  if (!key) return 0;
+      let aValue = a[key];
+      let bValue = b[key];
 
-  if (key === "SNo") {
-    const aNum = Number(a.SNo) || 0;
-    const bNum = Number(b.SNo) || 0;
-    return dir * (aNum - bNum);
-  }
+      //  Handle special case for EmployeeName (nested object)
+      if (key === "EmployeeName") {
+        aValue = a.EmployeeName?.Title || "";
+        bValue = b.EmployeeName?.Title || "";
+      }
 
-  if (key === "Department") {
-    const aStr = (a.Department || "").toString().trim().toLowerCase();
-    const bStr = (b.Department || "").toString().trim().toLowerCase();
-    if (aStr === "" && bStr === "") return 0;
-    if (aStr === "") return dir * 1;
-    if (bStr === "") return dir * -1;
-    return dir * aStr.localeCompare(bStr);
-  }
+      //  Convert any non-string values to string safely
+      if (typeof aValue !== "string") aValue = String(aValue ?? "");
+      if (typeof bValue !== "string") bValue = String(bValue ?? "");
 
-  if (key === "SuccessStories") {
-    const aStr = (a.SuccessStories || "").toString().trim().toLowerCase();
-    const bStr = (b.SuccessStories || "").toString().trim().toLowerCase();
-    if (aStr === "" && bStr === "") return 0;
-    if (aStr === "") return dir * 1;
-    if (bStr === "") return dir * -1;
-    return dir * aStr.localeCompare(bStr);
-  }
+      console.log(" Sorting by:", key, "| A:", aValue, "| B:", bValue);
 
-  return 0;
-});
+      return direction * aValue.localeCompare(bValue);
+    });
 
+    return sorted;
+  };
 
-  return sorted;
-};
-
-
-  const filteredData = applyFiltersAndSorting(SuccessList);
+  const filteredData = applyFiltersAndSorting(achievementList);
 
   // Pagination calculation
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -193,7 +223,7 @@ const sorted = [...filtered].sort((a, b) => {
   const endIndex = startIndex + itemsPerPage;
   const currentData = filteredData.slice(startIndex, endIndex);
 
-  // Handlers
+  // Sorting & Filtering handlers
   const handleSortChange = (key: string) => {
     let direction = "ascending";
     if (sortConfig.key === key && sortConfig.direction === "ascending") {
@@ -220,40 +250,66 @@ const sorted = [...filtered].sort((a, b) => {
       {/* <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
+          {/* <h4 className="page-title fw-bold mb-1 font-20">Recognition Master</h4>
+                                <ol className="breadcrumb m-0">
+                        
+                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
+                                    <li className="breadcrumb-item"> 
+                                      
+                                        </li>
+                                
+                                    <li className="breadcrumb-item active">Recognition Master</li>
+                                </ol> */}
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
+              {/* <!-- <label for="status-select" className="me-2">Sort By</label>
+                                    
+                                    </div> --> */}
+
+              {/* <a href="settings.html">  */}
               <button
                 type="button"
                 className="btn btn-secondary me-1 waves-effect waves-light"
-                onClick={() => navigate("/Settings")}
+                onClick={onAdd}
               >
+                {" "}
                 <ArrowLeft size={18} className="me-1" />
                 Back
               </button>
+              {/* </a>  */}
+              {/* <a href="add-news.html">  */}
               <button
                 type="button"
                 className="btn btn-primary waves-effect waves-light"
                 onClick={onEdit}
               >
+                {" "}
                 <PlusCircle className="me-1" size={18} />
                 Add
               </button>
+              {/* </a>  */}
             </form>
+
+            {/* <!-- <button type="button" className="btn btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#custom-modal"><i className="fe-filter me-1"></i>Filter</button> --> */}
+
+            {/* <!-- <button type="button" className="btn btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#custom-modal"><i className="fe-filter me-1"></i>Filter</button> --> */}
           </div>
         </div>
       </div>
       {/* <!-- end page title --> */}
-
       <div className="tab-content mt-3">
         <div className="tab-pane show active" id="profile1" role="tabpanel">
           <div className="card">
+            {/* <h2 className="page-title fw-bold mb-2 font-16 mt-2">
+                                  Suggestions Repository
+                                </h2> */}
             <table className="mtbalenew mt-0 table-centered table-nowrap table-borderless mb-0">
               <thead>
                 <tr>
-                  {/* S.No */}
+                  {/* # */}
                   <th
                     style={{
                       borderBottomLeftRadius: "0px",
@@ -267,7 +323,9 @@ const sorted = [...filtered].sort((a, b) => {
                       style={{ justifyContent: "space-between" }}
                     >
                       <span>S.No.</span>
-                      
+                      <span onClick={() => handleSortChange("SNo")}>
+                        <FontAwesomeIcon icon={faSort} />
+                      </span>
                     </div>
                     <div className="bd-highlight">
                       <input
@@ -281,24 +339,26 @@ const sorted = [...filtered].sort((a, b) => {
                     </div>
                   </th>
 
-                  {/* Success Stories */}
+                  {/* Employee Name */}
                   <th style={{ minWidth: "75px", maxWidth: "75px" }}>
                     <div className="d-flex flex-column bd-highlight">
                       <div
                         className="d-flex pb-2"
                         style={{ justifyContent: "space-evenly" }}
                       >
-                        <span>Success Stories</span>
-                        <span onClick={() => handleSortChange("SuccessStories")}>
+                        <span>Employee Name</span>
+                        <span onClick={() => handleSortChange("EmployeeName")}>
                           <FontAwesomeIcon icon={faSort} />
                         </span>
                       </div>
                       <div className="bd-highlight">
                         <input
                           type="text"
-                          placeholder="Filter by Success Stories"
-                          value={filters.SuccessStories}
-                          onChange={(e) => handleFilterChange(e, "SuccessStories")}
+                          placeholder="Filter by Employee Name"
+                          value={filters.EmployeeName}
+                          onChange={(e) =>
+                            handleFilterChange(e, "EmployeeName")
+                          }
                           className="inputcss"
                           style={{ width: "100%" }}
                         />
@@ -306,24 +366,82 @@ const sorted = [...filtered].sort((a, b) => {
                     </div>
                   </th>
 
-                  {/* Department */}
+                  {/* Title */}
                   <th style={{ minWidth: "75px", maxWidth: "75px" }}>
                     <div className="d-flex flex-column bd-highlight">
                       <div
                         className="d-flex pb-2"
                         style={{ justifyContent: "space-evenly" }}
                       >
-                        <span>Department</span>
-                        <span onClick={() => handleSortChange("Department")}>
+                        <span>Title</span>
+                        <span
+                          onClick={() => handleSortChange("AchievementTitle")}
+                        >
                           <FontAwesomeIcon icon={faSort} />
                         </span>
                       </div>
                       <div className="bd-highlight">
                         <input
                           type="text"
-                          placeholder="Filter by Department"
-                          value={filters.Department}
-                          onChange={(e) => handleFilterChange(e, "Department")}
+                          placeholder="Filter by Title"
+                          value={filters.AchievementTitle}
+                          onChange={(e) =>
+                            handleFilterChange(e, "AchievementTitle")
+                          }
+                          className="inputcss"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+                  </th>
+
+                  {/* Achievement Detail */}
+                  <th style={{ minWidth: "120px", maxWidth: "120px" }}>
+                    <div className="d-flex flex-column bd-highlight">
+                      <div
+                        className="d-flex pb-2"
+                        style={{ justifyContent: "space-evenly" }}
+                      >
+                        <span>Achievement Detail</span>
+                        <span
+                          onClick={() => handleSortChange("AchievementDetail")}
+                        >
+                          <FontAwesomeIcon icon={faSort} />
+                        </span>
+                      </div>
+                      <div className="bd-highlight">
+                        <input
+                          type="text"
+                          placeholder="Filter by Achievement Detail"
+                          value={filters.AchievementDetail}
+                          onChange={(e) =>
+                            handleFilterChange(e, "AchievementDetail")
+                          }
+                          className="inputcss"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+                  </th>
+
+                  {/* Top Star */}
+                  <th style={{ minWidth: "40px", maxWidth: "40px" }}>
+                    <div className="d-flex flex-column bd-highlight">
+                      <div
+                        className="d-flex pb-2"
+                        style={{ justifyContent: "space-evenly" }}
+                      >
+                        <span>Top Star</span>
+                        <span onClick={() => handleSortChange("TopStar")}>
+                          <FontAwesomeIcon icon={faSort} />
+                        </span>
+                      </div>
+                      <div className="bd-highlight">
+                        <input
+                          type="text"
+                          placeholder="Filter by Top Star"
+                          value={filters.TopStar}
+                          onChange={(e) => handleFilterChange(e, "TopStar")}
                           className="inputcss"
                           style={{ width: "100%" }}
                         />
@@ -374,6 +492,7 @@ const sorted = [...filtered].sort((a, b) => {
                 ) : (
                   currentData.map((item, index) => (
                     <tr key={item.Id}>
+                      {/* S.No. */}
                       <td style={{ minWidth: "20px", maxWidth: "20px" }}>
                         <div
                           style={{ marginLeft: "10px" }}
@@ -382,12 +501,32 @@ const sorted = [...filtered].sort((a, b) => {
                           {index + 1}
                         </div>
                       </td>
+
+                      {/*  AchievementTag */}
                       <td style={{ minWidth: "75px", maxWidth: "75px" }}>
-                        {item.SuccessStories || "-"}
+                        {item.EmployeeName?.Title || "-"}
                       </td>
+
+                      {/*  Title */}
                       <td style={{ minWidth: "75px", maxWidth: "75px" }}>
-                        {item.Department || "-"}
+                        {item.AchievementTitle || "-"}
                       </td>
+
+                      {/* AchievementDetail */}
+                      <td style={{ minWidth: "120px", maxWidth: "120px" }}>
+                        {item.AchievementDetail || "-"}
+                      </td>
+
+                      {/*  Details → SuggestionDetails */}
+                      <td style={{ minWidth: "40px", maxWidth: "40px" }}>
+                        {item.TopStar || "-"}
+                      </td>
+
+                      {/* <td style={{ minWidth: "120px", maxWidth: "120px" }}>
+                                            {new Date(item.Created).toLocaleDateString()}
+                                          </td> */}
+
+                      {/* Action Buttons */}
                       <td
                         style={{ minWidth: "40px", maxWidth: "40px" }}
                         className="ng-binding"
@@ -465,4 +604,4 @@ const sorted = [...filtered].sort((a, b) => {
   );
 };
 
-export default SuccessTable;
+export default EmployeeRecognitionTable;

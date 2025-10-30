@@ -23,7 +23,14 @@ const dashboard = () => {
     const [policies, setPolicies] = useState<any[]>([]);
     const [showFileViewer, setShowFileViewer] = useState(false);
     const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
+    const [modalItem, setModalItem] = React.useState<any[]>([]);
     //  Define dashboard display limits for "View All" visibility
+    const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+
+    const toggleExpand = (index: number) => {
+        setExpandedIndex(expandedIndex === index ? null : index);
+    };
     //  Define limits for dashboard sections
     const DISPLAY_LIMITS = {
         news: 2,
@@ -69,12 +76,28 @@ const dashboard = () => {
     //     showSlides(slideIndex);
     // }, [slideIndex]);
 
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setCurrentSlideIndex((prev) => (prev + 1) % 3); // rotates every 3 slides
+    //     }, 5000); // 5 seconds
+    //     return () => clearInterval(timer);
+    // }, []);
+
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentSlideIndex((prev) => (prev + 1) % 3); // rotates every 3 slides
-        }, 5000); // 5 seconds
-        return () => clearInterval(timer);
-    }, []);
+    if (banners.length > 0) {
+      const carouselElement = document.querySelector("#carouselExampleIndicators");
+      if (carouselElement) {
+        const bootstrap = require("bootstrap");
+        const carousel = new bootstrap.Carousel(carouselElement, {
+          interval: 5000, // 5 seconds
+          ride: "carousel", // auto start
+          pause: false, // keeps sliding even if hovered
+          wrap: true,
+        });
+      }
+    }
+  }, [banners]);
+
 
     //fetch Banners
     React.useEffect(() => {
@@ -139,6 +162,25 @@ const dashboard = () => {
     //     // in React, no manual DOM needed — state handles this
     //     // This function is kept for clarity, but not doing direct DOM
     // };
+
+    //  Helper to get image URLs from doc library
+    const getDocumentLinkByID = async (AttachmentId: number[]) => {
+        if (!AttachmentId || AttachmentId.length === 0) return [];
+        try {
+            const results = await Promise.all(
+                AttachmentId.map(async (id) => {
+                    const res = await sp.web.lists
+                        .getByTitle("AnnouncementandNewsDocs")
+                        .items.getById(id)
+                        .select("Id", "FileRef", "FileLeafRef")();
+                    return res;
+                })
+            );
+            return results;
+        } catch (error) {
+            return [];
+        }
+    };
     //fetch news
     React.useEffect(() => {
         const fetchNews = async () => {
@@ -159,24 +201,7 @@ const dashboard = () => {
                     .orderBy("Created", false) // latest first
                     .top(DISPLAY_LIMITS.news + 1)(); // only top 2 for dashboard display
 
-                //  Helper to get image URLs from doc library
-                const getDocumentLinkByID = async (AttachmentId: number[]) => {
-                    if (!AttachmentId || AttachmentId.length === 0) return [];
-                    try {
-                        const results = await Promise.all(
-                            AttachmentId.map(async (id) => {
-                                const res = await sp.web.lists
-                                    .getByTitle("AnnouncementandNewsDocs")
-                                    .items.getById(id)
-                                    .select("Id", "FileRef", "FileLeafRef")();
-                                return res;
-                            })
-                        );
-                        return results;
-                    } catch (error) {
-                        return [];
-                    }
-                };
+
 
                 //  Combine news items with their linked images
                 const formatted = await Promise.all(
@@ -244,62 +269,86 @@ const dashboard = () => {
                     .top(DISPLAY_LIMITS.announcements + 1)(); // only top 2 for dashboard
 
                 //  Fetch all comments with linked NewsID (Announcement ID)
-                const allComments = await sp.web.lists
-                    .getByTitle("NewsandAnnouncementComments")
-                    .items.select("Id", "NewsID/Id", "IsDeleted")
-                    .expand("NewsID")
-                    .filter("IsDeleted eq 0")();
+                // const allComments = await sp.web.lists
+                //     .getByTitle("NewsandAnnouncementComments")
+                //     .items.select("Id", "NewsID/Id", "IsDeleted")
+                //     .expand("NewsID")
+                //     .filter("IsDeleted eq 0")();
 
-                // Build a map of comment counts by announcement ID
-                const commentCountMap: Record<number, number> = {};
-                allComments.forEach((c: any) => {
-                    const newsId = c.NewsID?.Id;
-                    if (newsId) {
-                        commentCountMap[newsId] = (commentCountMap[newsId] || 0) + 1;
-                    }
-                });
+                // // Build a map of comment counts by announcement ID
+                // const commentCountMap: Record<number, number> = {};
+                // allComments.forEach((c: any) => {
+                //     const newsId = c.NewsID?.Id;
+                //     if (newsId) {
+                //         commentCountMap[newsId] = (commentCountMap[newsId] || 0) + 1;
+                //     }
+                // });
 
-                //  Fetch likes — each like links to CommentID → NewsID
-                const allLikes = await sp.web.lists
-                    .getByTitle("NewsandAnnouncementCommentLikes")
-                    .items.select("Id", "CommentID/Id")
-                    .expand("CommentID")();
+                // //  Fetch likes — each like links to CommentID → NewsID
+                // const allLikes = await sp.web.lists
+                //     .getByTitle("NewsandAnnouncementCommentLikes")
+                //     .items.select("Id", "CommentID/Id")
+                //     .expand("CommentID")();
 
-                //  Create a map from CommentID → NewsID using comments
-                const commentToNewsMap: Record<number, number> = {};
-                allComments.forEach((c: any) => {
-                    if (c.Id && c.NewsID?.Id) {
-                        commentToNewsMap[c.Id] = c.NewsID.Id;
-                    }
-                });
+                // //  Create a map from CommentID → NewsID using comments
+                // const commentToNewsMap: Record<number, number> = {};
+                // allComments.forEach((c: any) => {
+                //     if (c.Id && c.NewsID?.Id) {
+                //         commentToNewsMap[c.Id] = c.NewsID.Id;
+                //     }
+                // });
 
                 //  Count likes per NewsID using the map
-                const likeCountMap: Record<number, number> = {};
-                allLikes.forEach((like: any) => {
-                    const commentId = like.CommentID?.Id;
-                    const newsId = commentToNewsMap[commentId];
-                    if (newsId) {
-                        likeCountMap[newsId] = (likeCountMap[newsId] || 0) + 1;
-                    }
-                });
+                // const likeCountMap: Record<number, number> = {};
+                // allLikes.forEach((like: any) => {
+                //     const commentId = like.CommentID?.Id;
+                //     const newsId = commentToNewsMap[commentId];
+                //     if (newsId) {
+                //         likeCountMap[newsId] = (likeCountMap[newsId] || 0) + 1;
+                //     }
+                // });
 
-                //  Format final announcement list
-                const formattedAnnouncements = announcementItems.map(
-                    (item: any, index: number) => {
-                        const announcementId = item.Id;
+                // //  Format final announcement list
+                // const formattedAnnouncements = announcementItems.map(
+                //     (item: any, index: number) => {
+                //         const announcementId = item.Id;
 
-                        return {
-                            id: announcementId,
-                            sno: index + 1,
-                            title: item.Title,
-                            created: new Date(item.Created),
-                            likes: likeCountMap[announcementId] || 0,
-                            comments: commentCountMap[announcementId] || 0,
-                        };
-                    }
-                );
+                //         return {
+                //             id: announcementId,
+                //             sno: index + 1,
+                //             title: item.Title,
+                //             created: new Date(item.Created),
+                //             likes: likeCountMap[announcementId] || 0,
+                //             comments: commentCountMap[announcementId] || 0,
+                //         };
+                //     }
+                // );
 
                 //  Save to state
+
+                //  Combine news items with their linked images
+                const formattedAnnouncements = await Promise.all(
+                    announcementItems.map(async (item: any) => {
+                        const imageIds =
+                            item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+                        const imageLinks =
+                            imageIds.length > 0 ? await getDocumentLinkByID(imageIds) : [];
+
+                        return {
+                            id: item.Id,
+                            title: item.Title || "",
+                            description: item.Description || "",
+                            created: new Date(item.Created),
+                            images: imageLinks.map((img: any) => ({
+                                name: img.FileLeafRef,
+                                url: `${window.location.origin}${img.FileRef}`,
+                            })),
+                        };
+                    })
+                );
+
+                //  Save formatted data to state
                 setAnnouncements(formattedAnnouncements);
             } catch (error) {
             } finally {
@@ -664,7 +713,7 @@ const dashboard = () => {
                     )
                     .expand("Department")
                     .orderBy("Created", false)
-                    .top(3)();
+                    .top(6)();
 
                 const formatted = items.map((item: any, index: number) => ({
                     Id: item.Id,
@@ -812,7 +861,7 @@ const dashboard = () => {
                                                     data-bs-slide-to="2"
                                                 ></li> */}
                                             </ol>
-                                            <div className="carousel-inner" role="listbox">
+                                            <div className="carousel-inner" role="listbox" id="bannerCarousel">
                                                 {banners && banners.length > 0 ? (
                                                     banners.map((banner: any, index: number) => (
                                                         <div
@@ -866,7 +915,7 @@ const dashboard = () => {
 
                                             {announcements && announcements.length > 0 ? (
                                                 announcements.slice(0, DISPLAY_LIMITS.announcements).map((item, index) => (
-                                                    <div onClick={() => {
+                                                    <div style={{ cursor: "pointer" }} onClick={() => {
                                                         sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                                                         sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails")
                                                     }}
@@ -930,7 +979,7 @@ const dashboard = () => {
                                         <div className="card-body">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Quick Links
-                                                
+
                                                 {showViewAll.quickLinks && (
                                                     <NavLink
                                                         to="/QuickLinks"
@@ -1068,13 +1117,21 @@ const dashboard = () => {
                                         <div className="card-body pb-0 gheight">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Policies, Procedures, Forms, and Guidelines
-                                                <a
+                                                {/* <a
                                                     style={{ float: "right" }}
                                                     className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
                                                     href="javascript:void(0)"
                                                 >
                                                     View All
-                                                </a>
+                                                </a> */}
+
+                                                <NavLink
+                                                    to="/PolicyandProcedures"
+                                                    style={{ float: "right" }}
+                                                    className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                                >
+                                                    View All
+                                                </NavLink>
                                             </h4>
 
                                             <div className="row mt-2">
@@ -1233,7 +1290,7 @@ const dashboard = () => {
                                                     sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails")
                                                 }}
                                                     key={news.id}
-                                                    style={{ marginBottom: index === 0 ? "7px" : "0" }}
+                                                    style={{ cursor: "pointer", marginBottom: index === 0 ? "7px" : "0" }}
                                                     className={`mt-0 ${index === 0
                                                         ? "border-bottom newpadd pt-0 ng-scope"
                                                         : "mt-0 mb-0 border-bottom border-0"
@@ -1347,13 +1404,20 @@ const dashboard = () => {
                                 >
                                     <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                         Projects of the Month{" "}
-                                        <a
+                                        {/* <a
                                             style={{ float: "right" }}
                                             className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
                                             href="javascript:void(0)"
                                         >
                                             View All
-                                        </a>
+                                        </a> */}
+                                        <NavLink
+                                            to="/Projects"
+                                            style={{ float: "right" }}
+                                            className="font-11 fw-normal btn btn-primary rounded-pill waves-effect waves-light view-all"
+                                        >
+                                            View All
+                                        </NavLink>
                                     </h4>
 
                                     <div className="row mt-2">
@@ -1410,7 +1474,7 @@ const dashboard = () => {
                                                             </div>
 
                                                             {/* <!-- Desc--> */}
-                                                            <p
+                                                            {/* <p
                                                                 style={{ color: "#98a6ad" }}
                                                                 className="date-color font-12 mb-3 sp-line-2"
                                                             >
@@ -1421,6 +1485,23 @@ const dashboard = () => {
                                                                 >
                                                                     view more
                                                                 </a>
+                                                            </p> */}
+                                                            <p style={{ color: "#98a6ad" }} className="date-color font-12 mb-3 sp-line-2">
+                                                                {expandedIndex === index
+                                                                    ? proj.overview
+                                                                    : proj.overview?.length > 100
+                                                                        ? `${proj.overview.substring(0, 100)}...`
+                                                                        : proj.overview}
+
+                                                                {proj.overview?.length > 100 && (
+                                                                    <a
+                                                                        href="javascript:void(0);"
+                                                                        onClick={() => toggleExpand(index)}
+                                                                        className="fw-bold text-muted ms-1"
+                                                                    >
+                                                                        {expandedIndex === index ? "view less" : "view more"}
+                                                                    </a>
+                                                                )}
                                                             </p>
 
                                                             {/* <!-- Task info--> */}
@@ -1480,7 +1561,7 @@ const dashboard = () => {
 
                                                                 {proj.teamMembers &&
                                                                     proj.teamMembers.length > 4 && (
-                                                                        <a
+                                                                        <a onClick={() => { setModalItem(proj?.teamMembers || []); setShowModal(true) }}
                                                                             href="javascript: void(0);"
                                                                             className="text-dark font-12 fw-bold"
                                                                         >
@@ -1518,6 +1599,62 @@ const dashboard = () => {
                                 />
                             )}
                         </Modal.Body>
+                    </Modal>
+
+                    <Modal show={showModal} onHide={() => setShowModal(false)} size='lg' className="filemodal" >
+                        <Modal.Header closeButton>
+                            <Modal.Title>
+                                {/* <h4 className="font-16 text-dark fw-bold mb-1">
+                                                    Attachment Details
+                                                </h4>
+                                                <p className="text-muted font-14 mb-0 fw-400">
+                                                    Below are the attachment details for Project Gallery
+                                                </p> */}
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="" id="style-5">
+                            <div className="modal-body attending-user">
+                                <p style={{ display: "block;" }}>{modalItem.length} Members</p>
+                                <ul>
+                                    {modalItem.map((item: any, index: number) => (
+                                        <li key={index}>
+                                            {/* <a
+                                                            href={`https://multiversedemo.sharepoint.com/sites/CentralBankUAE/SitePages/NewApp.aspx#/UserProfile?UserProfileID=${item.Id}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        > */}
+                                            {/* {item.IsPicture ? ( */}
+                                            <img
+                                                src={`/_layouts/15/userphoto.aspx?size=S&username=${item.EMail}`}
+                                                className="rounded-circle avatar-sm"
+                                                alt={item.Title}
+                                                title={item.Title}
+
+                                            />
+                                            {/* <img title={item.Title} src={`/_layouts/15/userphoto.aspx?size=S&username=${item.EMail}`} alt={item.Title} /> */}
+                                            {/* ) : (
+                                                                <div
+                                                                    title={item.Name}
+                                                                    className="profile-dot imgbgnew1"
+                                                                    style={{ backgroundColor: item.backgroundcolor }}
+                                                                >
+                                                                    <figure></figure>
+                                                                    <figcaption style={{ color: item.color }} className="paddt1">
+                                                                        {item.Initials}
+                                                                    </figcaption>
+                                                                </div>
+                                                            )} */}
+                                            <span>{item.Title}</span>
+                                            {/* </a> */}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                            </div>
+
+
+                        </Modal.Body>
+
                     </Modal>
                 </>
             )}

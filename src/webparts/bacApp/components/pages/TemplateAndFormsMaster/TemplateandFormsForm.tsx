@@ -31,7 +31,7 @@ interface ITemplateProps {
 const Breadcrumb = [
   { MainComponent: "Settings", MainComponentURl: "Settings" },
   {
-    MainComponent: "Template and Forms ",
+    MainComponent: "Templates and Forms ",
     MainComponentURl: "TemplateandFormsMaster",
   },
 ];
@@ -684,13 +684,13 @@ const TemplateForm = ({
                     <label htmlFor="simpleinput" className="form-label">
                       Description<span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
+                    
                       id="Description"
                       className="form-control"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                    />
+                    ></textarea>
                   </div>
                 </div>
                 <div className="col-lg-6">

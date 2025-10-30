@@ -18,6 +18,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
   const navigate = useNavigate();
   const [newsItems, setNewsItems] = React.useState<any[]>([]);
   const [allNews, setAllNews] = React.useState<any[]>([]); // 🔹 Store all fetched news
+  const [featuredAnnouncement, setfeaturedAnnouncement] = React.useState<any[]>([]);
   // const [category, setCategory] = React.useState<string>('All'); // 🔹 Category filter
   const [fromDate, setFromDate] = React.useState<string>(''); // 🔹 From date
   const [toDate, setToDate] = React.useState<string>(''); // 🔹 To date
@@ -25,6 +26,14 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
 
   const [openDropdownIndex, setOpenDropdownIndex] = React.useState<number | null>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+
+  ////
+  const [skip, setSkip] = React.useState<number>(0); // used for pagination
+  const [hasMore, setHasMore] = React.useState<boolean>(true); // to control load more visibility
+  const pageSize = 10; // number of items per load
+
+
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -82,7 +91,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
           )
           .expand("Department,Author,AnnouncementandNewsImageID")
           .filter("SourceType eq 'Announcements'")
-          .orderBy("Created", false)();
+          .orderBy("Created", false).top(21)();
 
         // console.log("Raw News items:", items);
 
@@ -117,6 +126,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
 
         setNewsItems(formatted);
         setAllNews(formatted);
+        setfeaturedAnnouncement(formatted);
         // console.log("Formatted news with images:", formatted);
         setLoading(false);
       } catch (err) {
@@ -127,8 +137,75 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
     };
 
 
-    fetchNews();
+    // fetchNews();
+    fetchInitialNews();
   }, []);
+
+  const fetchInitialNews = async () => {
+    setLoading(true);
+    try {
+      const items = await sp.web.lists
+        .getByTitle("AnnouncementAndNews")
+        .items
+        .select(
+          "Id",
+          "Title",
+          "Description",
+          "Category",
+          "Department/DepartmentName",
+          "Department/Id",
+          "Overview",
+          "Created",
+          "Author/Title",
+          "Author/Id",
+          "Author/EMail",
+          "AnnouncementandNewsImageID/ID"
+        )
+        .expand("Department,Author,AnnouncementandNewsImageID")
+        .filter("SourceType eq 'Announcements'")
+        .orderBy("Id", false) // ✅ Descending (latest first)
+        .top(pageSize)();
+
+      // 🔹 Use Promise.all to wait for image fetch for each news item
+      const formatted = await Promise.all(
+        items.map(async (item: any, index: number) => {
+          const imageIds =
+            item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+          const imageLinks = imageIds.length > 0
+            ? await getDocumentLinkByID(imageIds)
+            : [];
+
+          return {
+            id: item.Id,
+            sno: index + 1,
+            title: item.Title,
+            description: item.Description,
+            department: item.Department?.DepartmentName || "",
+            departmentId: item.Department?.Id || null,
+            category: item.Category || "",
+            overview: item.Overview || "",
+            created: new Date(item.Created),
+            author: item.Author?.Title,
+            images: imageLinks.map((img: any) => ({
+              name: img.FileLeafRef,
+              url: img.FileRef,
+            })),
+          };
+        })
+      );
+
+      setNewsItems(formatted);
+      setAllNews(formatted);
+      if (items.length < pageSize) setHasMore(false);
+    } catch (err) {
+      console.error("Error fetching initial news:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   React.useEffect(() => {
     let filtered = [...allNews];
     // 🔸 Date validation
@@ -194,6 +271,88 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
     }
 
   ];
+
+  const fetchMoreNews = async () => {
+    if (!hasMore) return;
+    setLoading(true);
+
+    try {
+      // Get last item ID from the current list
+      const lastItemId = newsItems[newsItems.length - 1]?.id;
+
+      const items = await sp.web.lists
+        .getByTitle("AnnouncementAndNews")
+        .items
+        .select(
+          "Id",
+          "Title",
+          "Description",
+          "Category",
+          "Department/DepartmentName",
+          "Department/Id",
+          "Overview",
+          "Created",
+          "Author/Title",
+          "Author/Id",
+          "Author/EMail",
+          "AnnouncementandNewsImageID/ID"
+        )
+        .expand("Department,Author,AnnouncementandNewsImageID")
+        .filter(`SourceType eq 'Announcements' and ID lt ${lastItemId}`) // ✅ Older items only
+        .orderBy("Id", false)
+        .top(pageSize)();
+
+      if (items.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      // 🔹 Use Promise.all to wait for image fetch for each news item
+      const formatted = await Promise.all(
+        items.map(async (item: any, index: number) => {
+          const imageIds =
+            item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+          const imageLinks = imageIds.length > 0
+            ? await getDocumentLinkByID(imageIds)
+            : [];
+
+          return {
+            id: item.Id,
+            sno: index + 1,
+            title: item.Title,
+            description: item.Description,
+            department: item.Department?.DepartmentName || "",
+            departmentId: item.Department?.Id || null,
+            category: item.Category || "",
+            overview: item.Overview || "",
+            created: new Date(item.Created),
+            author: item.Author?.Title,
+            images: imageLinks.map((img: any) => ({
+              name: img.FileLeafRef,
+              url: img.FileRef,
+            })),
+          };
+        })
+      );
+
+      setNewsItems((prev) => [...prev, ...formatted]);
+      setAllNews((prev) => [...prev, ...formatted]);
+      if (items.length < pageSize) setHasMore(false);
+    } catch (err) {
+      console.error("Error fetching more news:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // 🔹 Apply filters whenever category/fromDate/toDate changes
+  const handleLoadMore = () => {
+    // fetchNews(true); // load next set of 10 items
+    fetchMoreNews();
+  };
+
   return (
     <>
 
@@ -275,7 +434,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         <p className="text-center text-muted mt-4">No announcement found.</p>
       )}
 
-      {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
+      {featuredAnnouncement.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
         <div className="col-lg-5">
           {/* <div className="imagemani mt-2 me-2">
                         <img src={require("../../../assets/Banner1.png")} data-themekey="#" />
@@ -340,7 +499,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
       </div>))}
       <div className="tab-content mt-4">
         <div className="tab-pane show active" id="home1">
-          {newsItems.slice(1).map((item, index) => (
+          {newsItems.map((item, index) => (
             <div className="card mb-2">
               <div className="card-body">
                 <div className="row align-items-start">
@@ -457,8 +616,35 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
 
         </div>
 
+        {/* {newsItems?.length>20 && <div style={{textAlign: "center", display: "block"}}>
+          <button className="btn btn-primary btn-sm" style={{padding: "7px 15px !important",MozAnimation:" #ff8200",fontSize:" 17px !important" ,width: "104px !important",float: "none",textAlign:"center"}} type="button">Load more</button>
+        </div>
+        }  */}
 
+
+        {hasMore && newsItems.length && (
+          <div style={{ textAlign: "center", display: "block" }}>
+            <button
+              className="btn btn-primary btn-sm"
+              style={{
+                padding: "7px 15px",
+                // backgroundColor: "#ff8200",
+                fontSize: "17px",
+                width: "120px",
+                marginTop: "10px",
+              }}
+              type="button"
+              onClick={handleLoadMore}
+            // disabled={loading}
+            >
+              {/* {loading ? "Loading..." : "Load More"} */}
+              Load More
+            </button>
+          </div>
+        )}
       </div>
+
+
 
     </>
   )

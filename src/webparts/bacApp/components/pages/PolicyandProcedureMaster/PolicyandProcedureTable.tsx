@@ -23,7 +23,7 @@ interface IPolicyandProcedureProps {
 
 const Breadcrumb = [
     { MainComponent: "Settings", MainComponentURl: "Settings" },
-    { MainComponent: "Procedure Master", MainComponentURl: "ProcedureMaster" },
+    { MainComponent: "Policy and Procedure", MainComponentURl: "PolicyandProceduresMaster" },
 ];
 const PolicyandProcedureTable = ({
     onAdd,

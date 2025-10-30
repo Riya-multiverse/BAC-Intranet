@@ -12,10 +12,10 @@ import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { getSP } from "../../../loc/pnpjsConfig";
-import { CheckCircle, X, Trash2 } from "react-feather";
+import { CheckCircle, X } from "react-feather";
 import CustomBreadcrumb from "../../common/CustomBreadcrumb";
 
-interface ITeamAchievementsProps {
+interface IEmployeeRecognitionProps {
   item?: any;
   onCancel: () => void;
   onSave: (data: any) => void;
@@ -23,29 +23,49 @@ interface ITeamAchievementsProps {
 }
 const Breadcrumb = [
   {
-    MainComponent: "Settings",
+    MainComponent: "Home",
 
-    MainComponentURl: "Settings",
+    MainComponentURl: "Home",
   },
 
   {
-    MainComponent: "Team Achievements",
+    MainComponent: "Recognition Master",
 
-    MainComponentURl: "TeamAchievementMaster",
+    MainComponentURl: "RecognitionMaster",
   },
 ];
 
-const TeamAchievements = ({
+const EmployeeRecognitionForm = ({
   item,
   onCancel,
   onSave,
   setLoading,
-}: ITeamAchievementsProps) => {
+}: IEmployeeRecognitionProps) => {
   ////State
-  const [title, setTitle] = React.useState<string>("");
-  const [achievementTag, setAchievementTag] = React.useState<string>("");
+  const [achievementTitle, setAchievementTitle] = React.useState<string>("");
   const [achievementDetail, setAchievementDetail] = React.useState<string>("");
-  const _sp: SPFI = getSP();
+  const [topStar, setTopStar] = React.useState<string>("No"); 
+
+  const [users, setUsers] = React.useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = React.useState<string>("");
+  const sp: SPFI = getSP();
+
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const sp = getSP();
+        const allUsers = await sp.web.siteUsers();
+       
+        const filtered = allUsers.filter(
+          (u: any) => !u.IsHiddenInUI && u.Email
+        );
+        setUsers(filtered);
+      } catch (err) {
+        console.error(" Error fetching users:", err);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   ///handles
 
@@ -56,29 +76,26 @@ const TeamAchievements = ({
 
     let isValid = true;
 
-    //  Check Question field
-    const TitleInput = document.getElementById("Title");
-    if (!title.trim()) {
-      TitleInput?.classList.add("border-on-error");
+    const employeeSelect = document.getElementById("EmployeeName");
+    if (!selectedUser) {
+      employeeSelect?.classList.add("border-on-error");
       isValid = false;
     }
 
-    const AchievementTagInput = document.getElementById("AchievementTag");
-    if (!achievementTag.trim()) {
-      AchievementTagInput?.classList.add("border-on-error");
+    const titleInput = document.getElementById("AchievementTitle");
+    if (!achievementTitle.trim()) {
+      titleInput?.classList.add("border-on-error");
       isValid = false;
     }
-    //  Check Answer field
-    const AchievementDetailInput = document.getElementById("AchievementDetail");
+
+    const detailInput = document.getElementById("AchievementDetail");
     if (!achievementDetail.trim()) {
-      AchievementDetailInput?.classList.add("border-on-error");
+      detailInput?.classList.add("border-on-error");
       isValid = false;
     }
 
-    //  Show alert if any field invalid
     if (!isValid) {
       Swal.fire("Please fill all the mandatory fields.");
-
       return false;
     }
 
@@ -88,37 +105,46 @@ const TeamAchievements = ({
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const sp = getSP();
+
+      // Resolve selected employee into a SharePoint user
+      const user = await sp.web.ensureUser(selectedUser);
+      const userId = user.data.Id;
+
+      // Prepare payload
       const payload = {
-        Title: title, 
-        AchievementDetail: achievementDetail, 
-        AchievementTag: achievementTag, 
+        AchievementTitle: achievementTitle,
+        AchievementDetail: achievementDetail,
+        EmployeeNameId: userId, // Person field mapping
+        TopStar: topStar, // Yes/No choice
       };
 
       if (item && item.Id) {
-        //  Update existing record (Edit Mode)
-        await _sp.web.lists
-          .getByTitle("TeamAchievements")
+        // Update record
+        await sp.web.lists
+          .getByTitle("EmployeeRecognition")
           .items.getById(item.Id)
           .update(payload);
-        console.log(" TeamAchievement updated:", payload);
+        console.log(" EmployeeRecognition updated:", payload);
       } else {
-        //  Add new record (Add Mode)
-        await _sp.web.lists.getByTitle("TeamAchievements").items.add(payload);
-        console.log(" TeamAchievement added:", payload);
+        // Add new record
+        await sp.web.lists.getByTitle("EmployeeRecognition").items.add(payload);
+        console.log(" EmployeeRecognition added:", payload);
       }
 
-      //  Reset form and notify parent component
+      // Reset form and notify parent
       onSave(payload);
-      setTitle("");
+      setAchievementTitle("");
       setAchievementDetail("");
-      setAchievementTag("");
+      setSelectedUser("");
+      setTopStar("No");
     } catch (error) {
-      console.error(" Error saving TeamAchievement:", error);
+      console.error(" Error saving EmployeeRecognition:", error);
       Swal.fire({
         title: "Error",
         text: "Failed to save the record.",
         icon: "error",
-        backdrop: "false",
+        backdrop: false,
       });
     } finally {
       setLoading(false);
@@ -180,14 +206,20 @@ const TeamAchievements = ({
 
   React.useEffect(() => {
     if (item) {
-      setTitle(item.Title || "");
-      setAchievementTag(item.AchievementTag || "");
+      setAchievementTitle(item.AchievementTitle || "");
       setAchievementDetail(item.AchievementDetail || "");
+      if (item.EmployeeName && item.EmployeeName.EMail) {
+        setSelectedUser(item.EmployeeName.EMail);
+      } else {
+        setSelectedUser("");
+      }
+
+      setTopStar(item.TopStar || "No");
     } else {
-      // Clear fields if no item (Add Mode)
-      setTitle("");
-      setAchievementTag("");
+      setAchievementTitle("");
       setAchievementDetail("");
+      setSelectedUser("");
+      setTopStar("No");
     }
   }, [item]);
 
@@ -196,13 +228,22 @@ const TeamAchievements = ({
       {/* // <!-- start page title --> */}
       <div className="row">
         <div className="col-lg-4">
-          
+          {/* <h4 className="page-title fw-bold mb-1 font-20">TeamAchievements Master</h4>
+                                <ol className="breadcrumb m-0">
+                        
+                                    <li className="breadcrumb-item"><a href="settings.html">Settings</a></li>
+                                    <li className="breadcrumb-item"> 
+                                        
+                                        </li>
+                                
+                                    <li className="breadcrumb-item active">TeamAchievements Master</li>
+                                </ol> */}
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <a href="javascript:void(0)">
+              <a href="settings.html">
                 {" "}
                 <button
                   type="button"
@@ -211,7 +252,7 @@ const TeamAchievements = ({
                   <i className="fe-arrow-left me-1"></i>Back
                 </button>
               </a>
-              <a href="javascript:void(0)">
+              <a href="add-news.html">
                 {" "}
                 <button
                   type="button"
@@ -233,30 +274,37 @@ const TeamAchievements = ({
               <div className="row mt-2">
                 <div className="col-lg-6">
                   <div className="mb-3">
-                    <label htmlFor="simpleinput" className="form-label">
-                      Title<span className="text-danger">*</span>
+                    <label className="form-label">
+                      Employee Name <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
-                      id="Title"
+
+                    <select
+                      id="EmployeeName"
                       className="form-control"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
+                      value={selectedUser}
+                      onChange={(e) => setSelectedUser(e.target.value)}
+                    >
+                      <option value="">-- Select Employee --</option>
+                      {users.map((user) => (
+                        <option key={user.Id} value={user.Email}>
+                          {user.Title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
                 <div className="col-lg-6">
                   <div className="mb-3">
                     <label htmlFor="simpleinput" className="form-label">
-                      Achievement Tag<span className="text-danger">*</span>
+                      Achievement Title<span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
-                      id="AchievementTag"
+                      id="AchievementTitle"
                       className="form-control"
-                      value={achievementTag}
-                      onChange={(e) => setAchievementTag(e.target.value)}
+                      value={achievementTitle}
+                      onChange={(e) => setAchievementTitle(e.target.value)}
                     />
                   </div>
                 </div>
@@ -276,12 +324,29 @@ const TeamAchievements = ({
                       <span className="text-danger">*</span>
                     </label>
                     <textarea
-                      className="form-control"
                       id="AchievementDetail"
+                      className="form-control"
                       style={{ height: "100px" }}
                       value={achievementDetail}
                       onChange={(e) => setAchievementDetail(e.target.value)}
                     ></textarea>
+                  </div>
+                </div>
+
+                <div className="col-lg-6 d-flex align-items-center">
+                  <div className="form-check mb-3">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="TopStar"
+                      checked={topStar === "Yes"}
+                      onChange={(e) =>
+                        setTopStar(e.target.checked ? "Yes" : "No")
+                      }
+                    />
+                    <label className="form-check-label ms-1" htmlFor="TopStar">
+                      Top Star
+                    </label>
                   </div>
                 </div>
 
@@ -320,4 +385,4 @@ const TeamAchievements = ({
   );
 };
 
-export default TeamAchievements;
+export default EmployeeRecognitionForm;

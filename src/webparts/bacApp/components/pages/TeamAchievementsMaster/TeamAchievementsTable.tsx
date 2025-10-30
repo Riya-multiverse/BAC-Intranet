@@ -30,15 +30,15 @@ interface ITeamAchievementsTableProps {
 
 const Breadcrumb = [
   {
-    MainComponent: "Home",
+    MainComponent: "Settings",
 
-    MainComponentURl: "Home",
+    MainComponentURl: "Settings",
   },
 
   {
-    MainComponent: "Achievement Master",
+    MainComponent: "Team Achievements",
 
-    MainComponentURl: "AchievementMaster",
+    MainComponentURl: "TeamAchievementMaster",
   },
 ];
 

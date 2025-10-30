@@ -37,6 +37,7 @@ const ContactInformation = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const sp: SPFI = getSP();
+  const [userInfoList, setuserInfoList] = useState<any[]>([]);
 
   // Fetch all users from SharePoint + their phones from User Profile Service
   const fetchAllUsers = async () => {
@@ -111,6 +112,23 @@ const ContactInformation = () => {
     }
   };
 
+  const getUserInformationList = async () => {
+    try {
+
+      const items = await sp.web.lists
+        .getByTitle("User Information List")
+        .items.select("*,ID", "Title", "Name", "EMail", "Department", "JobTitle").filter("ContentType eq 'Person'")
+        .top(5000)
+        .getAll();
+
+      console.log("User Information List items:", items);
+      setuserInfoList(items);
+      // return items;
+    } catch (error) {
+      console.error("Error fetching User Information List:", error);
+    }
+  };
+
   // Fetch once on mount and set state
   useEffect(() => {
     const getUsers = async () => {
@@ -118,7 +136,9 @@ const ContactInformation = () => {
       setUsers(users);
       setLoading(false);
     };
-    getUsers();
+    // getUsers();
+    getUserInformationList();
+    setLoading(false);
   }, []);
 
   return (
@@ -151,36 +171,42 @@ const ContactInformation = () => {
             ) : (
               <div className="emp-achievements">
                 <div className="cards">
-                  {users.length === 0 ? (
+                  {userInfoList.length === 0 ? (
                     <p>No users found.</p>
                   ) : (
-                    users.map((user) => (
-                      <div className="card" key={user.Id}>
-                        <img src={user.ImageUrl} alt={user.Name} />
-                        <h3>{user.Name}</h3>
-                        <p
-                          className="inbox-item-text font-12"
-                          style={{
-                            color: "#6b6b6b",
-                            marginTop: "1px",
-                            fontWeight: "500 !important",
-                          }}
-                        >
-                          {user.Department}
-                        </p>
-                        <p className="contact">
-                          <i className="fas fa-envelope"></i> {user.Email}
-                        </p>
-                      </div>
-                    ))
+                    userInfoList.map((user) => {
+                      const imageUrl = `/_layouts/15/userphoto.aspx?size=L&accountname=${user.EMail}`;
+                      return (
+                        <div className="card" key={user.Id}>
+                          <img src={imageUrl} alt={user.Title} />
+                          <h3>{user.Title}</h3>
+                          <p
+                            className="inbox-item-text font-12"
+                            style={{
+                              color: "#6b6b6b",
+                              marginTop: "1px",
+                              fontWeight: 500, // remove !important
+                            }}
+                          >
+                            {user.JobTitle}
+                          </p>
+                          <p className="contact">
+                            <i className="fas fa-envelope"></i> {user.EMail}
+                          </p>
+                          <p className="contact"><i className="fas fa-phone"></i> {user.WorkPhone}</p>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
+
+              // </div>
             )}
-          </main>
-        </div>
-      </div>
+      </main>
     </div>
+      </div >
+    </div >
   );
 };
 

@@ -22,8 +22,8 @@ interface ISuccessProps {
 }
 
 const Breadcrumb = [
-  { MainComponent: "Home", MainComponentURl: "Home" },
-  { MainComponent: "Success Master", MainComponentURl: "SuccessMaster" },
+  { MainComponent: "Settings", MainComponentURl: "Settings" },
+  { MainComponent: "Success Stories", MainComponentURl: "SuccessStoriesMaster" },
 ];
 
 const SuccessForm = ({ item, onCancel, onSave, setLoading }: ISuccessProps) => {

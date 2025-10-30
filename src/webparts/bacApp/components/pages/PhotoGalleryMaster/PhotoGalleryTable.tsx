@@ -27,8 +27,8 @@ interface IGalleryProps {
 
 const Breadcrumb = [
   {
-    MainComponent: "Home",
-    MainComponentURl: "Home",
+    MainComponent: "Settings",
+    MainComponentURl: "Settings",
   },
   {
     MainComponent: "Photo Gallery ",

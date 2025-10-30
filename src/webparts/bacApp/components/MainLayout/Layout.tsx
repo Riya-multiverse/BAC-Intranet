@@ -52,7 +52,7 @@ import TrainingMaterials from '../pages/TrainingMaterials';
 import PolicyandProcedures from '../pages/PolicyandProcedures';
 import ResouceDashboard from '../pages/ResourceDashboard';
 import PolicyandProcedure from '../pages/PolicyandProcedureMaster/PolicyandProcedure';
-
+import EmployeeRecognitions from '../pages/EmployeeRecognitionMaster/EmployeeRecognition'
 
 const Layout = () => {
 
@@ -84,7 +84,7 @@ const Layout = () => {
       <Route path="/ContactInformation" element={<ContactInformation />} />
       <Route path="/AboutTheDepartment" element={<AboutTheDepartment />} />
       <Route path="/EmployeeRecognition" element={<EmployeeRecognition />} />
-      <Route path="/EmployeeRecognitionMaster" element={<EmployeeRecognition />} />
+      <Route path="/EmployeeRecognitionMaster" element={<EmployeeRecognitions />} />
       <Route path="/TemplatesandFormsMaster" element={<Template />} />
       <Route path="/TemplatesandForms" element={<TemplateandForms />} />
       <Route path="/TrainingMaterialsMaster" element={<TrainingMaterial />} />
