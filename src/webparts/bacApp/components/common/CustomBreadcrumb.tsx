@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ChevronRight } from 'react-feather';
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import {
     HashRouter as Router,
     Routes,

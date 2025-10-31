@@ -640,6 +640,9 @@ const PolicyandProcedures = () => {
 
 
                                     )}
+
+
+                                    {!loading && viewMode === "table" && (
                 <nav className="justify-content-end mt-3">
                     <ul className="pagination pagination-rounded justify-content-end">
                         <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
@@ -666,6 +669,7 @@ const PolicyandProcedures = () => {
                         </li>
                     </ul>
                 </nav>
+                                    )}
 
 
                 {/* </Modal.Body> */}

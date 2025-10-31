@@ -2,7 +2,7 @@ import * as React from 'react'
 import CustomBreadcrumb from "../common/CustomBreadcrumb";
 import { NavLink } from "react-router-dom";
 import { ArrowLeft, PlusCircle, FileText } from "react-feather";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { SPFI } from "@pnp/sp";
 import { getSP } from "../../loc/pnpjsConfig";

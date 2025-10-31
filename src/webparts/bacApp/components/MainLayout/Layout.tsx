@@ -53,6 +53,8 @@ import PolicyandProcedures from '../pages/PolicyandProcedures';
 import ResouceDashboard from '../pages/ResourceDashboard';
 import PolicyandProcedure from '../pages/PolicyandProcedureMaster/PolicyandProcedure';
 import EmployeeRecognitions from '../pages/EmployeeRecognitionMaster/EmployeeRecognition'
+import MyApprovals from '../pages/MyApproval/MyApprovals';
+import DepartmentInitiative from '../pages/DepartmentInitiative/DepartmentInitiative';
 
 const Layout = () => {
 
@@ -95,6 +97,8 @@ const Layout = () => {
       <Route path="/Projects" element={<ProjectsMain />} />
       <Route path="/PolicyandProcedures" element={<PolicyandProcedures />} />
       <Route path="/ResourceDashboard" element={<ResouceDashboard />} />
+       <Route path="/MyApprovals" element={<MyApprovals />}/>
+       <Route path="/DepartmentInitiativeMaster" element={<DepartmentInitiative />}/>
        <Route path="/PolicyandProceduresMaster" element={<PolicyandProcedure />} />
 
       <Route

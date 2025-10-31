@@ -4,7 +4,7 @@ import { SPFI, spfi, SPFx } from "@pnp/sp";
 import { IItem } from "@pnp/sp/items";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../../../styles/global.scss";

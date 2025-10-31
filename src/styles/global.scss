@@ -13904,3 +13904,20 @@ th {
     .summary-card h5 { font-weight: 600; }
 
 /// policy css ends
+/// 
+//Faq css starts
+
+.faq-container {background:var(--card);border-radius:var(--radius);box-shadow:0 6px 16px rgba(0,0,0,0.08);padding:20px;}
+.faq-item {border-bottom:1px solid #ddd;}
+.faq-question {
+  padding:14px 0px; cursor:pointer; margin: 0px; position:relative; font-weight:600; color:var(--primary);
+}
+.faq-question i {position:absolute; right:16px; top:50%; transform:translateY(-50%); transition:transform 0.3s;}
+.faq-answer {
+  max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;
+  padding:0 12px; color:#444; font-size:14px;
+}
+.faq-item.active .faq-answer {padding:10px 0px; margin: 0px; max-height:200px;}
+.faq-item.active .faq-question i {transform:translateY(-50%) rotate(180deg);}
+
+//faq css ends

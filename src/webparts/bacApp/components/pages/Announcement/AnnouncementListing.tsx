@@ -434,7 +434,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         <p className="text-center text-muted mt-4">No announcement found.</p>
       )}
 
-      {featuredAnnouncement.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
+      {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
         <div className="col-lg-5">
           {/* <div className="imagemani mt-2 me-2">
                         <img src={require("../../../assets/Banner1.png")} data-themekey="#" />

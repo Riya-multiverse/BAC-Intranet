@@ -5,7 +5,7 @@ import "@pnp/sp/profiles";
 import { getSP } from "../../loc/pnpjsConfig";
 import { useEffect, useState } from "react";
 import { SPFI } from "@pnp/sp";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../../../styles/global.scss";

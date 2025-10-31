@@ -1,6 +1,6 @@
 import * as React from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import { SPFI } from "@pnp/sp";
 import { getSP } from "../../loc/pnpjsConfig";
 import { NavLink } from "react-router-dom";
@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import FileViewer from "../common/FileViewerNew";
 import { Modal } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import '../../../../styles/bootstrap.min.scss';
 const dashboard = () => {
     const navigate = useNavigate();
     const [slideIndex, setSlideIndex] = React.useState(1);
