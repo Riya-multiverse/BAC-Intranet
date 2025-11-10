@@ -2,7 +2,7 @@ import * as React from "react";
 //import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-// import "../../../../styles/faqglobal.scss";
+
 // import "../../../../styles/global.scss";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState } from "react";
@@ -62,14 +62,14 @@ const faq = () => {
   }, [faqItems]);
 
   return (
-    <div className="content">
+    <div className="">
       {/* <!-- Start Content--> */}
-      <div className="container-fluid  paddb">
+      <div className="">
         {/* <!-- start page title --> */}
         <div className="row">
           <div className="col-xl-12 col-lg-12">
             <div className="row">
-              <div className="col-lg-12 mb-3">
+              <div className="col-lg-12 mb-2">
                 {/* <h4 className="page-title fw-bold mb-1 font-20">
                   FAQs
                 </h4>

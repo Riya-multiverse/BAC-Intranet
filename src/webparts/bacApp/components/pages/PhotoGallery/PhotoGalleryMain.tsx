@@ -139,11 +139,11 @@ const PhotoGalleryMain = () => {
                             <CustomBreadcrumb Breadcrumb={Breadcrumb} />
 
                         </div>
-                        <div className="row mt-3">
+                        <div className="mt-2">
                             <div className="col-12">
                                 <div className="card p-2">
                                     <div className="">
-                                        <div className="row">
+                                        <div className="">
                                             <div className="col-md-12">
                                                 {/* <div className="text-center filter-menu">
                                                     <a href="javascript: void(0);" className="filter-menu-item active" data-rel="all">All</a>
@@ -190,7 +190,7 @@ const PhotoGalleryMain = () => {
 
 
                             <div className="pb-0">
-                                <div className="row internalmedia1  filterable-content mt-2">
+                                <div className="row internalmedia1  filterable-content newphoto mt-2">
                                     {masterlistdata.map((item) => (
                                         <div key={item.id} className="col-sm-6 col-xl-3 filter-item">
                                             <div className="gal-box" onClick={() => {

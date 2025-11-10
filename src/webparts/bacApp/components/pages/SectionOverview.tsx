@@ -31,8 +31,8 @@ const SectionOverview = () => {
   return (
    <div id="wrapper">
 
-<div className="content">
-      <div className="container-fluid paddb">
+<div >
+      <div >
         <div className="row">
           <div className="col-xl-12 col-lg-12">
             {/* <div className="row">
@@ -46,14 +46,16 @@ const SectionOverview = () => {
               </div>
             </div> */}
              <CustomBreadcrumb Breadcrumb={Breadcrumb}/>
+             </div></div>
 
-            <main>
-              <div className="grid mt-4">
+             <div className="row">
+          <div className="col-xl-12 col-lg-12">
+              <div className="grid mt-1">
                 <div>
                   {/* Overview Card */}
                   <div className="row">
                     <div className="col-md-5">
-                      <div className="card h-1001 mt-3">
+                      <div className="card h-100 mb-0">
                         <div className="card-body">
                           <h2 className="page-title text-dark mb-0 font-16">
                             <img src={require("../../assets/sec-1.png")} alt="" />&nbsp; Department Overview
@@ -67,8 +69,8 @@ const SectionOverview = () => {
                       </div>
                     </div>
 
-                    <div className="col-md-7">
-                      <div className="card h-1001 mt-3 mb-3">
+                    <div className="col-md-7 ">
+                      <div className="card h-100 mb-0">
                         <div className="card-body">
                           <h2 className="page-title text-dark mb-2 font-16">
                             <img src={require("../../assets/sec-2.png")} alt="" />&nbsp; Roles & Responsibilities
@@ -84,7 +86,7 @@ const SectionOverview = () => {
                       </div>
                     </div>
 
-                    <div className="col-md-7">
+                    <div className="col-md-7 mt-3">
                       <div className="card h-100 mt-0">
                         <div className="card-body">
                           <h2 className="page-title text-dark font-16 mb-2">
@@ -136,7 +138,7 @@ const SectionOverview = () => {
                       </div>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-5 mt-3">
                       <div className="card h-100">
                         <div className="card-body">
                           <h2 className="page-title text-dark font-16 mb-2">
@@ -190,16 +192,16 @@ const SectionOverview = () => {
                   </div>
                 </aside>
               </div>
-            </main>
-
+              </div>
+              </div>
           </div>
         </div>
       </div>
-    </div>
+    
 
   
 
-  </div>
+ 
 
 
   )

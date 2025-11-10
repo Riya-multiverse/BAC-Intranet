@@ -72,32 +72,21 @@ const UpcomingEvents = () => {
   
 
   return (
-    <div className="content">
+    <div>
       {/* Start Content */}
-      <div className="container-fluid paddb">
+     
         {/* start page title */}
         <div className="row">
           <div className="col-xl-12 col-lg-12">
-            <div className="row">
-              <div className="col-lg-12">
-                {/* <h4 className="page-title fw-bold mb-1 font-20">
-                  Upcoming Events
-                </h4>
-                <ol className="breadcrumb m-0">
-                  <li className="breadcrumb-item">
-                    <a href="javascript:void(0)">Home</a>
-                  </li>
-                  <li className="breadcrumb-item">
-                    <span className="fe-chevron-right"></span>
-                  </li>
-                  <li className="breadcrumb-item active">Upcoming Events</li>
-                </ol> */}
+           
+              
                  <CustomBreadcrumb Breadcrumb={Breadcrumb} />
               </div>
             </div>
 
-            <main>
-              <div className="card mt-3">
+            <div className="row">
+            <div className="col-xl-12 col-lg-12">
+              <div className="card mt-1">
                 <div className="card-body pb-1">
                   <div>
                     {events.length === 0 ? (
@@ -114,7 +103,7 @@ const UpcomingEvents = () => {
                         return (
                           <div
                             key={index}
-                            className="row align-items-start border-bottom mb-0 ng-scope"
+                            className="row align-items-center border-bottom mb-0 ng-scope"
                             style={{
                               padding: "0px 0px 0px 0px",
                               width: "100%",
@@ -130,15 +119,15 @@ const UpcomingEvents = () => {
                               </div>
                             </div>
 
-                            <div className="col-sm-9 upcom2">
+                            <div className="col-sm-9 upcom2 p-0">
                               <div className="w-100 ps-0">
                                 <h4 className="mt-2 mb-1 text-dark font-14 fw-bold ng-binding">
                                   {item.EventTitle}
                                 </h4>
-                                <p className="mb-1 mt-3 font-12 mt-sm-0 ng-binding">
+                                <p className="mb-1 mt-3 date-color font-12 mt-sm-0 ng-binding">
                                   <i
                                     data-feather="calendar"
-                                    className="me-1"
+                                    className="me-1 margintop"
                                   ></i>
                                   {`${day} ${month} ${year}`}
                                 </p>
@@ -151,11 +140,8 @@ const UpcomingEvents = () => {
                   </div>
                 </div>
               </div>
-            </main>
-          </div>
-        </div>
-      </div>
-    </div>
+              </div>
+          </div> </div>
   );
 };
 

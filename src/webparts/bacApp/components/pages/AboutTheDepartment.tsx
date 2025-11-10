@@ -430,7 +430,7 @@ const AboutTheDepartment = () => {
                 {/* <!-- start profile info --> */}
                 <div className="card announcementner">
                   
-                  <div className="card">
+                
                     {/* <!-- <div className="box-header a1">
                                         <ul className="paddsame">
                                               
@@ -506,10 +506,10 @@ const AboutTheDepartment = () => {
                                       {item.EventTitle}
                                     </h4>
                                     <p className="mb-1 mt-3 font-12 mt-sm-0 ng-binding">
-                                      <i
+                                      {/* <i
                                         data-feather="calendar"
                                         className="me-1"
-                                      ></i>
+                                      ></i> */}
                                       {`${day} ${month} ${year}`}
                                     </p>
                                   </div>
@@ -520,7 +520,7 @@ const AboutTheDepartment = () => {
                         )}
                       </div>
                     </div>
-                  </div>
+                  
                 </div>
                 {/* <!-- end profile info --> */}
 
@@ -649,7 +649,7 @@ const AboutTheDepartment = () => {
                               >
                                 {/* Index Number */}
                                 <div className="col-sm-1">
-                                  <div
+                                  <div style={{ marginLeft:'10px'}}
                                     className="product-price-tag positiont text-primary rounded-circle newc"
                                     title="Position"
                                   >
@@ -662,8 +662,8 @@ const AboutTheDepartment = () => {
                                   <img
                                     className="rounded-circle"
                                     src={profilePicUrl}
-                                    width="50"
-                                    height="50"
+                                    width="40"
+                                    height="40"
                                     alt={item.Name || "Employee"}
                                     style={{ objectFit: "cover" }}
                                     onError={(e: any) => {
@@ -673,7 +673,7 @@ const AboutTheDepartment = () => {
                                 </div>
 
                                 {/* Name + Department */}
-                                <div className="col-sm-3">
+                                <div className="col-sm-4">
                                   <div className="w-100 ps-3 pt-0">
                                     <h5
                                       style={{ marginTop: 10 }}
@@ -690,23 +690,23 @@ const AboutTheDepartment = () => {
                                 </div>
 
                                 {/* Achievement Badges */}
-                                <div className="col-sm-4">
+                                <div className="col-sm-3">
                                   <a
                                     style={{ marginTop: 3 }}
                                     href="javascript:void(0);"
-                                    className="btn btn-sm btn-link text-muted ps-0 pe-0"
+                                    className="d-flex align-items-center btn btn-sm btn-link text-muted ps-0 pe-0"
                                   >
-                                    <img
+                                    <img style={{width:'15px'}}
                                       src={require("../../assets/noun-achievement-6772537.png")}
                                       title="Badges"
                                       className="me-0"
                                     />
-                                    <img
+                                    <img style={{width:'15px'}}
                                       src={require("../../assets/noun-achievement-6772537.png")}
                                       title="Badges"
                                       className="me-0"
                                     />
-                                    <img
+                                    <img style={{width:'15px'}}
                                       src={require("../../assets/noun-achievement-6772537.png")}
                                       title="Badges"
                                       className="me-0"
@@ -762,52 +762,52 @@ const AboutTheDepartment = () => {
                 <div style={{ paddingTop: "12px" }}>
                   <div className="function-list">
                     <div className="function mb-2">
-                      <strong style={{ fontWeight: "500" }} className="text-dark">
+                      <h3  className="text-dark font-14 fw-bold mb-1">
                         {" "}
                         <img src={require("../../assets/sec-5.png")} />
                         &nbsp; Strategic Planning
-                      </strong>
-                      <br />
-                      <span>
+                      </h3>
+                     
+                      <span className="text-muted font-12">
                         Develop long-term strategies and translate them into annual
                         business plans.
                       </span>
                     </div>
 
                     <div className="function mb-2">
-                      <strong style={{ fontWeight: "500" }} className="text-dark">
+                      <h3  className="text-dark font-14 fw-bold mb-1">
                         {" "}
                         <img src={require("../../assets/sec-6.png")} />
                         &nbsp; Performance Management
-                      </strong>
-                      <br />
-                      <span>
+                      </h3>
+                      
+                      <span className="text-muted font-12">
                         Track progress against KPIs and ensure alignment with BAC’s
                         vision.
                       </span>
                     </div>
 
                     <div className="function mb-2">
-                      <strong style={{ fontWeight: "500" }} className="text-dark">
+                    <h3  className="text-dark font-14 fw-bold mb-1">
                         {" "}
                         <img src={require("../../assets/sec-7.png")} />
                         &nbsp; Stakeholder Engagement
-                      </strong>
-                      <br />
-                      <span>
+                      </h3>
+                   
+                      <span className="text-muted font-12">
                         Collaborate with airlines, regulators, and government
                         partners.
                       </span>
                     </div>
 
                     <div className="function">
-                      <strong style={{ fontWeight: "500" }} className="text-dark">
+                    <h3  className="text-dark font-14 fw-bold mb-1">
                         {" "}
                         <img src={require("../../assets/sec-8.png")} />
                         &nbsp; Innovation &amp; Transformation
-                      </strong>
-                      <br />
-                      <span>
+                      </h3>
+                     
+                      <span className="text-muted font-12">
                         Drive continuous improvement, digital transformation, and
                         new initiatives.
                       </span>
@@ -842,7 +842,7 @@ const AboutTheDepartment = () => {
                       <div
                         key={team.Id}
                         style={{ clear: "both", float: "left" }}
-                        className={`mt-2 newhd ${index === 0 ? "" : "border-top pt-2"
+                        className={`mt-2  ${index === 0 ? "" : "border-top pt-2"
                           }`}
                       >
                         <h3
@@ -851,13 +851,13 @@ const AboutTheDepartment = () => {
                             fontSize: "14px",
                             fontWeight: 600,
                           }}
-                          className="mt-0 mb-1 text-16 text-dark"
+                          className="mt-0 mb-1 text-16 text-dark  two-line-one"
                         >
                           {team.Title || "Untitled Team"}
                         </h3>
                         <p
                           style={{ textAlign: "left", fontSize: "13px" }}
-                          className="mb-1"
+                          className="mb-1 two-line-trim"
                         >
                           {team.AchievementDetail || "No details available."}
                         </p>

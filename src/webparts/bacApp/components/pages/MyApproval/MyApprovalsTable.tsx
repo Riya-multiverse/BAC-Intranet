@@ -325,7 +325,7 @@ const MyApprovalsTable = ({ onAdd, onEdit, setLoading }: ITemplateTableProps) =>
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
-          <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+          <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
               {/* <button
                 type="button"
@@ -367,7 +367,7 @@ const MyApprovalsTable = ({ onAdd, onEdit, setLoading }: ITemplateTableProps) =>
         </div>
       </div>
       {/* // <!-- end page title --></> */}
-      <div className="card cardCss mt-4 mb-0">
+      <div className="card cardCss mt-2 mb-0">
         <div className="card-body">
           <div id="cardCollpase4" className="collapse show">
             <div className="table-responsive pt-0">
@@ -547,7 +547,7 @@ const MyApprovalsTable = ({ onAdd, onEdit, setLoading }: ITemplateTableProps) =>
                           </div>
                         </div>
                       </div>
-                      <div style={{ height: "32px" }}></div>
+                      <div style={{ height: "18px" }}></div>
                     </th>
                   </tr>
                 </thead>
@@ -588,7 +588,7 @@ const MyApprovalsTable = ({ onAdd, onEdit, setLoading }: ITemplateTableProps) =>
 
                           {/* Status */}
                           <td style={{ minWidth: "120px", maxWidth: "120px" }}>
-                            {item.Status}
+                          <div className="finish mb-0">  {item.Status}</div>     
                           </td>
 
                           {/* Action */}

@@ -59,7 +59,7 @@ const CustomBreadcrumb: React.FC<CustomBreadcrumbProps> = ({ Breadcrumb }) => {
     <nav>
       <div>
         {Breadcrumb.length > 0 && 
-        <h4 className="page-title fw-bold mb-0 font-20">{Breadcrumb[Breadcrumb.length - 1].MainComponent}</h4>}
+        <h4 className="page-title mt-0 fw-bold mb-0 font-20">{Breadcrumb[Breadcrumb.length - 1].MainComponent}</h4>}
         <ol className="breadcrumb mb-2">
           {Breadcrumb.map((item, index) => {
             const isLast = index === Breadcrumb.length - 1;

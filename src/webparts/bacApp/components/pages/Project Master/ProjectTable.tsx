@@ -293,7 +293,7 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
                 </div>
                 <div className="col-lg-8">
-                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
                         <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
 
 
@@ -313,7 +313,7 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
             </div>
             {/* // <!-- end page title --></> */}
-            <div className="card cardCss mt-4 mb-0">
+            <div className="card cardCss mt-2 mb-0">
                 <div className="card-body">
                     <div id="cardCollpase4" className="collapse show">
                         <div className="table-responsive pt-0">
@@ -321,8 +321,8 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
                                 <thead>
                                     <tr>
                                         <th style={{
-                                            borderBottomLeftRadius: '0px', minWidth: '40px',
-                                            maxWidth: '40px', borderTopLeftRadius: '0px'
+                                            borderBottomLeftRadius: '0px', minWidth: '50px',
+                                            maxWidth: '50px', borderTopLeftRadius: '0px'
                                         }}>
                                             <div className="d-flex pb-2"
                                                 style={{ justifyContent: 'space-between' }}>
@@ -460,7 +460,7 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
                                         <th style={{ textAlign: 'center', minWidth: '80px', maxWidth: '80px', borderBottomRightRadius: '0px', borderTopRightRadius: '0px' }}> <div className="d-flex flex-column bd-highlight pb-2">
 
-                                            <div className="d-flex  pb-2" style={{ justifyContent: 'space-evenly' }}>  <span >Action</span> <div className="dropdown">
+                                            <div className="d-flex" style={{ justifyContent: 'space-evenly' }}>  <span >Action</span> <div className="dropdown">
 
                                                 <FontAwesomeIcon icon={faEllipsisV} onClick={toggleDropdown} size='xl' />
 
@@ -481,7 +481,7 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
                                         </div>
 
-                                            <div style={{ height: '32px' }}></div>
+                                            <div style={{ height: '24px' }}></div>
 
                                         </th>
 
@@ -508,7 +508,7 @@ const ProjectTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
                                              const DueDateyear = date2.getFullYear();
                                             return (
                                                 <tr key={index}>
-                                                    <td style={{ minWidth: '40px', maxWidth: '40px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>
+                                                    <td style={{ minWidth: '50px', maxWidth: '50px' }}><div style={{ marginLeft: '10px' }} className='indexdesign'> {index + 1}</div>  </td>
 
                                                     {/* <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.URL}</td> */}
                                                     <td style={{ minWidth: '120px', maxWidth: '120px' }}>{item.ProjectName}</td>

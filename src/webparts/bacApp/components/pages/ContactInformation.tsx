@@ -145,7 +145,7 @@ const ContactInformation = () => {
     <div className="row">
       <div className="col-xl-12 col-lg-12">
         <div className="row">
-          <div className="col-lg-12 mb-3">
+          <div className="col-lg-12 mb-1">
             <CustomBreadcrumb Breadcrumb={Breadcrumb} />
           </div>
 
@@ -179,9 +179,9 @@ const ContactInformation = () => {
                       return (
                         <div className="card" key={user.Id}>
                           <img src={imageUrl} alt={user.Title} />
-                          <h3>{user.Title}</h3>
+                          <h3 className="font-15 text-dark fw-bold two-line-one" title={user.Title}>{user.Title}</h3>
                           <p
-                            className="inbox-item-text font-12"
+                            className="inbox-item-text font-12 mb-0"
                             style={{
                               color: "#6b6b6b",
                               marginTop: "1px",
@@ -190,10 +190,10 @@ const ContactInformation = () => {
                           >
                             {user.JobTitle}
                           </p>
-                          <p className="contact">
+                          <p className="contact font-11">
                             <i className="fas fa-envelope"></i> {user.EMail}
                           </p>
-                          <p className="contact"><i className="fas fa-phone"></i> {user.WorkPhone}</p>
+                          <p className="contact font-11"><i className="fas fa-phone"></i> {user.WorkPhone}</p>
                         </div>
                       );
                     })

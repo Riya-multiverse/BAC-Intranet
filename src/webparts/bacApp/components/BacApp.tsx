@@ -14,7 +14,14 @@ import Footer from './MainLayout/Footer';
 
 import Layout from './MainLayout/Layout';
 
-
+import "@fontsource/figtree/300.css";
+import "@fontsource/figtree/400.css"; // regular
+import "@fontsource/figtree/600.css";
+import "@fontsource/figtree/700.css";
+import "@fontsource/figtree/800.css";
+import "@fontsource/figtree/900.css";
+// or import everything (bigger bundle)
+import "@fontsource/figtree";
 
 import {
   HashRouter as Router,

@@ -162,8 +162,8 @@ const submitComment = async () => {
                         <div className="row mt-2">
                             <div className="col-md-12 col-xl-12">
                                 <p className="mb-2 mt-1 d-block">
-                                    <span className="pe-2 text-nowrap mb-0 d-inline-block">
-                                        <Calendar className="fe-calendar" />  {moment.utc(item.created).local().format("DD MMM YYYY")}   &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;
+                                    <span className="pe-2 date-color text-nowrap mb-0 d-inline-block">
+                                        <Calendar className="fe-calendar m-5" />  {moment.utc(item.created).local().format("DD MMM YYYY")}   &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;
                                     </span>
                                     <span style={{ color: "#009157", fontWeight: 600 }} className="text-nowrap mb-0 d-inline-block">
                                         {item.category}
@@ -213,7 +213,7 @@ const submitComment = async () => {
 
 
                     </div>
-                    <div className="row mt-2
+                    <div className="row mt-0
                                             
                                             ">
                         {/* <!-- <h4 className="fw-bold mb-0 font-18">Overview:</h4> --> */}

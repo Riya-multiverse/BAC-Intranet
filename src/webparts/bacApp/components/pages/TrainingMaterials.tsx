@@ -190,7 +190,7 @@ const TrainingMaterials = () => {
 
                     <div
                         style={{ float: "left", width: "100%" }}
-                        className="desknewview mt-3"
+                        className="desknewview mt-1"
                     >
                         <div className="pb-0">
                             {loading ? (
@@ -239,7 +239,7 @@ const TrainingMaterials = () => {
                                                                 fileName.endsWith(".avi")
                                                             ) {
                                                                 return (
-                                                                    <img
+                                                                    <img style={{width:'60px'}}
                                                                         src={require("../../assets/Leader-Speak-video-icon.png")}
                                                                         alt="video-file-icon"
                                                                     />
@@ -254,7 +254,7 @@ const TrainingMaterials = () => {
                                                                 fileName.endsWith(".gif")
                                                             ) {
                                                                 return (
-                                                                    <img
+                                                                    <img style={{width:'60px'}}
                                                                         src={require("../../assets/img.png")}
                                                                         alt="image-file-icon"
                                                                     />
@@ -266,7 +266,7 @@ const TrainingMaterials = () => {
                                                                 <img
                                                                     src={fileIcon}
                                                                     alt="file-icon"
-                                                                    style={{ width: "100%", borderRadius: "6px" }}
+                                                                    style={{ width: "60px", borderRadius: "6px" }}
                                                                 />
                                                             );
                                                         })()}

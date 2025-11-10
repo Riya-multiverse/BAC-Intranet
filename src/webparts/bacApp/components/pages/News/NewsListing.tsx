@@ -417,12 +417,13 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
 
                 </div>
                 <div className="col-lg-10">
-                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-3 mb-3">
-                        <div style={{ width: '310px' }}>
-                            <label style={{ float: 'left', textAlign: 'right', width: '150px' }} htmlFor="inputPassword2" className="me-2 mt-1">Select Category</label>
-                            <select
+                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-1 mb-3">
+                       
+                            {/* <label style={{ float: 'left', textAlign: 'right', width: '150px' }} htmlFor="inputPassword2" className="me-2 mt-1">Select Category</label> */}
+                            <label  className="me-2">Select Category</label>
+                            <div className='me-2'>   <select
                                 style={{ float: 'left', width: '130px' }}
-                                className="form-select me-1"
+                                className="form-select "
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)} // 🔹 Update category
                             >
@@ -489,9 +490,9 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                         </div>
                         <div className="row">
                             <div className="col-sm-12">
-                                <p className="mb-2 mt-1 d-block">
-                                    <span style={{ "fontWeight": 400 }} className="pe-2 text-nowrap color-new font-12 mb-0 d-inline-block">
-                                        <Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
+                                <p className="mb-2 mt-1 d-block d-flex align-items-center">
+                                    <span style={{ "fontWeight": 400 }} className="pe-2 d-flex align-items-center gap-1 date-color text-nowrap color-new font-12 mb-0 d-inline-block">
+                                        <Calendar style={{marginTop:'-2px'}} className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
                                     </span>
                                     <span style={{ "fontWeight": 400 }} className="text-nowrap mb-0 color-new font-12 d-inline-block">
                                         Author: <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.author} &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
@@ -510,7 +511,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                                 <div onClick={() => {
                                     sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                                     sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails")
-                                }} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div>
+                                }} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-12 mt-0">Read more..</div>
 
                                 {/* </a> */}
 
@@ -544,16 +545,18 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                                     </div>
                                     <div className="col-sm-9">
                                         <div className="row">
-                                            <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
-
+                                            <div className="col-sm-12"> 
+                                                <div className='d-flex align-items-center mb-2'>
+                                                <span style={{ "marginTop": "2px" }} className="date-color d-flex align-items-center gap-1 font-12 float-start  mb-0 ng-binding"><Calendar className="fe-calendar font-12" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }} className='font-12'>{item.category} </span> </div>
+                                                 </div>
                                         </div>
                                         {/* <a href="javascript:void(0)"> */}
                                         <div className="w-100" onClick={() => {
                                             sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                                             sessionStorage.setItem("showNewsDetails", "true"); navigate("/NewsDetails");
                                         }} style={{ cursor: 'pointer' }}>
-                                            <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding">{item.title}</h4>
-                                            <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding">{item.description}</p>
+                                            <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding two-line-one">{item.title}</h4>
+                                            <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding two-line-trim">{item.description}</p>
                                             <p className="read-more">Read more..</p>
                                         </div> {/* </a> */}
 

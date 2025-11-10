@@ -54,7 +54,12 @@ import ResouceDashboard from '../pages/ResourceDashboard';
 import PolicyandProcedure from '../pages/PolicyandProcedureMaster/PolicyandProcedure';
 import EmployeeRecognitions from '../pages/EmployeeRecognitionMaster/EmployeeRecognition'
 import MyApprovals from '../pages/MyApproval/MyApprovals';
-import DepartmentInitiative from '../pages/DepartmentInitiative/DepartmentInitiative';
+import DepartmentInitiative from '../pages/DepartmentInitiativeMaster/DepartmentInitiative';
+// import DepartmentInitiativeTable from '../pages/DepartmentInitiativeMaster/DepartmentInitiativeTable';
+// import DepartmentInitiativeForm from '../pages/DepartmentInitiativeMaster/DepartmentInitiativeForm';
+import DepartmentInitiativeMain from '../pages/DepartmentInitiatives/DepartmentInitiativeMain';
+import DepartmentInitiativeInternal from '../pages/DepartmentInitiatives/DepartmentInitiativeInternal';
+// import DepartmentInitiatives from '../pages/DepartmentInitiatives';
 
 const Layout = () => {
 
@@ -99,6 +104,8 @@ const Layout = () => {
       <Route path="/ResourceDashboard" element={<ResouceDashboard />} />
        <Route path="/MyApprovals" element={<MyApprovals />}/>
        <Route path="/DepartmentInitiativeMaster" element={<DepartmentInitiative />}/>
+       <Route path="/DepartmentInitiatives" element={<DepartmentInitiativeMain />}/>
+       <Route path="/DepartmentInitiativeDetails" element={<DepartmentInitiativeInternal />}/>
        <Route path="/PolicyandProceduresMaster" element={<PolicyandProcedure />} />
 
       <Route

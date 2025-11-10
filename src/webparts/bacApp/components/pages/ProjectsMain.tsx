@@ -164,10 +164,10 @@ const ProjectsMain = () => {
                             <CustomBreadcrumb Breadcrumb={Breadcrumb} />
                         </div>
                         <div className="col-lg-8">
-                            <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+                            <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
                                 {/* <a href="https://officeindia.sharepoint.com/sites/AlRostmania/SitePages/App.aspx#/ProjectRequest" className="btn btn-secondary   waves-effect waves-light"> <i className="fe-plus-circle"></i> New Request</a> */}
 
-                                <NavLink className="btn btn-secondary   waves-effect waves-light"
+                                <NavLink className="btn btn-secondary text-white  waves-effect waves-light"
                                     to="/ProjectMaster">
                                     <PlusCircle className="me-1" size={18} />New Request
                                 </NavLink>
@@ -225,12 +225,12 @@ const ProjectsMain = () => {
 
 
 
-                    <div className="row">
+                    <div className="row mt-2">
                         {filteredProjects && filteredProjects.length > 0 ? (
                             filteredProjects.map((proj: any, index: number) => (<div className="col-lg-4">
                                 <div className="card project-box">
                                     <div className="card-body">
-                                        <div className="dropdown float-end">
+                                        <div className="dropdown float-end newposition">
                                             {/* <a href="#" className="dropdown-toggle card-drop arrow-none" data-bs-toggle="dropdown" aria-expanded="false"> */}
                                             {/* <i className="fe-more-horizontal- m-0 text-muted h3"></i> */}
                                             <MoreHorizontal size={18} className="cursor-pointer  m-0 text-muted h3" />

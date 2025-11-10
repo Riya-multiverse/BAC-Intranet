@@ -513,7 +513,7 @@ const ResouceDashboard = () => {
           </span>
         </div>
       ) : (
-        <div className="container-fluid  paddb">
+        <div >
           {/* <!-- start page title --> */}
           <div className="row">
             <div className="col-xl-12 col-lg-12">
@@ -533,7 +533,7 @@ const ResouceDashboard = () => {
                   <CustomBreadcrumb Breadcrumb={Breadcrumb} />
                 </div>
 
-                <div className="row mt-3">
+                <div className="row mt-2">
                   {/* <div className="col-md-3"><div className="kpi-card bg-kpi1">Requests Sent<br/><span style={{fontSize:"28px"}}>12</span></div></div>
         <div className="col-md-3"><div className="kpi-card bg-kpi2">Submissions<br/><span style={{fontSize:"28px"}}>2</span></div></div>
         <div className="col-md-3"><div className="kpi-card bg-kpi3">Pending Review<br/><span style={{fontSize:"28px"}}>0</span></div></div>
@@ -546,7 +546,7 @@ const ResouceDashboard = () => {
                         width: "100%",
                         textAlign: "left",
                       }}
-                      className="card desknewview mt-3"
+                      className="card desknewview mt-0"
                     >
                       {/* <!-- <div className="box-header a1">
                                         <ul className="paddsame">
@@ -602,7 +602,7 @@ const ResouceDashboard = () => {
                                     }}
                                     title={item.Title || ""}
                                   >
-                                    <div className="newbg2">
+                                    <div className="newbg">
                                       {item.FileRef.toLowerCase().endsWith(
                                         ".mp4"
                                       ) ||
@@ -614,7 +614,7 @@ const ResouceDashboard = () => {
                                           src={require("../../assets/Leader-Speak-video-icon.png")}
                                           alt=""
                                           style={{
-                                            width: "100%",
+                                            width: "60px",
                                             cursor: "pointer",
                                           }}
                                         />
@@ -623,7 +623,7 @@ const ResouceDashboard = () => {
                                           src={getFileIcon(item.FileLeafRef)}
                                           alt=""
                                           style={{
-                                            width: "100%",
+                                            width: "60px",
                                             cursor: "pointer",
                                           }}
                                         />

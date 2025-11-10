@@ -277,7 +277,7 @@ const AnnouncementDetails = () => {
     return (
       <>
         <div className="row">
-          <div className="col-lg-2">
+          <div className="col-lg-8">
 
             <CustomBreadcrumb Breadcrumb={Breadcrumb} />
           </div>
@@ -296,11 +296,12 @@ const AnnouncementDetails = () => {
               <div className="col-lg-12">
                 <h4 style={{ "lineHeight": "34px" }} className="page-title fw-700 mb-1  pe-5 font-28">{item?.title}</h4>
               </div>
-              <div className="row mt-2">
+              <div className="row mt-0">
                 <div className="col-md-12 col-xl-12">
                   <p className="mb-2 mt-1 d-block">
-                    <span className="pe-2 text-nowrap mb-0 d-inline-block">
-                      <Calendar className="fe-calendar" />  {moment.utc(item?.created).local().format("DD MMM YYYY")}   &nbsp;  &nbsp;  &nbsp;
+                    <span className="pe-2 text-nowrap date-color mb-0 d-inline-block">
+                      <Calendar className="fe-calendar margintop" />  {moment.utc(item?.created).local().format("DD MMM YYYY")}&nbsp;  &nbsp;  &nbsp;|&nbsp; 
+                      
                       {/* |&nbsp;  &nbsp; */}
                     </span>
                     {/* <span style={{ color: "#009157", fontWeight: 600 }} className="text-nowrap mb-0 d-inline-block">
@@ -316,7 +317,7 @@ const AnnouncementDetails = () => {
                       window.location.href = `mailto:?subject=${subject}&body=${body}`;
 
                     }}>
-                      <Share2 size={20} color="#6c757d" />   Share by email &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
+                      <Share2 size={14} color="#6c757d" />   Share by email &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
                     </span>
                     <span className="text-nowrap mb-0 d-inline-block" onClick={() => {
                       navigator.clipboard.writeText(
@@ -333,7 +334,7 @@ const AnnouncementDetails = () => {
                     }}>
                       {/* <i className="fe-link"></i>    */}
                       <Copy size={16} color="#6c757d" />
-                      Copy link &nbsp;  &nbsp;  &nbsp;
+                      &nbsp;   Copy link &nbsp;  &nbsp;  &nbsp;
                     </span>
 
                   </p>
@@ -364,7 +365,7 @@ const AnnouncementDetails = () => {
                   }`}>
                   <div className="gal-box">
                     <a onClick={() => handleImageClick(index)}
-                      className="image-popup"
+                      className="image-popup1"
                       title={`Screenshot-${index + 1}`}
                       style={{ cursor: "pointer" }}>
                       <img src={img.url} alt={img.name || `image-${index}`} className="img-fluid" data-themekey="#" />
@@ -380,7 +381,7 @@ const AnnouncementDetails = () => {
 
 
             </div>
-            <div className="row mt-2
+            <div className="row mt-0
                                             
                                             ">
               {/* <!-- <h4 className="fw-bold mb-0 font-18">Overview:</h4> --> */}

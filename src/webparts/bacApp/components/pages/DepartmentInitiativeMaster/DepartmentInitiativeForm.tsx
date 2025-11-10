@@ -1,5 +1,5 @@
 import * as React from "react";
-//import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../../../../styles/global.scss";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -742,7 +742,7 @@ const DepartmentInitiativeForm = ({
         items.push({
           localId: n.id, // local (UI) id
           spId: n.spId || null, // SharePoint id if exists
-          title: n.title || "Untitled",
+          title: n.title || "",
           description: n.description || "",
           parentLocalId, // track parent reference by localId
         });
@@ -937,39 +937,60 @@ const DepartmentInitiativeForm = ({
 
   /////////////////////////////
   // Validate: Leaf nodes must have BOTH title & description
-  const validateLeafNodes = (nodes: Section[]): { ok: boolean; errors: string[] } => {
+ const validateLeafNodes = (nodes: Section[]): { ok: boolean; errors: string[] } => {
     const errors: string[] = [];
+    let lastLeaf: Section | null = null;
 
-    const checkNode = (node: Section) => {
-      const isLeaf = node.children.length === 0;
-
-      if (isLeaf) {
-        let hasError = false;
-
-        // Title required
-        if (!node.title || node.title.trim() === "") {
-          errors.push(`Title required for a leaf section.`);
-          document.getElementById(`title-${node.id}`)?.classList.add("border-on-error");
-          hasError = true;
+    const findLastLeaf = (node: Section) => {
+        if (node.children.length === 0) {
+            lastLeaf = node; // overwrite => last one in traversal
+        } else {
+            node.children.forEach(findLastLeaf);
         }
-
-        //  Description required
-        if (!node.description || node.description.trim() === "") {
-          errors.push(`Description required for a leaf section.`);
-          document.getElementById(`desc-${node.id}`)?.classList.add("border-on-error");
-          hasError = true;
-        }
-
-        if (hasError) return;
-      }
-
-      node.children.forEach((child) => checkNode(child));
     };
 
-    nodes.forEach((n) => checkNode(n));
+    // ✅ First pass — find last leaf node
+    nodes.forEach(findLastLeaf);
+
+    const validateNode = (node: Section) => {
+        const isLeaf = node.children.length === 0;
+
+        if (isLeaf) {
+            if (node === lastLeaf) {
+                // ✅ Last Leaf → Title + Description required
+                if (!node.title?.trim()) {
+                    errors.push("Last leaf Title required");
+                    document.getElementById(`title-${node.id}`)?.classList.add("border-on-error");
+                }
+                if (!node.description?.trim()) {
+                    errors.push("Last leaf Description required");
+                    document.getElementById(`desc-${node.id}`)?.classList.add("border-on-error");
+                }
+            } else {
+                // ✅ Other leaf → Only Title required
+                if (!node.title?.trim()) {
+                    errors.push("Leaf Title required");
+                    document.getElementById(`title-${node.id}`)?.classList.add("border-on-error");
+                }
+            }
+        } 
+        else {
+            // ✅ Parent → Only Title required
+            if (!node.title?.trim()) {
+                errors.push("Parent Title required");
+                document.getElementById(`title-${node.id}`)?.classList.add("border-on-error");
+            }
+        }
+
+        node.children.forEach(validateNode);
+    };
+
+    nodes.forEach(validateNode);
 
     return { ok: errors.length === 0, errors };
-  };
+};
+
+
 
 
   ////////////////////////////////

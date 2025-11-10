@@ -838,7 +838,7 @@ const dashboard = () => {
                     <div className="row">
                         <div className="col-xl-9 col-lg-9 tabview1">
                             <div className="row">
-                                <div className="col-xl-8 col-lg-8 order-lg-2 order-xl-1">
+                                <div className="col-xl-8 col-lg-8 order-lg-2 order-xl-1 margin-20">
                                     {/* new post */}
                                     <div className="carousel1">
                                         <div
@@ -879,8 +879,8 @@ const dashboard = () => {
                                                                 alt={banner.Title || "..."}
                                                                 className="d-block img-fluid"
                                                             />
-                                                            <div className="carousel-caption d-none d-md-block">
-                                                                <p className="font-18 mb-1 mt-1 ps-4 pe-4 py-0">
+                                                            <div className="carousel-caption d-none d-md-block ">
+                                                                <p className="font-18 mb-1 mt-1 ps-4 pe-4 py-0 two-line-trim">
                                                                     {banner.Title}
                                                                 </p>
                                                             </div>
@@ -898,7 +898,7 @@ const dashboard = () => {
                                 </div>
                                 <div className="col-xl-4 col-lg-4 order-lg-1 order-xl-1">
                                     {/* start profile info */}
-                                    <div className="card announcementner">
+                                    <div className="card announcementner h-100 mb-0">
                                         <div className="card-body pb-0 height">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Latest Announcement
@@ -924,7 +924,7 @@ const dashboard = () => {
                                                         className={`${index === 0 ? "border-bottom mt-1" : "mt-2"
                                                             }`}
                                                     >
-                                                        <h4 className="mb-0 text-dark fw-bold font-14 mt-0 ng-binding">
+                                                        <h4 className="mb-0 text-dark fw-bold font-14 mt-0 ng-binding three-line-trim">
                                                             {truncateByWords(item.title, 12)}
                                                         </h4>
                                                         <p
@@ -974,7 +974,7 @@ const dashboard = () => {
                                 </div>
                                 {/* <!-- end col --> */}
                             </div>
-                            <div className="row">
+                            <div className="row mt-3">
                                 <div className="col-xl-12 col-lg-12">
                                     <div className="card">
                                         <div className="card-body">
@@ -1034,7 +1034,7 @@ const dashboard = () => {
 
                                 <div className="col-xl-5 col-lg-5">
                                     <div className="card">
-                                        <div className="card-body pb-3 gheight">
+                                        <div className="card-body pb-2 staffhei">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Staff Recognition
                                                 {showViewAll.recognitions && (
@@ -1115,7 +1115,7 @@ const dashboard = () => {
 
                                 <div className="col-xl-7 col-lg-7">
                                     <div className="card">
-                                        <div className="card-body pb-0 gheight">
+                                        <div className="card-body pb-0 staffhei">
                                             <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                                 Policies, Procedures, Forms, and Guidelines
                                                 {/* <a
@@ -1186,7 +1186,7 @@ const dashboard = () => {
                                                                     <div className="w-100 ps-3 pt-0">
                                                                         <h5
                                                                             style={{
-                                                                                marginTop: "10px",
+                                                                                marginTop: "5px",
                                                                                 paddingLeft: "7px",
                                                                             }}
                                                                             className="inbox-item-text fw-bold font-14 mb-0 text-dark"
@@ -1199,7 +1199,7 @@ const dashboard = () => {
                                                                                 color: "#6b6b6b",
                                                                                 paddingLeft: "7px",
                                                                             }}
-                                                                            className="font-12"
+                                                                            className="font-12 two-line-one"
                                                                         >
                                                                             {truncateByWords(policy.Description, 5)}
                                                                         </span>
@@ -1393,7 +1393,7 @@ const dashboard = () => {
                                     border: "0px solid #ccc !important",
                                     padding: "0px !important",
                                 }}
-                                className="card"
+                                className="border-0 borderr-0"
                             >
                                 <div
                                     style={{
@@ -1401,7 +1401,7 @@ const dashboard = () => {
                                         border: "0px solid #ccc !important",
                                         padding: "0px !important",
                                     }}
-                                    className="card-body pb-3"
+                                    className="card-body p-0 border-0"
                                 >
                                     <h4 className="header-title font-16 text-dark fw-bold mb-0">
                                         Projects of the Month{" "}
@@ -1455,7 +1455,7 @@ const dashboard = () => {
                                                                     {proj.name}
                                                                 </a>
                                                             </h4>
-                                                            <p className="text-muted text-uppercase mb-1">
+                                                            <p className="text-muted text-uppercase mb-1 two-line-trim">
                                                                 <small>{proj.department}</small>
                                                             </p>
 

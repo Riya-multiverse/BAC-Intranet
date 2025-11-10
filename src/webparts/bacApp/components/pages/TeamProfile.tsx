@@ -125,17 +125,18 @@ const TeamProfile = () => {
   }, []);
 
   return (
-    <div className="content">
-      <div className="container-fluid paddb">
+    <div>
+      <div>
         <div className="row">
           <div className="col-xl-12 col-lg-12">
-            <div className="row">
-              <div className="col-lg-12 mb-3">
+            
                 <CustomBreadcrumb Breadcrumb={Breadcrumb} />
               </div>
-
+              </div>
+              
               {/* Main Content */}
-              <main>
+              <div className="row">
+          <div className="col-xl-12 col-lg-12">
                 {loading ? (
                   <div className="loadernewadd mt-10">
                     <div>
@@ -155,22 +156,22 @@ const TeamProfile = () => {
                     </span>
                   </div>
                 ) : (
-                  <div className="Team-profile">
+                  <div className="Team-profile mt-1">
                     <div className="grid">
                       {users.length === 0 ? (
                         <p>No users found.</p>
                       ) : (
                         users.map((user) => (
-                          <div className="card" key={user.Id}>
+                          <div className="card card-body text-center" key={user.Id}>
                             <img
                               src={user.ImageUrl}
                               alt={user.Name}
-                              className="profile-pic"
+                              className="profile-pic1"
                             />
-                            <h2>{user.Name}</h2>
+                            <h2 className="font-16 fw-bold mb-0">{user.Name}</h2>
 
                             <p
-                              className="inbox-item-text font-12"
+                              className="inbox-item-text font-12 mb-0"
                               // style={{
                               //   color: "#6b6b6b",
                               //   marginTop: "1px",
@@ -180,7 +181,7 @@ const TeamProfile = () => {
                               {user.Department}
                             </p>
 
-                            <div className="contact mt-2">
+                            <div className="contact mt-0">
                               <p>
                                 <i className="fas fa-envelope"></i> {user.Email}
                               </p>
@@ -194,12 +195,11 @@ const TeamProfile = () => {
                     </div>
                   </div>
                 )}
-              </main>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+   
   );
 };
 

@@ -382,7 +382,7 @@ const PolicyandProcedures = () => {
               
                 <main>
                     {/* 🔧 Filters Section */}
-                    <div className="controls mt-3 d-flex gap-3 align-items-end flex-wrap">
+                    <div className="controls mt-0 d-flex gap-3 align-items-end flex-wrap">
                         <div className="search position-relative" style={{ minWidth: "280px" }}>
                             <i className="fas fa-search" style={{ color: "var(--muted)", position: "absolute", left: "10px", top: "12px" }}></i>
                             <input
@@ -446,7 +446,7 @@ const PolicyandProcedures = () => {
                     </div>
 
                     {/* 🧩 Layout */}
-                    <div className="layout d-flex mt-4 flex-wrap">
+                    <div className="layout d-flex mt-2 flex-wrap">
                         <section style={{ flex: "1 1 70%" }}>
                             {/* No results */}
                             {filteredItems.length === 0 ? (
@@ -459,7 +459,7 @@ const PolicyandProcedures = () => {
                                                 {getInitials(item.title)}
                                             </div>
                                             <div className="doc-meta ">
-                                                <h5>{item.title}</h5>
+                                                <h5 className='mt-0 font-16 fw-bold text-dark mb-1'>{item.title}</h5>
                                                 <p > {item.description || ""}</p>
                                                 <div className="doc-actions ">
                                                     <button type="button" className="btn view" onClick={() => handleFileClick(item.fileUrl)}>
@@ -617,7 +617,7 @@ const PolicyandProcedures = () => {
                         {/* 📂 Quick Access */}
                         <aside style={{ flex: "1 1 25%", marginLeft: "20px" }}>
                             <div className="card">
-                                <h5><i className="fas fa-folder-open"></i> Quick Access</h5>
+                                <h5 className='header-title font-16 text-dark fw-bold mb-0'><i className="fas fa-folder-open"></i> Quick Access</h5>
                                 <p style={{ color: "var(--muted)", marginTop: "6px" }}> Frequently used documents.</p>
                                 <table className="doc-table" id="quickTable">
                                     <thead>

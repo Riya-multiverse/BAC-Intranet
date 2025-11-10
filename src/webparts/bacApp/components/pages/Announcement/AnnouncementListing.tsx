@@ -357,13 +357,13 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
     <>
 
       <div className="row">
-        <div className="col-lg-2">
+        <div className="col-lg-4">
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
 
         </div>
-        <div className="col-lg-10">
-          <div className="d-flex flex-wrap align-items-center justify-content-end mt-3 mb-3">
-            <div style={{ width: '310px' }}>
+        <div className="col-lg-8">
+          <div className="d-flex flex-wrap align-items-center justify-content-end mt-1 mb-3">
+            <div style={{ width: '250px' }}>
               <label htmlFor="inputPassword2" className="visually-hidden">Search</label>
               <div className="me-2 position-relative">
                 <input
@@ -447,7 +447,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         </div>
         <div className="col-lg-7">
           <div className="row">
-            <div className="col-sm-3 text-left">
+            <div className="col-sm-4 text-left">
               <span style={{ "padding": "5px", "borderRadius": "4px", "fontWeight": 500, "color": "#009157", "top": 0, "position": "relative" }} className="posnew font-14 float-start mt-2">Featured Announcement</span>
 
             </div>
@@ -458,18 +458,18 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
             <div className="row">
               <div className="col-sm-12">
                 <p className="mb-2 mt-1 d-block">
-                  <span style={{ "fontWeight": 400 }} className="pe-2 text-nowrap color-new font-12 mb-0 d-inline-block">
-                    <Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
+                  <span style={{ "fontWeight": 400 }} className="pe-2 date-color text-nowrap color-new text-dark font-12 mb-0 d-inline-block">
+                    <Calendar className="fe-calendar margintop" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
                   </span>
-                  <span style={{ "fontWeight": 400 }} className="text-nowrap mb-0 color-new font-12 d-inline-block">
+                  <span style={{ "fontWeight": 400 }} className="text-nowrap mb-0 color-new font-12 text-dark d-inline-block">
                     Author: <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.author} &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
                     </span>
-                    <span className="text-nowrap mb-0 color-new font-12 d-inline-block">
+                    <span className="text-nowrap mb-0 color-new font-12 text-dark d-inline-block">
                       4 min read
                     </span>
                   </span></p>
 
-                <div style={{ "clear": "both", "lineHeight": "22px" }}> <p style={{ "lineHeight": "20px", "fontWeight": 400 }} className="d-block color-new font-14">
+                <div style={{ "clear": "both", "lineHeight": "22px" }}> <p style={{ "lineHeight": "20px", "fontWeight": 400 }} className="d-block color-new font-14 text-dark">
                   {item.description}
                 </p>
                 </div>
@@ -487,7 +487,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                 <div onClick={() => {
                   sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                   sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails")
-                }} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-16 mt-0">Read more..</div>
+                }} style={{ "height": "40px", "lineHeight": "24px" }} className="btn btn-primary rounded-pill font-12 mt-0">Read more..</div>
 
                 {/* </a> */}
 
@@ -521,7 +521,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                   </div>
                   <div className="col-sm-9">
                     <div className="row">
-                      <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp; &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.category} </span> </div>
+                      <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp;  <span style={{ "color": "#009157", "fontWeight": 600 }}>  | &nbsp;&nbsp;{item.category} </span> </div>
 
                     </div>
                     {/* <a href="javascript:void(0)"> */}
@@ -529,8 +529,8 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                       sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                       sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails");
                     }} style={{ cursor: 'pointer' }}>
-                      <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding">{item.title}</h4>
-                      <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding">{item.description}</p>
+                      <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding two-line-one">{item.title}</h4>
+                      <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding two-line-trim">{item.description}</p>
                       <p className="read-more">Read more..</p>
                     </div> {/* </a> */}
 

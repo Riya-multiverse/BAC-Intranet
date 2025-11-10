@@ -90,12 +90,13 @@ useEffect(() => {
                  
 
                                 </div>
-
-                 <main>
+                                </div>
+                                <div className=" mt-0">
+                
 
                      
   {/* <!-- Individual Achievements --> */}
-  <h2 className="page-title fw-bold mb-3 font-20 mt-3">
+  <h2 className="page-title fw-bold mb-2 font-18 mt-2">
      Individual Achievements</h2>
  {loading ? (
     // Loader shown while fetching
@@ -141,9 +142,9 @@ useEffect(() => {
           />
 
           {/*  Bind EmployeeName, AchievementDetail, AchievementTitle */}
-          <h3>{item.EmployeeName?.Title || "N/A"}</h3>
-          <p>{item.AchievementDetail || "No details available."}</p>
-          <span className="badge gold">{item.AchievementTitle || "N/A"}</span>
+          <h3 className='fw-bold font-16 two-line-one'>{item.EmployeeName?.Title || "N/A"}</h3>
+          <p className='three-line-trim'>{item.AchievementDetail || "No details available."}</p>
+          <span style={{ maxWidth:'max-content' }} className="badge bg-danger mt-1">{item.AchievementTitle || "N/A"}</span>
         </div>
       ))
     )}
@@ -152,7 +153,7 @@ useEffect(() => {
 
 
 
-  <h2 className="page-title fw-bold mb-3 font-16 mt-1"> Team Achievements</h2> 
+  <h2 className="page-title fw-bold mb-2 font-18 mt-3"> Team Achievements</h2> 
 {/* <!-- Team Achievements --> */}
 <div className="">
   {/* Bind data dynamically */}
@@ -160,15 +161,15 @@ useEffect(() => {
     <p>No team achievements found.</p>
   ) : (
     teamAchievements.map((team) => (
-      <div className="card" key={team.Id}>
+      <div className="card mb-2" key={team.Id}>
         <div className="card-body p-2">
-          <h3 style={{ textAlign: "left" }} className="mt-0">
+          <h3 style={{ textAlign: "left" }} className="mt-0 font-16 fw-bold two-line-one">
             {team.Title || "Untitled Team"}
           </h3>
-          <p style={{ textAlign: "left" }} className="mb-0">
+          <p style={{ textAlign: "left" }} className="mb-0 font-14 two-line-one">
             {team.AchievementDetail || "No details available."}
           </p>
-          <span style={{ float: "left" }} className="badge gold">
+          <span style={{ float: "left",maxWidth:'max-content' }} className="badge bg-danger mt-1">
             {team.AchievementTag || ""}
           </span>
         </div>
@@ -178,7 +179,7 @@ useEffect(() => {
 </div>
 </>
   )}
-</main>
+
                          
                            
                         </div>

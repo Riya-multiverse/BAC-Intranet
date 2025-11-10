@@ -685,7 +685,7 @@ const TemplateForm = ({
                       Description<span className="text-danger">*</span>
                     </label>
                     <textarea
-                    
+
                       id="Description"
                       className="form-control"
                       value={description}
@@ -917,17 +917,13 @@ const TemplateForm = ({
                   const isNewFile = file instanceof File;
                   const handleFileDelete = (file: any, isNewFile: boolean) => {
                     if (isNewFile) {
-                      // Delete only from new icon state
-                      setIcons([]);
+                      // Remove from new uploaded attachments only 
+                      setThumbnails([]);
                     } else {
-                      // Delete only from existing icon state
-                      setExistingIcons((prev) =>
-                        prev.filter((f) => f.id !== file.id)
-                      );
-                      setExistingIconIds((prev) =>
-                        prev.filter((id) => id !== file.id)
-                      );
-                      setDeletedIconIds((prev) => [...prev, file.id]);
+                      // Remove from existing attachment arrays only 
+                      setExistingThumbnails((prev) => prev.filter((f) => f.id !== file.id));
+                      setExistingThumbnailIds((prev) => prev.filter((id) => id !== file.id));
+                      setDeletedFileIds((prev) => [...prev, file.id]);
                     }
                   };
 

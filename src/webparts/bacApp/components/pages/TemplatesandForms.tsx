@@ -181,7 +181,7 @@ const TemplateandForms = () => {
     <div className="row">
       <div className="col-xl-12 col-lg-12">
         <div className="row">
-          <div className="col-lg-12 mb-3">
+          <div className="col-lg-12 mb-2">
             {/* <h4 className="page-title fw-bold mb-1 font-20">Template and Forms</h4>
                                 <ol className="breadcrumb m-0">
                         
@@ -215,7 +215,8 @@ const TemplateandForms = () => {
               <div className="cards">
                 {templates &&
                   templates.map((item: any, index: number) => (
-                    <div className="card" key={index}>
+                    <div className="card text-center mb-0" key={index}>
+                     <div className="card-body">
                       {item.IconUrl ? (
                         <img
                           src={item.IconUrl}
@@ -230,10 +231,8 @@ const TemplateandForms = () => {
                       ) : (
                         <i className="fas fa-file-alt card-icon"></i>
                       )}
-
-                      <div className="card-body">
                         {/* Title */}
-                        <h3>{item.Title}</h3>
+                        <h3 className="font-16 fw-bold text-dark">{item.Title}</h3>
 
                         {/* Department */}
                         <div className="meta">
@@ -244,7 +243,7 @@ const TemplateandForms = () => {
                         </div>
 
                         {/* Description */}
-                        <div className="details">{item.Description || ""}</div>
+                        <div className="details two-line-trim">{item.Description || ""}</div>
 
                         {/* Download Button */}
                         {item.FileUrl ? (

@@ -426,8 +426,10 @@ const handleDelete = async (id: number) => {
                 <CustomBreadcrumb Breadcrumb={Breadcrumb} />
               </div>
             </div>
-
-            <main>
+            </div>
+            </div>
+            <div className="row">
+            <div className="col-xl-12 col-lg-12">
               {/* <!-- Suggestion Form --> */}
               <div className="card mt-3">
                 <div className="card-body">
@@ -470,8 +472,8 @@ const handleDelete = async (id: number) => {
                       </div> */}
 
                       <div className="col-sm-3">
-                        <div className="form-group">
-                          <label htmlFor="name" className="mb-1">
+                        <div className="form-group mb-3">
+                          <label htmlFor="name" className="form-label mb-1">
                             Full Name
                           </label>
                           <input
@@ -487,8 +489,8 @@ const handleDelete = async (id: number) => {
                       </div>
 
                       <div className="col-sm-3">
-                        <div className="form-group mb-1">
-                          <label htmlFor="email">Email Address</label>
+                        <div className="form-group mb-3">
+                          <label htmlFor="email" className="form-label mb-1">Email Address</label>
                           <input
                             type="email"
                             id="email"
@@ -501,14 +503,14 @@ const handleDelete = async (id: number) => {
                         </div>
                       </div>
 
-                      <div className="col-lg-6">
+                      <div className="col-lg-3">
                         <div className="mb-3">
-                          <label htmlFor="DepartmentID" className="form-label">
+                          <label htmlFor="DepartmentID" className="form-label mb-1">
                             Department<span className="text-danger">*</span>
                           </label>
                           <Select
                             id="DepartmentID"
-                            className="form-control p-0 border-0"
+                            className="form-select p-0 border-0"
                             classNamePrefix="react-select"
                             placeholder="Select Department"
                             options={departments} // [{value: 1, label: "Finance"}, ...]
@@ -532,9 +534,9 @@ const handleDelete = async (id: number) => {
                         </div>
                       </div> */}
 
-                      <div className="col-sm-6">
+                      <div className="col-sm-3">
                         <div className="form-group mb-3">
-                          <label htmlFor="suggestionTitle" className="mb-1">
+                          <label htmlFor="suggestionTitle" className="form-label mb-1">
                             Suggestion Title<span className="text-danger">*</span>
                           </label>
                           <input
@@ -551,7 +553,7 @@ const handleDelete = async (id: number) => {
 
                       <div className="col-sm-12">
                         <div className="form-group mb-3">
-                          <label htmlFor="suggestionDetails" className="mb-1">
+                          <label htmlFor="suggestionDetails" className="form-label mb-1">
                             Suggestion Details<span className="text-danger">*</span>
                           </label>
                           <textarea
@@ -567,7 +569,9 @@ const handleDelete = async (id: number) => {
                         </div>
                       </div>
                     </div>
-
+        <div className="d-flex justify-content-center align-items-center">
+          
+        
                     <button
                       style={{ width: "180px", margin: "auto" }}
                       type="submit"
@@ -576,13 +580,14 @@ const handleDelete = async (id: number) => {
                     >
                       Submit Suggestion
                     </button>
+                    </div>
                   </form>
                 </div>
               </div>
 
               {/* <!-- Repository (Admin View) --> */}
-              <div className="card">
-                <h2 className="page-title fw-bold mb-2 font-16 mt-2">
+              <div className="card card-body">
+                <h2 className="page-title fw-bold mb-2 font-16 mt-0">
                   Suggestions Repository
                 </h2>
                 <table className="mtbalenew mt-0 table-centered table-nowrap table-borderless mb-0">
@@ -598,7 +603,7 @@ const handleDelete = async (id: number) => {
                         }}
                       >
                         <div
-                          className="d-flex pb-2"
+                          className="d-flex pb-1"
                           style={{ justifyContent: "space-between" }}
                         >
                           <span>S.No.</span>
@@ -622,7 +627,7 @@ const handleDelete = async (id: number) => {
                       <th style={{ minWidth: "120px", maxWidth: "120px" }}>
                         <div className="d-flex flex-column bd-highlight">
                           <div
-                            className="d-flex pb-2"
+                            className="d-flex pb-1"
                             style={{ justifyContent: "space-evenly" }}
                           >
                             <span>Submitted By</span>
@@ -651,7 +656,7 @@ const handleDelete = async (id: number) => {
                       <th style={{ minWidth: "120px", maxWidth: "120px" }}>
                         <div className="d-flex flex-column bd-highlight">
                           <div
-                            className="d-flex pb-2"
+                            className="d-flex pb-1"
                             style={{ justifyContent: "space-evenly" }}
                           >
                             <span>Department</span>
@@ -680,7 +685,7 @@ const handleDelete = async (id: number) => {
                       <th style={{ minWidth: "120px", maxWidth: "120px" }}>
                         <div className="d-flex flex-column bd-highlight">
                           <div
-                            className="d-flex pb-2"
+                            className="d-flex pb-1"
                             style={{ justifyContent: "space-evenly" }}
                           >
                             <span>Title</span>
@@ -708,10 +713,10 @@ const handleDelete = async (id: number) => {
                       </th>
 
                       {/* Details */}
-                      <th style={{ minWidth: "200px", maxWidth: "250px" }}>
+                      <th style={{ minWidth: "200px", maxWidth: "200px" }}>
                         <div className="d-flex flex-column bd-highlight">
                           <div
-                            className="d-flex pb-2"
+                            className="d-flex pb-1"
                             style={{ justifyContent: "space-evenly" }}
                           >
                             <span>Details</span>
@@ -742,7 +747,7 @@ const handleDelete = async (id: number) => {
                       <th style={{ minWidth: "120px", maxWidth: "120px" }}>
                         <div className="d-flex flex-column bd-highlight">
                           <div
-                            className="d-flex pb-2"
+                            className="d-flex pb-1"
                             style={{ justifyContent: "space-evenly" }}
                           >
                             <span>Date</span>
@@ -832,7 +837,7 @@ const handleDelete = async (id: number) => {
                           </td>
 
                           {/*  Details → SuggestionDetails */}
-                          <td style={{ minWidth: "200px", maxWidth: "250px" }}>
+                          <td style={{ minWidth: "200px", maxWidth: "200px" }}>
                             {item.SuggestionDetails || "-"}
                           </td>
 
@@ -903,14 +908,13 @@ const handleDelete = async (id: number) => {
                                 </ul>
                             </nav>
               </div>
-            </main>
-
+            </div>
+            </div>
             {/* <!-- end page title --> */}
             {/* <!-- end row --> */}
             {/* <!-- end row --> */}
             {/* <!-- end row --> */}
-          </div>
-        </div>
+        
       
     </> 
   );
