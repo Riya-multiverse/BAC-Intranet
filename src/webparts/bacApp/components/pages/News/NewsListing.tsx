@@ -18,13 +18,16 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
     const navigate = useNavigate();
     const [newsItems, setNewsItems] = React.useState<any[]>([]);
     const [allNews, setAllNews] = React.useState<any[]>([]); // 🔹 Store all fetched news
+     const [latestNews, setlatestNews] = React.useState<any[]>([]); 
     const [category, setCategory] = React.useState<string>('All'); // 🔹 Category filter
     const [fromDate, setFromDate] = React.useState<string>(''); // 🔹 From date
     const [toDate, setToDate] = React.useState<string>(''); // 🔹 To date
-    const [itemLimit, setitemLimit] = React.useState<number>(20);
+    const [itemLimit, setitemLimit] = React.useState<number>(10);
     const [skip, setSkip] = React.useState<number>(0); // used for pagination
-    const [hasMore, setHasMore] = React.useState<boolean>(true); // to control load more visibility
-    const pageSize = 10; // number of items per load
+    const [hasMore, setHasMore] = React.useState<boolean>(false); // to control load more visibility
+    let [pageSize, setpageSize] = React.useState<number>(10);
+    const [loadItemSize, setloadItemSize] = React.useState<number>(11);
+    // let pageSize = 10; // number of items per load
     const [openDropdownIndex, setOpenDropdownIndex] = React.useState<number | null>(null);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -138,81 +141,11 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
         // fetchNews(false);
         fetchInitialNews();
     }, []);
-    const fetchNews = async (loadMore = false) => {
-        setLoading(true);
-        try {
-            const items = await sp.web.lists
-                .getByTitle("AnnouncementAndNews")
-                .items.select(
-                    "Id",
-                    "Title",
-                    "Description",
-                    "Category",
-                    "Department/DepartmentName",
-                    "Department/Id",
-                    "Overview",
-                    "Created",
-                    "Author/Title",
-                    "Author/Id",
-                    "Author/EMail",
-                    "AnnouncementandNewsImageID/ID"
-                )
-                .expand("Department,Author,AnnouncementandNewsImageID")
-                .filter("SourceType eq 'News'")
-                .orderBy("Created", false)
-                .skip(skip)   // ✅ skip previous items
-                .top(pageSize)(); // ✅ fetch only next 10
 
-            if (!items || items.length === 0) {
-                setHasMore(false);
-                setLoading(false);
-                return;
-            }
-
-            const formatted = await Promise.all(
-                items.map(async (item: any) => {
-                    const imageIds = item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
-                    const imageLinks = imageIds.length > 0 ? await getDocumentLinkByID(imageIds) : [];
-
-                    return {
-                        id: item.Id,
-                        title: item.Title,
-                        description: item.Description,
-                        department: item.Department?.DepartmentName || "",
-                        departmentId: item.Department?.Id || null,
-                        category: item.Category || "",
-                        overview: item.Overview || "",
-                        created: new Date(item.Created),
-                        author: item.Author?.Title,
-                        images: imageLinks.map((img: any) => ({
-                            name: img.FileLeafRef,
-                            url: img.FileRef,
-                        })),
-                    };
-                })
-            );
-
-            if (loadMore) {
-                // Append new items
-                setNewsItems((prev) => [...prev, ...formatted]);
-            } else {
-                // Initial load
-                setNewsItems(formatted);
-            }
-
-            // Update skip count
-            setSkip((prev) => prev + pageSize);
-
-            // If fewer than pageSize, it means no more data
-            if (items.length < pageSize) setHasMore(false);
-        } catch (err) {
-            console.error("Error fetching news data:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
     const fetchInitialNews = async () => {
         setLoading(true);
+        // pageSize = 10;
+        setpageSize(10);
         try {
             const items = await sp.web.lists
                 .getByTitle("AnnouncementAndNews")
@@ -233,7 +166,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                 .expand("Department,Author,AnnouncementandNewsImageID")
                 .filter("SourceType eq 'News'")
                 .orderBy("Id", false) // ✅ Descending (latest first)
-                .top(pageSize)();
+                .top(loadItemSize)();
 
             // 🔹 Use Promise.all to wait for image fetch for each news item
             const formatted = await Promise.all(
@@ -265,11 +198,25 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
             );
 
             setNewsItems(formatted);
-            setAllNews(formatted);
-            if (items.length < pageSize) setHasMore(false);
+            // setAllNews(formatted);
+            setlatestNews(formatted.slice(0,1))
+            var newPageSize = pageSize;
+            if (items.length > newPageSize) {
+
+                // setpageSize(pageSize);
+                setHasMore(true);
+
+            }
+            else {
+                setHasMore(false);
+            }
+            // pageSize += 10;
         } catch (err) {
             console.error("Error fetching initial news:", err);
         } finally {
+            // pageSize += 10;
+            // setpageSize(pageSize);
+            // setitemLimit(pageSize);
             setLoading(false);
         }
     };
@@ -278,10 +225,32 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
     const fetchMoreNews = async () => {
         if (!hasMore) return;
         setLoading(true);
+        pageSize += 10;
+        setpageSize(pageSize);
+        setitemLimit(pageSize);
 
         try {
             // Get last item ID from the current list
+
             const lastItemId = newsItems[newsItems.length - 1]?.id;
+            let filterQuery = `SourceType eq 'News' and ID lt ${lastItemId}`;
+
+            // 🔹 Apply category filter directly in the SharePoint query if not 'All'
+            if (category && category !== "All") {
+
+                filterQuery += ` and Category eq '${category}'`;
+            }
+            // 🔹 Apply From Date filter
+            if (fromDate) {
+                const from = new Date(fromDate).toISOString();
+                filterQuery += ` and Created ge datetime'${from}'`;
+            }
+
+            // 🔹 Apply To Date filter
+            if (toDate) {
+                const to = new Date(toDate).toISOString();
+                filterQuery += ` and Created le datetime'${to}'`;
+            }
 
             const items = await sp.web.lists
                 .getByTitle("AnnouncementAndNews")
@@ -300,9 +269,124 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                     "AnnouncementandNewsImageID/ID"
                 )
                 .expand("Department,Author,AnnouncementandNewsImageID")
-                .filter(`SourceType eq 'News' and ID lt ${lastItemId}`) // ✅ Older items only
+                // .filter(`SourceType eq 'News' and ID lt ${lastItemId}`) // ✅ Older items only
+                .filter(filterQuery)
                 .orderBy("Id", false)
-                .top(pageSize)();
+                .top(loadItemSize)();
+
+            if (items.length === 0) {
+                setHasMore(false);
+                // pageSize += 10;
+                // setpageSize(pageSize);
+                // setitemLimit(pageSize);
+                return;
+            }
+
+            // 🔹 Use Promise.all to wait for image fetch for each news item
+            const formatted = await Promise.all(
+                items.map(async (item: any, index: number) => {
+                    const imageIds =
+                        item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+                    const imageLinks = imageIds.length > 0
+                        ? await getDocumentLinkByID(imageIds)
+                        : [];
+
+                    return {
+                        id: item.Id,
+                        sno: index + 1,
+                        title: item.Title,
+                        description: item.Description,
+                        department: item.Department?.DepartmentName || "",
+                        departmentId: item.Department?.Id || null,
+                        category: item.Category || "",
+                        overview: item.Overview || "",
+                        created: new Date(item.Created),
+                        author: item.Author?.Title,
+                        images: imageLinks.map((img: any) => ({
+                            name: img.FileLeafRef,
+                            url: img.FileRef,
+                        })),
+                    };
+                })
+            );
+
+            setNewsItems((prev) => [...prev, ...formatted]);
+            // setAllNews((prev) => [...prev, ...formatted]);
+            // if (items.length < pageSize) setHasMore(false);
+            var newPageSize = pageSize;
+            if ((items.length + newsItems.length) > newPageSize) {
+
+                // setpageSize(pageSize);
+                setHasMore(true);
+            }
+            else {
+                setHasMore(false);
+            }
+        } catch (err) {
+            console.error("Error fetching more news:", err);
+        } finally {
+            // pageSize += 10;
+            // setpageSize(pageSize);
+            // setitemLimit(pageSize);
+            setLoading(false);
+        }
+    };
+
+    const fetchMoreOnFilter = async () => {
+        // if (!hasMore) return;
+        setLoading(true);
+        setHasMore(false);
+        pageSize = 10;
+         setpageSize(pageSize);
+        setitemLimit(pageSize);
+
+        try {
+            // Get last item ID from the current list
+
+            // const lastItemId = newsItems[newsItems.length - 1]?.id;
+            // let filterQuery = `SourceType eq 'News' and ID lt ${lastItemId}`;
+            let filterQuery = `SourceType eq 'News'`;
+
+            // 🔹 Apply category filter directly in the SharePoint query if not 'All'
+            if (category && category !== "All") {
+
+                filterQuery += ` and Category eq '${category}'`;
+            }
+
+            // 🔹 Apply From Date filter
+            if (fromDate) {
+                const from = new Date(fromDate).toISOString();
+                filterQuery += ` and Created ge datetime'${from}'`;
+            }
+
+            // 🔹 Apply To Date filter
+            if (toDate) {
+                const to = new Date(toDate).toISOString();
+                filterQuery += ` and Created le datetime'${to}'`;
+            }
+
+            const items = await sp.web.lists
+                .getByTitle("AnnouncementAndNews")
+                .items
+                .select("Id",
+                    "Title",
+                    "Description",
+                    "Category",
+                    "Department/DepartmentName",
+                    "Department/Id",
+                    "Overview",
+                    "Created",
+                    "Author/Title",
+                    "Author/Id",
+                    "Author/EMail",
+                    "AnnouncementandNewsImageID/ID"
+                )
+                .expand("Department,Author,AnnouncementandNewsImageID")
+                // .filter(`SourceType eq 'News' and ID lt ${lastItemId}`) // ✅ Older items only
+                .filter(filterQuery)
+                .orderBy("Id", false)
+                .top(loadItemSize)();
 
             if (items.length === 0) {
                 setHasMore(false);
@@ -338,12 +422,27 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                 })
             );
 
-            setNewsItems((prev) => [...prev, ...formatted]);
-            setAllNews((prev) => [...prev, ...formatted]);
-            if (items.length < pageSize) setHasMore(false);
+            // setNewsItems((prev) => [...prev, ...formatted]);
+            // setAllNews((prev) => [...prev, ...formatted]);
+            // if (items.length < pageSize) setHasMore(false);
+            setNewsItems(formatted);
+            // setAllNews(formatted);
+            // if (items.length < pageSize) setHasMore(false);
+            var newPageSize = pageSize;
+            if (items.length > newPageSize) {
+
+                // setpageSize(pageSize);
+                setHasMore(true);
+            }
+            else {
+                setHasMore(false);
+            }
         } catch (err) {
             console.error("Error fetching more news:", err);
         } finally {
+            // pageSize += 10;
+            // setpageSize(pageSize);
+            // setitemLimit(pageSize);
             setLoading(false);
         }
     };
@@ -355,38 +454,48 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
         fetchMoreNews();
     };
 
+    // React.useEffect(() => {
+    //     // let filtered = [...allNews];
+
+    //     // if (fromDate && toDate && moment(toDate).isBefore(moment(fromDate))) {
+    //     //     setToDate('');
+    //     //     Swal.fire("To Date cannot be earlier than From Date.");
+    //     //     return;
+    //     // }
+
+    //     // if (category !== 'All') {
+    //     //     filtered = filtered.filter(
+    //     //         (item) => item.category?.toLowerCase() === category.toLowerCase()
+    //     //     );
+    //     // }
+
+    //     // if (fromDate) {
+    //     //     const from = moment(fromDate).startOf('day');
+    //     //     filtered = filtered.filter((item) =>
+    //     //         moment(item.created).isSameOrAfter(from)
+    //     //     );
+    //     // }
+
+    //     // if (toDate) {
+    //     //     const to = moment(toDate).endOf('day');
+    //     //     filtered = filtered.filter((item) =>
+    //     //         moment(item.created).isSameOrBefore(to)
+    //     //     );
+    //     // }
+
+    //     // setNewsItems(filtered);
+    //     // setpageSize(10);
+    //     fetchMoreOnFilter();
+    // }, [category, fromDate, toDate]);
+    const isFirstLoad = React.useRef(true);
+
     React.useEffect(() => {
-        let filtered = [...allNews];
-        // 🔸 Date validation
-        if (fromDate && toDate && moment(toDate).isBefore(moment(fromDate))) {
-            setToDate('');
-            Swal.fire("To Date cannot be earlier than From Date.");
+        if (isFirstLoad.current) {
+            isFirstLoad.current = false;   // skip first run
             return;
         }
-
-        if (category !== 'All') {
-            filtered = filtered.filter(
-                (item) => item.category?.toLowerCase() === category.toLowerCase()
-            );
-        }
-
-        if (fromDate) {
-            const from = moment(fromDate).startOf('day');
-            filtered = filtered.filter((item) =>
-                moment(item.created).isSameOrAfter(from)
-            );
-        }
-
-        if (toDate) {
-            const to = moment(toDate).endOf('day');
-            filtered = filtered.filter((item) =>
-                moment(item.created).isSameOrBefore(to)
-            );
-        }
-
-        setNewsItems(filtered);
-    }, [category, fromDate, toDate, allNews]);
-
+        fetchMoreOnFilter();               // run only on changes
+    }, [category, fromDate, toDate]);
     const Breadcrumb = [
 
         {
@@ -418,19 +527,19 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                 </div>
                 <div className="col-lg-10">
                     <div className="d-flex flex-wrap align-items-center justify-content-end mt-1 mb-3">
-                       
-                            {/* <label style={{ float: 'left', textAlign: 'right', width: '150px' }} htmlFor="inputPassword2" className="me-2 mt-1">Select Category</label> */}
-                            <label  className="me-2">Select Category</label>
-                            <div className='me-2'>   <select
-                                style={{ float: 'left', width: '130px' }}
-                                className="form-select "
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)} // 🔹 Update category
-                            >
-                                <option>All</option>
-                                <option>Internal</option>
-                                <option>External</option>
-                            </select></div>
+
+                        {/* <label style={{ float: 'left', textAlign: 'right', width: '150px' }} htmlFor="inputPassword2" className="me-2 mt-1">Select Category</label> */}
+                        <label className="me-2">Select Category</label>
+                        <div className='me-2'>   <select
+                            style={{ float: 'left', width: '130px' }}
+                            className="form-select "
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)} // 🔹 Update category
+                        >
+                            <option>All</option>
+                            <option>Internal</option>
+                            <option>External</option>
+                        </select></div>
 
                         <label htmlFor="status-select" className="me-2">From</label>
                         <div className="me-3">
@@ -467,7 +576,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                 <p className="text-center text-muted mt-4">No news found.</p>
             )}
 
-            {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
+            {latestNews.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
                 <div className="col-lg-5">
                     {/* <div className="imagemani mt-2 me-2">
                         <img src={require("../../../assets/Banner1.png")} data-themekey="#" />
@@ -492,7 +601,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                             <div className="col-sm-12">
                                 <p className="mb-2 mt-1 d-block d-flex align-items-center">
                                     <span style={{ "fontWeight": 400 }} className="pe-2 d-flex align-items-center gap-1 date-color text-nowrap color-new font-12 mb-0 d-inline-block">
-                                        <Calendar style={{marginTop:'-2px'}} className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
+                                        <Calendar style={{ marginTop: '-2px' }} className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}  &nbsp;  &nbsp;  &nbsp;|
                                     </span>
                                     <span style={{ "fontWeight": 400 }} className="text-nowrap mb-0 color-new font-12 d-inline-block">
                                         Author: <span style={{ "color": "#009157", "fontWeight": 600 }}>{item.author} &nbsp;  &nbsp;  &nbsp;|&nbsp;  &nbsp;  &nbsp;
@@ -523,7 +632,7 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
             </div>))}
             <div className="tab-content mt-4">
                 <div className="tab-pane show active" id="home1">
-                    {newsItems.map((item, index) => (
+                    {newsItems.slice(0, itemLimit).map((item, index) => (
                         <div className="card mb-2">
                             <div className="card-body">
                                 <div className="row align-items-start">
@@ -545,10 +654,10 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
                                     </div>
                                     <div className="col-sm-9">
                                         <div className="row">
-                                            <div className="col-sm-12"> 
+                                            <div className="col-sm-12">
                                                 <div className='d-flex align-items-center mb-2'>
-                                                <span style={{ "marginTop": "2px" }} className="date-color d-flex align-items-center gap-1 font-12 float-start  mb-0 ng-binding"><Calendar className="fe-calendar font-12" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }} className='font-12'>{item.category} </span> </div>
-                                                 </div>
+                                                    <span style={{ "marginTop": "2px" }} className="date-color d-flex align-items-center gap-1 font-12 float-start  mb-0 ng-binding"><Calendar className="fe-calendar font-12" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp; &nbsp;| &nbsp; <span style={{ "color": "#009157", "fontWeight": 600 }} className='font-12'>{item.category} </span> </div>
+                                            </div>
                                         </div>
                                         {/* <a href="javascript:void(0)"> */}
                                         <div className="w-100" onClick={() => {
@@ -642,11 +751,8 @@ const NewsListing = ({ setLoading }: INewsListingProps) => {
 
                 </div>
 
-                {/* {newsItems?.length > itemLimit && <div style={{ textAlign: "center", display: "block" }} onClick={handleLoadMore}>
-                    <button className="btn btn-primary btn-sm" style={{ padding: "7px 15px !important", MozAnimation: " #ff8200", fontSize: " 17px !important", width: "104px !important", float: "none", textAlign: "center" }} type="button">Load more</button>
-                </div>
-                } */}
-                {hasMore && newsItems.length && (
+
+                {hasMore && newsItems.length > 0 && (
                     <div style={{ textAlign: "center", display: "block" }}>
                         <button
                             className="btn btn-primary btn-sm"

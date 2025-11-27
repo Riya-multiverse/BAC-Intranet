@@ -180,7 +180,7 @@ const AnnouncementDetails = () => {
         .items.select("ID", "CommentText", "Created", "Author/Title,Author/EMail,Author/ID", "ParentCommentID/ID")
         .expand("Author", "ParentCommentID")
         .filter(`NewsID eq ${item.id}`)
-        .orderBy("Created", false)();
+        .orderBy("Created", false).top(4999)();
 
       // Separate main comments and replies
       if (items) {

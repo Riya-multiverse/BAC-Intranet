@@ -34,6 +34,11 @@ const TrainingMaterials = () => {
     const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
     const [showModalTemplateDoc, setShowModalTemplateDoc] = useState(false);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const pageSize = 10;
+    const [visibleTraining, setVisibleTraining] = useState<any[]>([]);
+    const [hasMore, setHasMore] = useState(false);
+    const [page, setPage] = useState(1);
+
 
     useEffect(() => {
         const fetchTrainingData = async () => {
@@ -88,6 +93,12 @@ const TrainingMaterials = () => {
                 );
 
                 setTrainingData(enrichedItems);
+
+                //  Show first 10 only
+                setVisibleTraining(enrichedItems.slice(0, pageSize));
+                setHasMore(enrichedItems.length > pageSize);
+                setPage(1);
+
             } catch (error) {
             } finally {
                 setLoading(false);
@@ -174,6 +185,24 @@ const TrainingMaterials = () => {
         setShowModalTemplateDoc(false);
     };
 
+    const loadMore = () => {
+        const next = page + 1;
+        const start = (next - 1) * pageSize;
+        const end = next * pageSize;
+
+        setVisibleTraining(prev => [
+            ...prev,
+            ...trainingData.slice(start, end)
+        ]);
+
+        setPage(next);
+
+        if (end >= trainingData.length) {
+            setHasMore(false);
+        }
+    };
+
+
     return (
         <div className="row">
             <div className="col-xl-12 col-lg-12">
@@ -214,7 +243,7 @@ const TrainingMaterials = () => {
                                 </div>
                             ) : (
                                 <div className="row internalmedia1 filterable-content mt-2">
-                                    {trainingData.map((item, index) => (
+                                    {visibleTraining.map((item, index) => (
                                         <div
                                             key={index}
                                             className="col-sm-6 col-xl-3 filter-item all web illustrator"
@@ -311,6 +340,24 @@ const TrainingMaterials = () => {
                                     ))}
                                 </div>
                             )}
+                            {hasMore && (
+                                <div style={{ textAlign: "center" }}>
+                                    <button
+                                        className="btn btn-primary btn-sm"
+                                        style={{
+                                padding: "7px 15px",
+                                // backgroundColor: "#ff8200",
+                                fontSize: "17px",
+                                width: "120px",
+                                marginTop: "10px",
+                            }}
+                                        onClick={loadMore}
+                                    >
+                                        Load More
+                                    </button>
+                                </div>
+                            )}
+
                         </div>
                     </div>
                 </div>

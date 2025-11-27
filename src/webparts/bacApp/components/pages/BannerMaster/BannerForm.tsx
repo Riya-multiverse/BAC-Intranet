@@ -536,12 +536,13 @@ const BannerForm = ({ item, onCancel, onSave, setLoading }: IMyFormProps) => {
     // ///////////
     return (
         <>
-            <div style={{ paddingLeft: '1.3rem', paddingRight: '1.5rem' }} className="row">
+            <div  className="row">
                 <div className="col-lg-4">
                     <CustomBreadcrumb Breadcrumb={Breadcrumb} />
 
                 </div>
-                <div className="card mt-3" >
+                <div className='px-2'>
+                <div className="card mt-2" >
                     <div className="card-body">
                         <div className="row mt-2">
 
@@ -707,7 +708,7 @@ const BannerForm = ({ item, onCancel, onSave, setLoading }: IMyFormProps) => {
                         </div>
                     </div>
 
-                </div>
+                </div></div>
             </div>
             <div className="row mt-3">
                 <div className="col-12 text-center">

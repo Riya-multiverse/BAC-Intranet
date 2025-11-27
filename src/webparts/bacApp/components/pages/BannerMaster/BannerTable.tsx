@@ -285,7 +285,7 @@ const BannerTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
                 </div>
                 <div className="col-lg-8">
-                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+                    <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
                         <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
 
 
@@ -305,7 +305,7 @@ const BannerTable = ({ onAdd, onEdit, setLoading }: IMyTableProps) => {
 
             </div>
             {/* // <!-- end page title --></> */}
-            <div className="card cardCss mt-4 mb-0">
+            <div className="card cardCss mt-2 mb-0">
                 <div className="card-body">
                     <div id="cardCollpase4" className="collapse show">
                         <div className="table-responsive pt-0">

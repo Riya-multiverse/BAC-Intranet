@@ -23,9 +23,9 @@ interface IEventProps {
 }
 const Breadcrumb = [
   {
-    MainComponent: "Home",
+    MainComponent: "Settings",
 
-    MainComponentURl: "Home",
+    MainComponentURl: "Settings",
   },
 
   {

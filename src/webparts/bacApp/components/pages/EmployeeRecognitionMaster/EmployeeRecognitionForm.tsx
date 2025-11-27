@@ -243,7 +243,7 @@ const EmployeeRecognitionForm = ({
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <a href="settings.html">
+              {/* <a href="settings.html">
                 {" "}
                 <button
                   type="button"
@@ -260,7 +260,7 @@ const EmployeeRecognitionForm = ({
                 >
                   <i className="fe-plus-circle me-1"></i>Add
                 </button>
-              </a>
+              </a> */}
             </form>
           </div>
         </div>

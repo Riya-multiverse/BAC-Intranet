@@ -37,6 +37,10 @@ const TeamProfile = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const sp: SPFI = getSP();
+  const [displayUsers, setDisplayUsers] = useState<IUser[]>([]);
+  const [hasMore, setHasMore] = useState<boolean>(false);
+  const pageSize = 10;
+  const [page, setPage] = useState(1);
 
   //Fetch only real users and their profile info
   const fetchAllUsers = async () => {
@@ -95,7 +99,7 @@ const TeamProfile = () => {
               )}`,
             };
           } catch (profileError) {
-          
+
             return {
               Id: user.ID,
               Name: user.Title,
@@ -111,7 +115,7 @@ const TeamProfile = () => {
         })
       );
 
-  
+
       setUsers(usersWithPhones);
     } catch (error) {
       setUsers([]);
@@ -124,82 +128,115 @@ const TeamProfile = () => {
     fetchAllUsers();
   }, []);
 
+  const handleLoadMore = () => {
+  const nextPage = page + 1;
+  const start = (nextPage - 1) * pageSize;
+  const end = nextPage * pageSize;
+
+  const moreUsers = users.slice(start, end);
+
+  setDisplayUsers(prev => [...prev, ...moreUsers]);
+  setPage(nextPage);
+
+  if (end >= users.length) {
+    setHasMore(false);
+  }
+};
+
   return (
     <div>
       <div>
         <div className="row">
           <div className="col-xl-12 col-lg-12">
-            
-                <CustomBreadcrumb Breadcrumb={Breadcrumb} />
-              </div>
-              </div>
-              
-              {/* Main Content */}
-              <div className="row">
+
+            <CustomBreadcrumb Breadcrumb={Breadcrumb} />
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="row">
           <div className="col-xl-12 col-lg-12">
-                {loading ? (
-                  <div className="loadernewadd mt-10">
-                    <div>
-                      <img
-                        src={require("../../assets/BAC_loader.gif")}
-                        className="alignrightl"
-                        alt="Loading..."
-                      />
-                    </div>
-                    <span>Loading </span>{" "}
-                    <span>
-                      <img
-                        src={require("../../assets/edcnew.gif")}
-                        className="alignrightl"
-                        alt="Loading..."
-                      />
-                    </span>
-                  </div>
-                ) : (
-                  <div className="Team-profile mt-1">
-                    <div className="grid">
-                      {users.length === 0 ? (
-                        <p>No users found.</p>
-                      ) : (
-                        users.map((user) => (
-                          <div className="card card-body text-center" key={user.Id}>
-                            <img
-                              src={user.ImageUrl}
-                              alt={user.Name}
-                              className="profile-pic1"
-                            />
-                            <h2 className="font-16 fw-bold mb-0">{user.Name}</h2>
+            {loading ? (
+              <div className="loadernewadd mt-10">
+                <div>
+                  <img
+                    src={require("../../assets/BAC_loader.gif")}
+                    className="alignrightl"
+                    alt="Loading..."
+                  />
+                </div>
+                <span>Loading </span>{" "}
+                <span>
+                  <img
+                    src={require("../../assets/edcnew.gif")}
+                    className="alignrightl"
+                    alt="Loading..."
+                  />
+                </span>
+              </div>
+            ) : (
+              <div className="Team-profile mt-1">
+                <div className="grid">
+                  {users.length === 0 ? (
+                    <p>No users found.</p>
+                  ) : (
+                    users.map((user) => (
+                      <div className="card card-body text-center" key={user.Id}>
+                        <img
+                          src={user.ImageUrl}
+                          alt={user.Name}
+                          className="profile-pic1"
+                        />
+                        <h2 className="font-16 fw-bold mb-0">{user.Name}</h2>
 
-                            <p
-                              className="inbox-item-text font-12 mb-0"
-                              // style={{
-                              //   color: "#6b6b6b",
-                              //   marginTop: "1px",
-                              //   fontWeight: "500 !important",
-                              // }}
-                            >
-                              {user.Department}
-                            </p>
+                        <p
+                          className="inbox-item-text font-12 mb-0"
+                        // style={{
+                        //   color: "#6b6b6b",
+                        //   marginTop: "1px",
+                        //   fontWeight: "500 !important",
+                        // }}
+                        >
+                          {user.Department}
+                        </p>
 
-                            <div className="contact mt-0">
-                              <p>
-                                <i className="fas fa-envelope"></i> {user.Email}
-                              </p>
-                              <p>
-                                <i className="fe-phone"></i> {user.Mobile}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                        <div className="contact mt-0">
+                          <p>
+                            <i className="fas fa-envelope"></i> {user.Email}
+                          </p>
+                          <p>
+                            <i className="fe-phone"></i> {user.Mobile}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {hasMore && (
+                  <div style={{ textAlign: "center" }}>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      style={{
+                        padding: "7px 15px",
+                        // backgroundColor: "#ff8200",
+                        fontSize: "17px",
+                        width: "120px",
+                        marginTop: "10px",
+                      }}
+                      type="button"
+                      onClick={handleLoadMore}
+                    >
+                      Load More
+                    </button>
                   </div>
                 )}
               </div>
-            </div>
+            )}
           </div>
         </div>
-   
+      </div>
+    </div>
+
   );
 };
 

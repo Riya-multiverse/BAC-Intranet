@@ -398,8 +398,8 @@ const LeftNav: React.FC<ILeftNavProps> = ({ isCollapsed }) => {
   return (
     // <!-- menu-left -->
     <nav>
-      <div className={` scrollbar mt-1 left-nav ${isCollapsed ? 'collapsed' : ''}`}>
-
+      <div className={` scrollbar mt-1 left-nav ${isCollapsed ? 'collapsed' : ''}`} data-simplebar="init">
+   
 
         {/* <!--- Menu --> */}
         <ul className="menu">

@@ -240,7 +240,7 @@ const navigate = useNavigate();
         </div>
 
         <div className="col-lg-8">
-          <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+          <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
               {/* Back Button */}
               <button
@@ -268,9 +268,10 @@ const navigate = useNavigate();
       </div>
 
       {/* Table Section */}
-      <div className="tab-content mt-3">
+      <div className="tab-content mt-0">
         <div className="tab-pane show active" id="profile1" role="tabpanel">
           <div className="card">
+          <div className="card-body">
             <table className="mtbalenew mt-0 table-centered table-nowrap table-borderless mb-0">
               <thead>
                 <tr>
@@ -360,7 +361,7 @@ const navigate = useNavigate();
                         <span>Action</span>
                       </div>
                     </div>
-                    <div style={{ height: "32px" }}></div>
+                    <div style={{ height: "20px" }}></div>
                   </th>
                 </tr>
               </thead>
@@ -458,7 +459,7 @@ const navigate = useNavigate();
                 </li>
               </ul>
             </nav>
-          </div>
+          </div>  </div>
         </div>
       </div>
     </>

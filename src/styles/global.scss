@@ -34,7 +34,7 @@
 }
 .staffhei{height:357px;}
 .app-menu .scrollbar {
-    margin-top: 0px !important;
+    margin-top: 12px !important;
 }
 .ms-rtestate-field p, p.ms-rteElement-P{display: none;}
 .borderr-0{border-radius: 0px !important;}
@@ -1713,9 +1713,11 @@ html[data-menu-color=gradient] .app-menu .logo-box .logo-dark {
 .content-page .content {
     min-height: calc(100vh - var(--ct-topbar-height));
     padding: 0 15px var(--ct-footer-height);
-    padding-top: 35px;    background: #ededed;
+    padding-top: 20px;    background: #ededed;
 }
-
+.carousel-caption p{
+    display: block;
+}
 .user-box {
     padding: 30px 20px;
     text-align: center;
@@ -1805,11 +1807,14 @@ html[data-sidenav-user=true] .user-box {
     /* color: #aea9a9; */
 }
 
-.menu .menu-item .menu-link.show,
-.menu .menu-item .menu-link:focus,
-.menu .menu-item .menu-link:hover,
-.menu .menu-item .menu-link[aria-expanded=true] {
-    color: #da291c;
+// .menu .menu-item .menu-link.show,
+// .menu .menu-item .menu-link:focus,
+// .menu .menu-item .menu-link:hover,
+// .menu .menu-item .menu-link[aria-expanded=true] {
+//     color: #da291c;
+// }
+.tooltip-title:hover{
+    color: #da291c; 
 }
 
 .sub-menu .menu .menu-item.menuitem-active>.menu-link {
@@ -1879,6 +1884,10 @@ html[data-sidenav-user=true] .user-box {
 }
 
 .menu .menu-item.menuitem-active>.menu-link {
+    color: #fff;
+    background: #da291c;
+}
+.menu .menu-item a.active {
     color: #fff;
     background: #da291c;
 }
@@ -8800,6 +8809,7 @@ body {
 }
 #s4-bodyContainer {
     padding-bottom: 0px !important;
+    margin-top:-18px !important;
 }
 .tav-image {
     height: 70px !important;
@@ -8986,7 +8996,7 @@ body {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -10044,7 +10054,7 @@ h2 {
 
 .footer {
   
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -10385,7 +10395,7 @@ h2 {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -10805,7 +10815,7 @@ h2 {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -11552,14 +11562,31 @@ th {
 }
 
 .tooltip-title {
-    font-weight: bold;
-    color: #fff;
-    background-color: #d32f2f;
+ 
+    color: #6c757d;
+    background-color: #fff;
     /* red like your screenshot */
     padding: 4px 8px;
-    margin-bottom: 4px;
+    margin-bottom: 0px;
 }
 
+input[type=password][disabled], .react-select__placeholder, .react-select__input, input[type=text][disabled], .react-select__single-value, input[type=file][disabled], input:not([type])[disabled], textarea[disabled], select[disabled], .sp-peoplepicker-topLevelDisabled, .ms-inputBoxDisabled {
+    color: #000 !important;
+   border-color: #ededed !important;
+    
+    font-weight: 600 !important;
+    
+}
+input[type=password],.form-control,.form-select, input[type=text], input[type=file], input:not([type]), select, textarea, .sp-peoplepicker-topLevel, .sp-peoplepicker-topLevelDisabled, .sp-peoplepicker-autoFillContainer, .ms-inputBox {
+    border: 1px solid #ededed;
+    background-color: #ffffff;
+  
+    color: #000 !important;font-weight: 600 !important;
+}
+
+textarea::placeholder{
+    font-weight: 600 !important; color: #000 !important;
+}
 .tooltip-submenu li {
     padding: 2px 0;
 }
@@ -11812,7 +11839,7 @@ a:hover {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -12239,7 +12266,7 @@ a:hover {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -13001,7 +13028,7 @@ th {
 .footer {
     position: fixed;
     width: 98.8%;
-    padding: 0px 10px 0px 80px;
+    padding: 0px 10px 0px 260px;
 }
 
 .paddb {
@@ -14004,7 +14031,7 @@ th {
 }
 .faq-item.active .faq-answer {padding:10px 0px; margin: 0px; max-height:200px;}
 .faq-item.active .faq-question i {transform:translateY(-50%) rotate(180deg);}
-.alignmentnew{}
+// .alignmentnew{}
 //faq css ends
 .mtable td #myDropdown svg{
     top: 0px !important;
@@ -14018,3 +14045,4 @@ th {
     font-weight: 600;
     color: #000;  
 }
+.modal-title{margin-top: 0px !important; margin-bottom: 0px !important; }

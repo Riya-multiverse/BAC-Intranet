@@ -5,29 +5,33 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'material-symbols/index.css';
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <>
-    <footer className="footer">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-6">
-            
-            <div>© 2025
-               {/* <script>document.write(new Date().getFullYear())</script>  */}
-               Bahrain Airport Company, All Rights Reserved. </div>
-          </div>
-          <div className="col-md-6">
-            <div className="d-none d-md-flex gap-4 align-item-center justify-content-md-end footer-links">
-              <a href="javascript: void(0);">About</a>
-              <a href="javascript: void(0);">Support</a>
-              <a href="javascript: void(0);">Contact Us</a>
+      <footer className="footer">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-6">
+              <div>
+                © {currentYear} &nbsp; Bahrain Airport Company, All Rights Reserved.
+              </div>
             </div>
+
+            <div className="col-md-6">
+              <div className="d-none d-md-flex gap-4 align-item-center justify-content-md-end footer-links">
+                <a href="javascript:void(0);">About</a>
+                <a href="javascript:void(0);">Support</a>
+                <a href="javascript:void(0);">Contact Us</a>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
     </>
-  )
-}
+  );
+};
+
 
 export default Footer

@@ -59,6 +59,7 @@ import DepartmentInitiative from '../pages/DepartmentInitiativeMaster/Department
 // import DepartmentInitiativeForm from '../pages/DepartmentInitiativeMaster/DepartmentInitiativeForm';
 import DepartmentInitiativeMain from '../pages/DepartmentInitiatives/DepartmentInitiativeMain';
 import DepartmentInitiativeInternal from '../pages/DepartmentInitiatives/DepartmentInitiativeInternal';
+import BACAnnualPlanning from '../pages/BACAnnualPlanning';
 // import DepartmentInitiatives from '../pages/DepartmentInitiatives';
 
 const Layout = () => {
@@ -107,6 +108,7 @@ const Layout = () => {
        <Route path="/DepartmentInitiatives" element={<DepartmentInitiativeMain />}/>
        <Route path="/DepartmentInitiativeDetails" element={<DepartmentInitiativeInternal />}/>
        <Route path="/PolicyandProceduresMaster" element={<PolicyandProcedure />} />
+       <Route path="/BACAnnualPlanning" element={<BACAnnualPlanning />} />
 
       <Route
         path="*"

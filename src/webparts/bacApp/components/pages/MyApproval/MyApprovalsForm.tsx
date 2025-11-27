@@ -1177,7 +1177,7 @@ const MyApprovalsForm = ({
                 </div>
             </div>
 
-            <div className="tab-content mt-3">
+            <div className="tab-content mt-0">
                 <div className="tab-pane show active" id="profile1" role="tabpanel">
                     <div className="card">
                         <div className="card-body">
@@ -1430,8 +1430,8 @@ const MyApprovalsForm = ({
                                             {status === "Pending" && (
 
 
-                                                <div className="mb-3" style={{ maxWidth: 720, margin: "0 auto" }}>
-                                                    <label className="form-label">
+                                                <div className="mb-3">
+                                                    <label style={{textAlign:'left',width:'100%'}} className="form-label">
                                                         Remarks
                                                         {/* Required only during Pending Reject/Rework */}
                                                         {status === "Pending" && (actionType === "Rejected" || actionType === "Rework") && (
@@ -1513,7 +1513,7 @@ const MyApprovalsForm = ({
  🧩 ADD SECTION HIERARCHY CARD
  This block appears below the main form
 ====================================================== */}
-                    <div className="card mt-4">
+                    <div className="card mt-0">
                         <div className="card-body">
                             <h5 className="fw-bold mb-3">Add Section Hierarchy</h5>
 
@@ -1544,7 +1544,7 @@ const MyApprovalsForm = ({
 
 
                     {/* AUDIT HISTORY*/}
-                    <div className="card mt-4">
+                    <div className="card mt-0">
                         <div className="card-body">
                             <h5 className="fw-bold mb-3">Audit History</h5>
                             <div className="table-responsive">

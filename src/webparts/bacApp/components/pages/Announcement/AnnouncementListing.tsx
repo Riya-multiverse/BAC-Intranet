@@ -31,10 +31,20 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
   ////
   const [skip, setSkip] = React.useState<number>(0); // used for pagination
   const [hasMore, setHasMore] = React.useState<boolean>(true); // to control load more visibility
-  const pageSize = 10; // number of items per load
+  // const pageSize = 10; // number of items per load
+  let [pageSize, setpageSize] = React.useState<number>(10);
+  const [loadItemSize, setloadItemSize] = React.useState<number>(11);
+  const [latestNews, setlatestNews] = React.useState<any[]>([]);
+  const [itemLimit, setitemLimit] = React.useState<number>(10);
+  const isFirstLoad = React.useRef(true);
 
-
-
+  React.useEffect(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;   // skip first run
+      return;
+    }
+    fetchMoreOnFilter();               // run only on changes
+  }, [searchTerm, fromDate, toDate]);
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,81 +78,146 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
 
   React.useEffect(() => {
 
-    const fetchNews = async () => {
-      setLoading(true);
-      try {
+    // const fetchNews = async () => {
+    //   setLoading(true);
+    //   try {
 
 
-        const items = await sp.web.lists
-          .getByTitle("AnnouncementAndNews")
-          .items.select(
-            "Id",
-            "Title",
-            "Description",
-            "Category",
-            "Department/DepartmentName",
-            "Department/Id",
-            "Overview",
-            "Created",
-            "Author/Title",
-            "Author/Id",
-            "Author/EMail",
-            "AnnouncementandNewsImageID/ID"
-          )
-          .expand("Department,Author,AnnouncementandNewsImageID")
-          .filter("SourceType eq 'Announcements'")
-          .orderBy("Created", false).top(21)();
+    //     const items = await sp.web.lists
+    //       .getByTitle("AnnouncementAndNews")
+    //       .items.select(
+    //         "Id",
+    //         "Title",
+    //         "Description",
+    //         "Category",
+    //         "Department/DepartmentName",
+    //         "Department/Id",
+    //         "Overview",
+    //         "Created",
+    //         "Author/Title",
+    //         "Author/Id",
+    //         "Author/EMail",
+    //         "AnnouncementandNewsImageID/ID"
+    //       )
+    //       .expand("Department,Author,AnnouncementandNewsImageID")
+    //       .filter("SourceType eq 'Announcements'")
+    //       .orderBy("Created", false).top(21)();
 
-        // console.log("Raw News items:", items);
+    //     // console.log("Raw News items:", items);
 
-        // 🔹 Use Promise.all to wait for image fetch for each news item
-        const formatted = await Promise.all(
-          items.map(async (item: any, index: number) => {
-            const imageIds =
-              item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+    //     // 🔹 Use Promise.all to wait for image fetch for each news item
+    //     const formatted = await Promise.all(
+    //       items.map(async (item: any, index: number) => {
+    //         const imageIds =
+    //           item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
 
-            const imageLinks = imageIds.length > 0
-              ? await getDocumentLinkByID(imageIds)
-              : [];
+    //         const imageLinks = imageIds.length > 0
+    //           ? await getDocumentLinkByID(imageIds)
+    //           : [];
 
-            return {
-              id: item.Id,
-              sno: index + 1,
-              title: item.Title,
-              description: item.Description,
-              department: item.Department?.DepartmentName || "",
-              departmentId: item.Department?.Id || null,
-              // category: item.Category || "",
-              overview: item.Overview || "",
-              created: new Date(item.Created),
-              author: item.Author?.Title,
-              images: imageLinks.map((img: any) => ({
-                name: img.FileLeafRef,
-                url: img.FileRef,
-              })),
-            };
-          })
-        );
+    //         return {
+    //           id: item.Id,
+    //           sno: index + 1,
+    //           title: item.Title,
+    //           description: item.Description,
+    //           department: item.Department?.DepartmentName || "",
+    //           departmentId: item.Department?.Id || null,
+    //           // category: item.Category || "",
+    //           overview: item.Overview || "",
+    //           created: new Date(item.Created),
+    //           author: item.Author?.Title,
+    //           images: imageLinks.map((img: any) => ({
+    //             name: img.FileLeafRef,
+    //             url: img.FileRef,
+    //           })),
+    //         };
+    //       })
+    //     );
 
-        setNewsItems(formatted);
-        setAllNews(formatted);
-        setfeaturedAnnouncement(formatted);
-        // console.log("Formatted news with images:", formatted);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching news data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     setNewsItems(formatted);
+    //     setAllNews(formatted);
+    //     setfeaturedAnnouncement(formatted);
+    //     // console.log("Formatted news with images:", formatted);
+    //     setLoading(false);
+    //   } catch (err) {
+    //     console.error("Error fetching news data:", err);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
 
     // fetchNews();
     fetchInitialNews();
   }, []);
 
+  // const fetchInitialNews = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const items = await sp.web.lists
+  //       .getByTitle("AnnouncementAndNews")
+  //       .items
+  //       .select(
+  //         "Id",
+  //         "Title",
+  //         "Description",
+  //         "Category",
+  //         "Department/DepartmentName",
+  //         "Department/Id",
+  //         "Overview",
+  //         "Created",
+  //         "Author/Title",
+  //         "Author/Id",
+  //         "Author/EMail",
+  //         "AnnouncementandNewsImageID/ID"
+  //       )
+  //       .expand("Department,Author,AnnouncementandNewsImageID")
+  //       .filter("SourceType eq 'Announcements'")
+  //       .orderBy("Id", false) // ✅ Descending (latest first)
+  //       .top(pageSize)();
+
+  //     // 🔹 Use Promise.all to wait for image fetch for each news item
+  //     const formatted = await Promise.all(
+  //       items.map(async (item: any, index: number) => {
+  //         const imageIds =
+  //           item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+  //         const imageLinks = imageIds.length > 0
+  //           ? await getDocumentLinkByID(imageIds)
+  //           : [];
+
+  //         return {
+  //           id: item.Id,
+  //           sno: index + 1,
+  //           title: item.Title,
+  //           description: item.Description,
+  //           department: item.Department?.DepartmentName || "",
+  //           departmentId: item.Department?.Id || null,
+  //           category: item.Category || "",
+  //           overview: item.Overview || "",
+  //           created: new Date(item.Created),
+  //           author: item.Author?.Title,
+  //           images: imageLinks.map((img: any) => ({
+  //             name: img.FileLeafRef,
+  //             url: img.FileRef,
+  //           })),
+  //         };
+  //       })
+  //     );
+
+  //     setNewsItems(formatted);
+  //     setAllNews(formatted);
+  //     if (items.length < pageSize) setHasMore(false);
+  //   } catch (err) {
+  //     console.error("Error fetching initial news:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const fetchInitialNews = async () => {
     setLoading(true);
+    // pageSize = 10;
+    setpageSize(10);
     try {
       const items = await sp.web.lists
         .getByTitle("AnnouncementAndNews")
@@ -151,7 +226,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
           "Id",
           "Title",
           "Description",
-          "Category",
+          "AnnouncementCategory/Category",
           "Department/DepartmentName",
           "Department/Id",
           "Overview",
@@ -161,10 +236,10 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
           "Author/EMail",
           "AnnouncementandNewsImageID/ID"
         )
-        .expand("Department,Author,AnnouncementandNewsImageID")
+        .expand("Department,Author,AnnouncementandNewsImageID,AnnouncementCategory")
         .filter("SourceType eq 'Announcements'")
         .orderBy("Id", false) // ✅ Descending (latest first)
-        .top(pageSize)();
+        .top(loadItemSize)();
 
       // 🔹 Use Promise.all to wait for image fetch for each news item
       const formatted = await Promise.all(
@@ -183,7 +258,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
             description: item.Description,
             department: item.Department?.DepartmentName || "",
             departmentId: item.Department?.Id || null,
-            category: item.Category || "",
+            category: item?.AnnouncementCategory.Category || "",
             overview: item.Overview || "",
             created: new Date(item.Created),
             author: item.Author?.Title,
@@ -196,59 +271,72 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
       );
 
       setNewsItems(formatted);
-      setAllNews(formatted);
-      if (items.length < pageSize) setHasMore(false);
+      // setAllNews(formatted);
+      setlatestNews(formatted.slice(0, 1))
+      var newPageSize = pageSize;
+      if (items.length > newPageSize) {
+
+        // setpageSize(pageSize);
+        setHasMore(true);
+
+      }
+      else {
+        setHasMore(false);
+      }
+      // pageSize += 10;
     } catch (err) {
       console.error("Error fetching initial news:", err);
     } finally {
+      // pageSize += 10;
+      // setpageSize(pageSize);
+      // setitemLimit(pageSize);
       setLoading(false);
     }
   };
 
+  // React.useEffect(() => {
+  //   let filtered = [...allNews];
+  //   // 🔸 Date validation
+  //   if (fromDate && toDate && moment(toDate).isBefore(moment(fromDate))) {
+  //     setToDate('');
+  //     Swal.fire("To Date cannot be earlier than From Date.");
+  //     return;
+  //   }
 
-  React.useEffect(() => {
-    let filtered = [...allNews];
-    // 🔸 Date validation
-    if (fromDate && toDate && moment(toDate).isBefore(moment(fromDate))) {
-      setToDate('');
-      Swal.fire("To Date cannot be earlier than From Date.");
-      return;
-    }
+  //   // if (category !== 'All') {
+  //   //   filtered = filtered.filter(
+  //   //     (item) => item.category?.toLowerCase() === category.toLowerCase()
+  //   //   );
+  //   // }
 
-    // if (category !== 'All') {
-    //   filtered = filtered.filter(
-    //     (item) => item.category?.toLowerCase() === category.toLowerCase()
-    //   );
-    // }
+  //   if (fromDate) {
+  //     const from = moment(fromDate).startOf('day');
+  //     filtered = filtered.filter((item) =>
+  //       moment(item.created).isSameOrAfter(from)
+  //     );
+  //   }
 
-    if (fromDate) {
-      const from = moment(fromDate).startOf('day');
-      filtered = filtered.filter((item) =>
-        moment(item.created).isSameOrAfter(from)
-      );
-    }
+  //   if (toDate) {
+  //     const to = moment(toDate).endOf('day');
+  //     filtered = filtered.filter((item) =>
+  //       moment(item.created).isSameOrBefore(to)
+  //     );
+  //   }
 
-    if (toDate) {
-      const to = moment(toDate).endOf('day');
-      filtered = filtered.filter((item) =>
-        moment(item.created).isSameOrBefore(to)
-      );
-    }
+  //   // 🔸 Search filter
+  //   if (searchTerm.trim() !== '') {
+  //     const term = searchTerm.toLowerCase();
+  //     filtered = filtered.filter(
+  //       (item) =>
+  //         item.title?.toLowerCase().includes(term) ||
+  //         item.description?.toLowerCase().includes(term) ||
+  //         item.author?.toLowerCase().includes(term) ||
+  //         item.department?.toLowerCase().includes(term)
+  //     );
+  //   }
 
-    // 🔸 Search filter
-    if (searchTerm.trim() !== '') {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(term) ||
-          item.description?.toLowerCase().includes(term) ||
-          item.author?.toLowerCase().includes(term) ||
-          item.department?.toLowerCase().includes(term)
-      );
-    }
-
-    setNewsItems(filtered);
-  }, [fromDate, toDate, allNews, searchTerm]);
+  //   setNewsItems(filtered);
+  // }, [fromDate, toDate, allNews, searchTerm]);
 
   const Breadcrumb = [
 
@@ -272,22 +360,129 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
 
   ];
 
+  // const fetchMoreNews = async () => {
+  //   if (!hasMore) return;
+  //   setLoading(true);
+
+  //   try {
+  //     // Get last item ID from the current list
+  //     const lastItemId = newsItems[newsItems.length - 1]?.id;
+
+  //     const items = await sp.web.lists
+  //       .getByTitle("AnnouncementAndNews")
+  //       .items
+  //       .select(
+  //         "Id",
+  //         "Title",
+  //         "Description",
+  //         "Category",
+  //         "Department/DepartmentName",
+  //         "Department/Id",
+  //         "Overview",
+  //         "Created",
+  //         "Author/Title",
+  //         "Author/Id",
+  //         "Author/EMail",
+  //         "AnnouncementandNewsImageID/ID"
+  //       )
+  //       .expand("Department,Author,AnnouncementandNewsImageID")
+  //       .filter(`SourceType eq 'Announcements' and ID lt ${lastItemId}`) // ✅ Older items only
+  //       .orderBy("Id", false)
+  //       .top(pageSize)();
+
+  //     if (items.length === 0) {
+  //       setHasMore(false);
+  //       return;
+  //     }
+
+  //     // 🔹 Use Promise.all to wait for image fetch for each news item
+  //     const formatted = await Promise.all(
+  //       items.map(async (item: any, index: number) => {
+  //         const imageIds =
+  //           item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+  //         const imageLinks = imageIds.length > 0
+  //           ? await getDocumentLinkByID(imageIds)
+  //           : [];
+
+  //         return {
+  //           id: item.Id,
+  //           sno: index + 1,
+  //           title: item.Title,
+  //           description: item.Description,
+  //           department: item.Department?.DepartmentName || "",
+  //           departmentId: item.Department?.Id || null,
+  //           category: item.Category || "",
+  //           overview: item.Overview || "",
+  //           created: new Date(item.Created),
+  //           author: item.Author?.Title,
+  //           images: imageLinks.map((img: any) => ({
+  //             name: img.FileLeafRef,
+  //             url: img.FileRef,
+  //           })),
+  //         };
+  //       })
+  //     );
+
+  //     setNewsItems((prev) => [...prev, ...formatted]);
+  //     setAllNews((prev) => [...prev, ...formatted]);
+  //     if (items.length < pageSize) setHasMore(false);
+  //   } catch (err) {
+  //     console.error("Error fetching more news:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  // 🔹 Apply filters whenever category/fromDate/toDate changes
+  const handleLoadMore = () => {
+    // fetchNews(true); // load next set of 10 items
+    fetchMoreNews();
+  };
+
   const fetchMoreNews = async () => {
     if (!hasMore) return;
     setLoading(true);
+    pageSize += 10;
+    setpageSize(pageSize);
+    setitemLimit(pageSize);
 
     try {
       // Get last item ID from the current list
+
       const lastItemId = newsItems[newsItems.length - 1]?.id;
+      let filterQuery = `SourceType eq 'Announcements' and ID lt ${lastItemId}`;
+
+      // 🔹 Apply category filter directly in the SharePoint query if not 'All'
+      // if (category && category !== "All") {
+
+      //     filterQuery += ` and Category eq '${category}'`;
+      // }
+      // 🔹 Apply From Date filter
+      if (fromDate) {
+        const from = new Date(fromDate).toISOString();
+        filterQuery += ` and Created ge datetime'${from}'`;
+      }
+
+      // 🔹 Apply To Date filter
+      if (toDate) {
+        const to = new Date(toDate).toISOString();
+        filterQuery += ` and Created le datetime'${to}'`;
+      }
+
+      if (searchTerm.trim() !== '') {
+        const search = searchTerm.replace(/'/g, "''");
+        filterQuery += ` and (substringof('${search}', Title))`;
+      }
 
       const items = await sp.web.lists
         .getByTitle("AnnouncementAndNews")
         .items
-        .select(
-          "Id",
+        .select("Id",
           "Title",
           "Description",
-          "Category",
+          "AnnouncementCategory/Category",
           "Department/DepartmentName",
           "Department/Id",
           "Overview",
@@ -297,10 +492,134 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
           "Author/EMail",
           "AnnouncementandNewsImageID/ID"
         )
-        .expand("Department,Author,AnnouncementandNewsImageID")
-        .filter(`SourceType eq 'Announcements' and ID lt ${lastItemId}`) // ✅ Older items only
+        .expand("Department,Author,AnnouncementandNewsImageID,AnnouncementCategory")
+        // .filter(`SourceType eq 'News' and ID lt ${lastItemId}`) // ✅ Older items only
+        .filter(filterQuery)
         .orderBy("Id", false)
-        .top(pageSize)();
+        .top(loadItemSize)();
+
+      if (items.length === 0) {
+        setHasMore(false);
+        // pageSize += 10;
+        // setpageSize(pageSize);
+        // setitemLimit(pageSize);
+        return;
+      }
+
+      // 🔹 Use Promise.all to wait for image fetch for each news item
+      const formatted = await Promise.all(
+        items.map(async (item: any, index: number) => {
+          const imageIds =
+            item.AnnouncementandNewsImageID?.map((img: any) => img.ID) || [];
+
+          const imageLinks = imageIds.length > 0
+            ? await getDocumentLinkByID(imageIds)
+            : [];
+
+          return {
+            id: item.Id,
+            sno: index + 1,
+            title: item.Title,
+            description: item.Description,
+            department: item.Department?.DepartmentName || "",
+            departmentId: item.Department?.Id || null,
+            category: item?.AnnouncementCategory?.Category || "",
+            overview: item.Overview || "",
+            created: new Date(item.Created),
+            author: item.Author?.Title,
+            images: imageLinks.map((img: any) => ({
+              name: img.FileLeafRef,
+              url: img.FileRef,
+            })),
+          };
+        })
+      );
+
+      setNewsItems((prev) => [...prev, ...formatted]);
+      // setAllNews((prev) => [...prev, ...formatted]);
+      // if (items.length < pageSize) setHasMore(false);
+      var newPageSize = pageSize;
+      if ((items.length + newsItems.length) > newPageSize) {
+
+        // setpageSize(pageSize);
+        setHasMore(true);
+      }
+      else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Error fetching more news:", err);
+    } finally {
+      // pageSize += 10;
+      // setpageSize(pageSize);
+      // setitemLimit(pageSize);
+      setLoading(false);
+    }
+  };
+
+  const fetchMoreOnFilter = async () => {
+    // if (!hasMore) return;
+    setLoading(true);
+    setHasMore(false);
+    pageSize = 10;
+    setpageSize(pageSize);
+    setitemLimit(pageSize);
+
+    try {
+      // Get last item ID from the current list
+
+      // const lastItemId = newsItems[newsItems.length - 1]?.id;
+      // let filterQuery = `SourceType eq 'News' and ID lt ${lastItemId}`;
+      let filterQuery = `SourceType eq 'Announcements'`;
+
+      // 🔹 Apply category filter directly in the SharePoint query if not 'All'
+      // if (category && category !== "All") {
+
+      //     filterQuery += ` and Category eq '${category}'`;
+      // }
+
+      // 🔹 Apply From Date filter
+      if (fromDate) {
+        const from = new Date(fromDate).toISOString();
+        filterQuery += ` and Created ge datetime'${from}'`;
+      }
+
+      // 🔹 Apply To Date filter
+      if (toDate) {
+        const to = new Date(toDate).toISOString();
+        filterQuery += ` and Created le datetime'${to}'`;
+      }
+
+      if (searchTerm.trim() !== '') {
+        const search = searchTerm.replace(/'/g, "''");
+                filterQuery += ` and (substringof('${search}', Title))`;
+
+        // filterQuery += ` and (substringof('${search}', Title) or substringof('${search}', AnnouncementCategory/Category))`;
+      }
+
+
+
+      const items = await sp.web.lists
+        .getByTitle("AnnouncementAndNews")
+        .items
+        .select("Id",
+          "Title",
+          "Description",
+          "AnnouncementCategory/Category",
+          "Department/DepartmentName",
+          "Department/Id",
+          "Overview",
+          "Created",
+          "Author/Title",
+          "Author/Id",
+          "Author/EMail",
+          "AnnouncementandNewsImageID/ID"
+        )
+        .expand("Department,Author,AnnouncementandNewsImageID,AnnouncementCategory")
+        // .filter(`SourceType eq 'News' and ID lt ${lastItemId}`) // ✅ Older items only
+        .filter(filterQuery)
+        .orderBy("Id", false)
+        .top(loadItemSize)();
 
       if (items.length === 0) {
         setHasMore(false);
@@ -324,7 +643,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
             description: item.Description,
             department: item.Department?.DepartmentName || "",
             departmentId: item.Department?.Id || null,
-            category: item.Category || "",
+            category: item?.AnnouncementCategory?.Category || "",
             overview: item.Overview || "",
             created: new Date(item.Created),
             author: item.Author?.Title,
@@ -336,21 +655,29 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         })
       );
 
-      setNewsItems((prev) => [...prev, ...formatted]);
-      setAllNews((prev) => [...prev, ...formatted]);
-      if (items.length < pageSize) setHasMore(false);
+      // setNewsItems((prev) => [...prev, ...formatted]);
+      // setAllNews((prev) => [...prev, ...formatted]);
+      // if (items.length < pageSize) setHasMore(false);
+      setNewsItems(formatted);
+      // setAllNews(formatted);
+      // if (items.length < pageSize) setHasMore(false);
+      var newPageSize = pageSize;
+      if (items.length > newPageSize) {
+
+        // setpageSize(pageSize);
+        setHasMore(true);
+      }
+      else {
+        setHasMore(false);
+      }
     } catch (err) {
       console.error("Error fetching more news:", err);
     } finally {
+      // pageSize += 10;
+      // setpageSize(pageSize);
+      // setitemLimit(pageSize);
       setLoading(false);
     }
-  };
-
-
-  // 🔹 Apply filters whenever category/fromDate/toDate changes
-  const handleLoadMore = () => {
-    // fetchNews(true); // load next set of 10 items
-    fetchMoreNews();
   };
 
   return (
@@ -434,7 +761,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         <p className="text-center text-muted mt-4">No announcement found.</p>
       )}
 
-      {newsItems.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
+      {latestNews?.slice(0, 1).map((item, index) => (<div className="row mt-2" key={item.id}>
         <div className="col-lg-5">
           {/* <div className="imagemani mt-2 me-2">
                         <img src={require("../../../assets/Banner1.png")} data-themekey="#" />
@@ -499,7 +826,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
       </div>))}
       <div className="tab-content mt-4">
         <div className="tab-pane show active" id="home1">
-          {newsItems.map((item, index) => (
+          {newsItems?.slice(0, itemLimit).map((item, index) => (
             <div className="card mb-2">
               <div className="card-body">
                 <div className="row align-items-start">
@@ -512,7 +839,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                                             <img className="d-flex align-self-center me-3 w-100" src={require("../../../assets/Banner1.png")} alt="Generic placeholder image" />
 
                                         </div> */}
-                    {item.images.slice(0, 1).map((img: any, index: number) => (
+                    {item?.images?.slice(0, 1).map((img: any, index: number) => (
                       <div key={index} className="imagehright">
                         <img className="d-flex align-self-center me-3 w-100" src={img.url} alt={img.name || `image-${index}`} data-themekey="#" />
                       </div>
@@ -521,7 +848,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                   </div>
                   <div className="col-sm-9">
                     <div className="row">
-                      <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item.created).local().format("DD MMM YYYY")}</span>  &nbsp;  <span style={{ "color": "#009157", "fontWeight": 600 }}>  | &nbsp;&nbsp;{item.category} </span> </div>
+                      <div className="col-sm-3"> <span style={{ "marginTop": "2px" }} className="date-color font-12 float-start  mb-1 ng-binding"><Calendar className="fe-calendar" /> {moment.utc(item?.created).local().format("DD MMM YYYY")}</span>  &nbsp;  <span style={{ "color": "#009157", "fontWeight": 600 }}>  | &nbsp;&nbsp;{item?.category} </span> </div>
 
                     </div>
                     {/* <a href="javascript:void(0)"> */}
@@ -529,8 +856,8 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
                       sessionStorage.setItem("selectedNewsItem", JSON.stringify(item));
                       sessionStorage.setItem("showNewsDetails", "true"); navigate("/AnnouncementsDetails");
                     }} style={{ cursor: 'pointer' }}>
-                      <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding two-line-one">{item.title}</h4>
-                      <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding two-line-trim">{item.description}</p>
+                      <h4 className="mt-0 mb-1 font-16 text-dark fw-bold ng-binding two-line-one">{item?.title}</h4>
+                      <p style={{ "color": "#6b6b6b" }} className="mb-2 font-14 ng-binding two-line-trim">{item?.description}</p>
                       <p className="read-more">Read more..</p>
                     </div> {/* </a> */}
 
@@ -622,7 +949,7 @@ const AnnouncementListing = ({ setLoading }: IMyListingProps) => {
         }  */}
 
 
-        {hasMore && newsItems.length && (
+        {hasMore && newsItems.length > 0 && (
           <div style={{ textAlign: "center", display: "block" }}>
             <button
               className="btn btn-primary btn-sm"

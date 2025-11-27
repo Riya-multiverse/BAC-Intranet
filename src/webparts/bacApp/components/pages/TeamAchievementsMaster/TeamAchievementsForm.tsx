@@ -202,7 +202,7 @@ const TeamAchievements = ({
         <div className="col-lg-8">
           <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
-              <a href="javascript:void(0)">
+              {/* <a href="javascript:void(0)">
                 {" "}
                 <button
                   type="button"
@@ -219,7 +219,7 @@ const TeamAchievements = ({
                 >
                   <i className="fe-plus-circle me-1"></i>Add
                 </button>
-              </a>
+              </a> */}
             </form>
           </div>
         </div>

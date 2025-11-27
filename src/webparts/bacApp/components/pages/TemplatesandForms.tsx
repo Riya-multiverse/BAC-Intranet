@@ -24,6 +24,11 @@ const Breadcrumb = [
 const TemplateandForms = () => {
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const pageSize = 10;
+  const [visibleTemplates, setVisibleTemplates] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
+
 
   //file size
   const formatSize = (bytes: number | null | undefined): string => {
@@ -168,6 +173,10 @@ const TemplateandForms = () => {
           })
         );
         setTemplates(mappedItems);
+        setVisibleTemplates(mappedItems.slice(0, pageSize));
+        setHasMore(mappedItems.length > pageSize);
+        setPage(1);
+
       } catch (error: any) {
       } finally {
         setLoading(false);
@@ -176,6 +185,24 @@ const TemplateandForms = () => {
 
     fetchTemplatesAndForms();
   }, []);
+
+  const loadMore = () => {
+    const next = page + 1;
+    const start = (next - 1) * pageSize;
+    const end = next * pageSize;
+
+    setVisibleTemplates(prev => [
+      ...prev,
+      ...templates.slice(start, end)
+    ]);
+
+    setPage(next);
+
+    if (end >= templates.length) {
+      setHasMore(false);
+    }
+  };
+
 
   return (
     <div className="row">
@@ -214,7 +241,7 @@ const TemplateandForms = () => {
             <main>
               <div className="cards">
                 {templates &&
-                  templates.map((item: any, index: number) => (
+                  visibleTemplates.map((item: any, index: number) => (
                     <div className="card text-center mb-0" key={index}>
                      <div className="card-body">
                       {item.IconUrl ? (
@@ -274,6 +301,23 @@ const TemplateandForms = () => {
                     </div>
                   ))}
               </div>
+              {hasMore && (
+                <div style={{ textAlign: "center" }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    style={{
+                                padding: "7px 15px",
+                                // backgroundColor: "#ff8200",
+                                fontSize: "17px",
+                                width: "120px",
+                                marginTop: "10px",
+                            }}
+                    onClick={loadMore}
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
             </main>
           )}
         </div>

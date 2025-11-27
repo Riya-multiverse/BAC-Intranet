@@ -219,7 +219,7 @@ const FaqForm = ({ item, onCancel, onSave ,setLoading}: IFaqFormProps) => {
                         </div>
                         {/* // <!-- end page title --></> */}
 
-     <div className="tab-content mt-3">
+     <div className="tab-content mt-0">
                   
 
                         <div className="tab-pane show active" id="profile1" role="tabpanel">

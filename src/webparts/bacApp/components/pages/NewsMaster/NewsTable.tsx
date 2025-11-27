@@ -264,7 +264,7 @@ const NewsTable = ({ onAdd, onEdit, setLoading }: INewsTableProps) => {
           <CustomBreadcrumb Breadcrumb={Breadcrumb} />
         </div>
         <div className="col-lg-8">
-          <div className="d-flex flex-wrap align-items-center justify-content-end mt-3">
+          <div className="d-flex flex-wrap align-items-center justify-content-end mt-1">
             <form className="d-flex flex-wrap align-items-center justify-content-start ng-pristine ng-valid">
               {/* <button
                 type="button"
@@ -300,7 +300,7 @@ const NewsTable = ({ onAdd, onEdit, setLoading }: INewsTableProps) => {
       </div>
       {/* <!-- end page title --> */}
 
-      <div className="tab-content mt-3">
+      <div className="tab-content mt-0">
         <div className="tab-pane show active" id="profile1" role="tabpanel">
           <div className="card">
             <div className="card-body">

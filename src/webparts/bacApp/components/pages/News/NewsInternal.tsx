@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import CommentsCard from '../../common/CommentsCard';
 import { useLocation } from 'react-router-dom';
 import { APP_URL } from '../../../../../Shared/Constant';
+
 const NewsInternal = () => {
     const sp: SPFI = getSP();
     const location = useLocation();
@@ -18,6 +19,10 @@ const NewsInternal = () => {
     const [comments, setComments] = React.useState<any[]>([]);
     const [liked, setLiked] = React.useState(false);
     const [commentText, setCommentText] = React.useState("");
+    const [loadItemSize, setloadItemSize] = React.useState<number>(11);
+    const [hasMore, setHasMore] = React.useState<boolean>(false);
+    let [pageSize, setpageSize] = React.useState<number>(10);
+    const [Loading, setLoading] = React.useState(false);
     const [item, setEditItem] = React.useState<any>(null);
     const Breadcrumb = [
 
@@ -57,7 +62,7 @@ const NewsInternal = () => {
 
         if (savedItem && showDetail) {
             setEditItem(JSON.parse(savedItem));
-           
+
             fetchComments(JSON.parse(savedItem));
         }
         const hash = window.location.hash; // e.g. "#/NewsDetails?newsId=44"
@@ -173,7 +178,6 @@ const NewsInternal = () => {
     //         fetchComments();
     //     }, [item.id]);
 
-
     const fetchComments = async (item: any) => {
         try {
             const items = await sp.web.lists
@@ -181,24 +185,118 @@ const NewsInternal = () => {
                 .items.select("ID", "CommentText", "Created", "Author/Title,Author/EMail,Author/ID", "ParentCommentID/ID")
                 .expand("Author", "ParentCommentID")
                 .filter(`NewsID eq ${item.id}`)
-                .orderBy("Created", false)();
+                .orderBy("Created", false).top(4999)();
+            // .orderBy("Created", false).top(loadItemSize)();
 
             // Separate main comments and replies
-            const mainComments = items.filter((i) => !i.ParentCommentID);
-            const replies = items.filter((i) => i.ParentCommentID);
-            const currentUser = await sp.web.currentUser();
-            setCurrentUser(currentUser);
-            // Group replies under parent
-            const nestedComments = mainComments.map((c) => ({
-                ...c,
-                Replies: replies.filter((r) => r.ParentCommentID?.ID === c.ID),
-            }));
+            if (items.length) {
+                const mainComments = items.filter((i) => !i.ParentCommentID);
+                const replies = items.filter((i) => i.ParentCommentID);
+                const currentUser = await sp.web.currentUser();
+                setCurrentUser(currentUser);
+                // Group replies under parent
+                const nestedComments = mainComments.map((c) => ({
+                    ...c,
+                    Replies: replies.filter((r) => r.ParentCommentID?.ID === c.ID),
+                }));
 
-            setComments(nestedComments);
+
+                setComments(nestedComments);
+
+            }
+
         } catch (err) {
             console.error("Error fetching comments:", err);
         }
     };
+
+    // const fetchComments = async (item: any) => {
+    //     try {
+    //         const items = await sp.web.lists
+    //             .getByTitle("NewsandAnnouncementComments")
+    //             .items.select("ID", "CommentText", "Created", "Author/Title,Author/EMail,Author/ID", "ParentCommentID/ID")
+    //             .expand("Author", "ParentCommentID")
+    //             .filter(`NewsID eq ${item.id}`)
+    //              .orderBy("Created", false).top(loadItemSize)();
+    //             // .orderBy("Created", false).top(loadItemSize)();
+
+    //         // Separate main comments and replies
+    //         const mainComments = items.filter((i) => !i.ParentCommentID);
+    //         const replies = items.filter((i) => i.ParentCommentID);
+    //         const currentUser = await sp.web.currentUser();
+    //         setCurrentUser(currentUser);
+    //         // Group replies under parent
+    //         const nestedComments = mainComments.map((c) => ({
+    //             ...c,
+    //             Replies: replies.filter((r) => r.ParentCommentID?.ID === c.ID),
+    //         }));
+    //         var newPageSize = pageSize;
+
+    //         if (nestedComments.length > newPageSize) {
+
+    //             // setpageSize(pageSize);
+    //             setHasMore(true);
+
+    //         }
+    //         else {
+    //             setHasMore(false);
+    //         }
+
+    //         setComments(nestedComments);
+    //     } catch (err) {
+    //         console.error("Error fetching comments:", err);
+    //     }
+    // };
+
+    // const fetchCommentsMore = async () => {
+    //     setLoading(true);
+    //     setHasMore(false);
+    //     pageSize += 10;
+    //     setpageSize(pageSize);
+    //     // setitemLimit(pageSize);
+    //     try {
+    //          const lastItemId = comments[comments.length - 1]?.Id;
+    //          let filterQuery = `NewsID eq ${item.id} and ID lt ${lastItemId}`;
+    //         const items = await sp.web.lists
+    //             .getByTitle("NewsandAnnouncementComments")
+    //             .items.select("ID", "CommentText", "Created", "Author/Title,Author/EMail,Author/ID", "ParentCommentID/ID")
+    //             .expand("Author", "ParentCommentID")
+    //             // .filter(`NewsID eq ${item.id}`)
+    //             .filter(filterQuery)
+    //             .orderBy("Created", false).top(loadItemSize)();
+
+    //         // Separate main comments and replies
+    //         const mainComments = items.filter((i) => !i.ParentCommentID);
+    //         const replies = items.filter((i) => i.ParentCommentID);
+    //         const currentUser = await sp.web.currentUser();
+    //         setCurrentUser(currentUser);
+    //         // Group replies under parent
+    //         const nestedComments = mainComments.map((c) => ({
+    //             ...c,
+    //             Replies: replies.filter((r) => r.ParentCommentID?.ID === c.ID),
+    //         }));
+
+    //         // setComments(nestedComments);
+    //         setComments((prev) => [...prev, ...nestedComments]);
+
+    //         var newPageSize = pageSize;
+
+    //         if ((comments.length + nestedComments.length) > newPageSize) {
+
+    //             // setpageSize(pageSize);
+    //             setHasMore(true);
+
+    //         }
+    //         else {
+    //             setHasMore(false);
+    //         }
+    //     } catch (err) {
+    //         console.error("Error fetching comments:", err);
+    //     }
+    //     finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const submitComment = async () => {
         if (!commentText.trim()) return;
@@ -274,9 +372,28 @@ const NewsInternal = () => {
     else {
         return (
             <>
+                {Loading && (
+                    <div className="loadernewadd mt-10">
+                        <div>
+                            <img
+                                src={require("../../../assets/BAC_loader.gif")}
+                                className="alignrightl"
+                                alt="Loading..."
+                            />
+                        </div>
+                        <span>Loading </span>{" "}
+                        <span>
+                            <img
+                                src={require("../../../assets/edcnew.gif")}
+                                className="alignrightl"
+                                alt="Loading..."
+                            />
+                        </span>
+                    </div>
+                )}
                 <div className="row">
                     <div className="col-lg-2">
-                      
+
                         <CustomBreadcrumb Breadcrumb={Breadcrumb} />
                     </div>
 
@@ -416,6 +533,27 @@ const NewsInternal = () => {
 
 
                     </div>
+
+                    {/* {hasMore && comments.length > 0 && (
+                        <div style={{ textAlign: "center", display: "block" }}>
+                            <button
+                                className="btn btn-primary btn-sm"
+                                style={{
+                                    padding: "7px 15px",
+                                    // backgroundColor: "#ff8200",
+                                    fontSize: "17px",
+                                    width: "120px",
+                                    marginTop: "10px",
+                                }}
+                                type="button"
+                                onClick={fetchCommentsMore}
+                           
+                            >
+                               
+                                Load More
+                            </button>
+                        </div>
+                    )} */}
                 </div>
 
                 {/*  */}

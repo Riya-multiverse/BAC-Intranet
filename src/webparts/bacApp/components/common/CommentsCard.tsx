@@ -218,7 +218,7 @@ const CommentsCard = ({ newsId, comments }: INewsCommentsProps) => {
                                         src={profilePicUrl}
                                         alt="User"
                                     />
-                                    <div className="w-100  mt-0">
+                                    <div className="w-100  mt-0" style={{paddingLeft: "45px;"}}>
                                         <h5 className="mt-0  mb-0">
                                             <a href="#" className="text-dark fw-bold font-14">
                                                 {comment.Author?.Title}

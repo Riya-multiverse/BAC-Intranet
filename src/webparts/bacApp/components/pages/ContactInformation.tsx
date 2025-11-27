@@ -38,6 +38,11 @@ const ContactInformation = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const sp: SPFI = getSP();
   const [userInfoList, setuserInfoList] = useState<any[]>([]);
+  const pageSize = 10;
+  const [visibleUsers, setVisibleUsers] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
+
 
   // Fetch all users from SharePoint + their phones from User Profile Service
   const fetchAllUsers = async () => {
@@ -123,6 +128,9 @@ const ContactInformation = () => {
 
       console.log("User Information List items:", items);
       setuserInfoList(items);
+      setVisibleUsers(items.slice(0, pageSize));
+      setHasMore(items.length > pageSize);
+      setPage(1);
       // return items;
     } catch (error) {
       console.error("Error fetching User Information List:", error);
@@ -140,6 +148,17 @@ const ContactInformation = () => {
     getUserInformationList();
     setLoading(false);
   }, []);
+
+  const loadMore = () => {
+    const next = page + 1;
+    const start = (next - 1) * pageSize;
+    const end = next * pageSize;
+
+    setVisibleUsers(prev => [...prev, ...userInfoList.slice(start, end)]);
+    setPage(next);
+
+    if (end >= userInfoList.length) setHasMore(false);
+  };
 
   return (
     <div className="row">
@@ -174,7 +193,7 @@ const ContactInformation = () => {
                   {userInfoList.length === 0 ? (
                     <p>No users found.</p>
                   ) : (
-                    userInfoList.map((user) => {
+                    visibleUsers.map((user) => {
                       const imageUrl = `/_layouts/15/userphoto.aspx?size=L&accountname=${user.EMail}`;
                       return (
                         <div className="card" key={user.Id}>
@@ -199,6 +218,24 @@ const ContactInformation = () => {
                     })
                   )}
                 </div>
+                {hasMore && (
+                  <div style={{ textAlign: "center" }}>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      style={{
+                                padding: "7px 15px",
+                                // backgroundColor: "#ff8200",
+                                fontSize: "17px",
+                                width: "120px",
+                                marginTop: "10px",
+                            }}
+                      onClick={loadMore}
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
+
               </div>
 
               // </div>

@@ -880,7 +880,7 @@ const dashboard = () => {
                                                                 className="d-block img-fluid"
                                                             />
                                                             <div className="carousel-caption d-none d-md-block ">
-                                                                <p className="font-18 mb-1 mt-1 ps-4 pe-4 py-0 two-line-trim">
+                                                                <p style={{display:"block"}} className="font-18 mb-1 mt-1 ps-4 pe-4 py-0 two-line-trim">
                                                                     {banner.Title}
                                                                 </p>
                                                             </div>

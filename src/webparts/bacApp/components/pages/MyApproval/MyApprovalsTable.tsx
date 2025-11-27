@@ -582,12 +582,12 @@ const MyApprovalsTable = ({ onAdd, onEdit, setLoading }: ITemplateTableProps) =>
                           </td>
 
                           {/* Requested On */}
-                          <td style={{ minWidth: "140px", maxWidth: "180px" }}>
+                          <td style={{ minWidth: "140px", maxWidth: "180px",textAlign:'center' }}>
                             {requestedOnStr}
                           </td>
 
                           {/* Status */}
-                          <td style={{ minWidth: "120px", maxWidth: "120px" }}>
+                          <td style={{ minWidth: "120px", maxWidth: "120px",textAlign:'center' }}>
                           <div className="finish mb-0">  {item.Status}</div>     
                           </td>
 
